@@ -1,6 +1,7 @@
 "# Project-350" 
 "# Project-350" 
 App Features:
+
 1.Itinerary Generation – Creates personalized travel plans with transport, hotels, meal recommendations, and cost breakdowns.
 2.Integrated Map – Displays key tourist locations, directions, and filters for activities, restaurants, and services.
 3.Weather Forecasts – Provides a 7-day forecast, severe weather alerts, and packing suggestions.
