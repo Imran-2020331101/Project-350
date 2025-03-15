@@ -1,1 +1,0 @@
-//checking whether the folder is connected or not
