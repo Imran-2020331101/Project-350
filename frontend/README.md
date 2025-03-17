@@ -7,14 +7,18 @@ To run this project locally:
 ```bash
 git clone https://github.com/Imran-2020331101/Project-350
 ```
+### 2. go to the frontend folder
 
-### 2. Install the necessary dependencies:
+```bash
+cd Project-350/frontend
+```
+### 3. Install the necessary dependencies:
 
 ```bash
 npm install
 ```
 
-### 3. Start the development server:
+### 4. Start the development server:
 
 Run the following command to start the server:
 
