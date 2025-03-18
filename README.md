@@ -38,9 +38,6 @@
 ### 🎭 Local Event Finder  
 - Recommends festivals, concerts, and cultural events based on travel dates.
 
-### 🔍 AR Travel Guide  
-- Augmented Reality feature to scan landmarks and get historical or cultural information.
-
 ## Get Started
 1. **Install the app** – Download and set up the application on your device.
 2. **Sign up/Login** – Create an account or log in to access features.
