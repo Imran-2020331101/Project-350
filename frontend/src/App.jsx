@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import Home from './pages/home'
 import { Route, Routes} from 'react-router-dom'
 import ParentLayout from './components/parentLayout'
@@ -14,7 +13,7 @@ import ImageUpload from "./components/ImageUpload";
 import Logout from './components/logout'
 
 function App() {
-git 
+
   return (
     <Routes>
       <Route path='/' element={<ParentLayout/>} >
