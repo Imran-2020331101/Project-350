@@ -8,8 +8,8 @@ const MapComponent = ({ places, type }) => {
         lng: places[0].location.lng,
     };
     const mapStyles = {
-        height: "50vh",
-        width: "50%",
+        height: "70vh",
+        width: "100%",
     };
     const handleMarkerClick = (place) => {
         // alert(`Hotel: ${place.name}`);

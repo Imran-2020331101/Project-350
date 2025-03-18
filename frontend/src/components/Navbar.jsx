@@ -21,7 +21,7 @@ const Navbar = () => {
       {/* Desktop Navigation */}
       <div className="hidden md:flex space-x-6">
         <Link className="text-lg font-semibold" to="/">Home</Link>
-        <Link className="text-lg font-semibold" to="/blogs">Blogs</Link>
+        <Link className="text-lg font-semibold" to="/blog">Blogs</Link>
         <Link className="text-lg font-semibold" to="/hotels">Hotels</Link>
       </div>
 
