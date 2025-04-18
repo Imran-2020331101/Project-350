@@ -21,10 +21,7 @@ import BlogCard from './blogCard';
 
 const Experiences = () => {
   return (
-    <div className="fixed w-[70%] right-0 h-full flex flex-col items-start px-10 py-6 overflow-y-auto gap-6">
-      
-      {/* Heading */}
-      <h1 className="text-3xl font-semibold text-gray-800">Save your memories</h1>
+    <div className="fixed w-[70%] right-0 h-full flex flex-col items-start px-10 py-6 overflow-y-auto gap-3">
 
       {/* Action Buttons */}
       <div className="flex gap-4">
@@ -40,6 +37,7 @@ const Experiences = () => {
       </div>
 
       {/* Image Gallery */}
+      <h1 className="text-3xl font-semibold text-gray-800">Images</h1>
       <section className="w-full h-[220px] overflow-y-auto flex flex-wrap gap-4 pr-2">
         {Array.from({ length: 9 }).map((_, i) => (
           <ImageCard key={i} />
@@ -48,7 +46,7 @@ const Experiences = () => {
 
       {/* Blog Section */}
       <section className="w-full flex flex-col gap-4">
-        <h2 className="text-xl font-semibold text-gray-800">Your Travel Blog</h2>
+        <h2 className="text-xl font-semibold text-gray-800">Your Travel Blogs</h2>
         <BlogCard />
       </section>
     </div>

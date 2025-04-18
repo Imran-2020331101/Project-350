@@ -32,14 +32,16 @@ const Navbar = () => {
     <nav className="z-50 fixed top-0 left-0 right-0 h-16 backdrop-blur-md flex items-center justify-between px-5 md:px-10">
       {/* Brand Logo */}
       <div className="w-1/4">
-        <img src={img} alt="App logo" className="h-40"/>
+        <Link to="/">
+          <img src={img} alt="App logo" className="h-40"/>
+        </Link>
       </div>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex space-x-6">
         <Link className="text-lg font-semibold" to="/">Home</Link>
         <Link className="text-lg font-semibold" to="/dashboard/blog">Blogs</Link>
-        <Link className="text-lg font-semibold" to="/hotels">Hotels</Link>
+        <Link className="text-lg font-semibold" to="/newtrip">Create trip</Link>
       </div>
 
       {/* Login & Signup (Desktop) */}
