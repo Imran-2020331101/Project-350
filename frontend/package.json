@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.3",
     "@reduxjs/toolkit": "^2.3.0",
+    "@vis.gl/react-google-maps": "^1.5.2",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "lucide-react": "^0.482.0",

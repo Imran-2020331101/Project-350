@@ -5,7 +5,7 @@ import { test } from '../constants'
 
 const Travel = () => {
   return (
-    <div className= 'h-full w-full pt-[60px] flex flex-col justify-start items-center  gap-[30px] pb-[40px]'>
+    <div className= 'h-full w-full pt-5 pr-4 flex flex-col justify-start items-center  gap-[30px] pb-[40px]'>
       <p className='text-2xl font-semibold mb-5'>Destination</p>
       <section className='h-[120px] w-[50%]  flex flex-col justify-between items-center'>
             <p className='text-xl font-semibold'>Weather update</p>
@@ -37,8 +37,9 @@ const Travel = () => {
 
       <p className='text-xl font-semibold mb-[-10px]'>Travel</p>
 
-      <div  className='w-[700px] h-[200px]  overflow-y-scroll flex flex-col justify-start items-center mt-5'>
-        <p className='text-xl font-semibold'>Travel description</p>
+      <div  className='w-full h-full overflow-y-scroll flex flex-col justify-start items-center mt-5'>
+        <p className='text-xl font-semibold'>Places to visit</p>
+        <MapComponent places={test} type={'hotels'}/>
         <p className='text-lg '>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. 
         Unde cumque itaque corrupti reprehenderit suscipit.
@@ -46,12 +47,16 @@ const Travel = () => {
          nam quia excepturi voluptatem cupiditate neque veniam?
         </p>
       </div >
-        <p className='text-xl font-semibold'>Some hotels you can use</p>
+        <p className='text-xl font-semibold'>
+          Some hotels you can use
+          </p>
         <ul className='flex flex-col w-[700px] h-[250px] overflow-y-scroll justify-start items-start gap-2'>
-            {test && test.map((item)=> <li  className='  w-full h-auto'>
+          {test && test.map((item)=> 
+            <li  className='  w-full h-auto' key={item.name}>
                 <p>{item.name}</p>
                 <p>{item.formatted_location}</p>
-            </li>)}
+            </li>
+          )}
         </ul>
         <MapComponent places={test} type={'hotels'}/>
     </div>

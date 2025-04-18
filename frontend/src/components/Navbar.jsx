@@ -1,36 +1,46 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // For responsive menu icons
 import { useSelector } from "react-redux";
+import img from '../assets/logo.png'
+
+/**
+ * Navbar Component
+ * ----------------
+ * A responsive navigation bar that displays:
+ *   - Brand logo on the left
+ *   - Navigation links (Home, Blogs, Hotels)
+ *   - Auth section (Login/Register or Profile Picture)
+ *   - Mobile menu toggle with dropdown and search input
+ *
+ * Features:
+ *   - Responsive: adapts to mobile/desktop views
+ *   - Redux state integration for authentication
+ *   - React Router for navigation
+ *   - Accessible mobile toggle button with aria attributes
+ */
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Extract auth state from Redux
+  const { isSignedIn, user } = useSelector((state) => state.auth);
+  const profilePhotoLink = user?.profilePhoto || "/defaultUser.jpg";
 
-  const isSignedIn = useSelector((state)=> state.auth.isSignedIn)
-
-  const profilePhotoLink = useSelector(
-    (state) => state.auth.user?.profilePhoto || "/defaultUser.jpg"
-  );
   
   return (
     <nav className="z-50 fixed top-0 left-0 right-0 h-16 backdrop-blur-md flex items-center justify-between px-5 md:px-10">
-      {/* Brand Name */}
-      <h1 className="text-2xl md:text-3xl font-bold">OnTheGo</h1>
+      {/* Brand Logo */}
+      <div className="w-1/4">
+        <img src={img} alt="App logo" className="h-40"/>
+      </div>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex space-x-6">
         <Link className="text-lg font-semibold" to="/">Home</Link>
-        <Link className="text-lg font-semibold" to="/blog">Blogs</Link>
+        <Link className="text-lg font-semibold" to="/dashboard/blog">Blogs</Link>
         <Link className="text-lg font-semibold" to="/hotels">Hotels</Link>
       </div>
-
-      {/* Search Bar */}
-      <input 
-        type="text"
-        className="hidden md:block w-64 md:w-80 h-8 border-2 border-gray-600 text-gray-900 rounded-md px-2"
-        placeholder="Search..."
-      />
 
       {/* Login & Signup (Desktop) */}
       <div className="hidden md:flex space-x-5">
@@ -54,11 +64,6 @@ const Navbar = () => {
     <Link className="text-lg font-semibold text-gray-800" to="/">Home</Link>
     <Link className="text-lg font-semibold text-gray-800" to="/blogs">Blogs</Link>
     <Link className="text-lg font-semibold text-gray-800" to="/hotels">Hotels</Link>
-    <input 
-      type="text"
-      className="w-4/5 h-8 border-2 border-gray-600 text-gray-900 rounded-md px-2"
-      placeholder="Search..."
-    />
     {isSignedIn==false ? (
         <>
           <Link className="text-lg font-semibold text-gray-900" to="/login">Log in</Link>

@@ -5,7 +5,30 @@ import { useDispatch } from "react-redux";
 import { allUsers ,  status , addUser} from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
 import {postUsers} from '../redux/authSlice'
- 
+
+/**
+ * Auth Component
+ * --------------
+ * A login interface for authenticating users.
+ * 
+ * Features:
+ * - Accepts user email and password via controlled form inputs.
+ * - Dispatches `postUsers` thunk to authenticate user credentials.
+ * - Navigates to the dashboard if login is successful (based on Redux `status`).
+ * - Uses Redux to access authentication state (`allUsers`, `status`).
+ * - Responsive design with TailwindCSS and form validation.
+ * - Includes navigation back to home or registration page.
+ * 
+ * Dependencies:
+ * - React hooks (`useState`, `useEffect`)
+ * - React Router DOM (`useNavigate`)
+ * - Redux (`useDispatch`, `useSelector`)
+ * 
+ * Note:
+ * - Login result is dependent on the `status` value in the Redux store.
+ * - `postUsers` must correctly update the Redux state for navigation to succeed.
+ */
+
 const Auth = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -26,11 +49,8 @@ const Auth = () => {
         } catch (error) {
             console.log(error.message);
         }
-        
-        
-        // dispatch(addUser(email, password));
-        // console.log( users, currentStatus)
         }
+        
     return (
         <section className="fixed top-0 left-0 backdrop-blur-[7px] h-screen w-full  font-sans z-10">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">

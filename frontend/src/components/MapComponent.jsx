@@ -1,8 +1,15 @@
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
 
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 const MapComponent = ({ places, type }) => {
+    console.log(places);
+
+    // const { isLoaded } = useJsApiLoader({
+    //     id: 'google-map-script',
+    //     googleMapsApiKey: 'YOUR_API_KEY',
+    //   })
+
     const defaultCenter = {
         lat: places[0].location.lat,
         lng: places[0].location.lng,
