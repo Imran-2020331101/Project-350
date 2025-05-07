@@ -29,18 +29,12 @@ const UserProfile = () => {
       <h2 className="text-2xl font-bold text-gray-800">Name</h2>
 
       {/* Trips Section */}
+      <div className="text-center">
+        <p className="text-xl font-semibold mb-2">Your trips</p>
+      </div>
+      
+      {/* Trip Items */}
       <section className="w-[80%] max-h-[300px] overflow-y-auto flex flex-col items-center gap-4 pb-2">
-        <div className="text-center">
-          <p className="text-xl font-semibold mb-2">Visit your trips</p>
-          <button
-            onClick={() => navigate('/newtrip')}
-            className="w-48 h-10 rounded-xl bg-indigo-600 text-white font-medium shadow hover:bg-indigo-700 transition"
-          >
-            Plan New Trip
-          </button>
-        </div>
-
-        {/* Trip Items */}
         {trips.map((trip, index) => (
           <div
             key={index}

@@ -32,14 +32,16 @@ const Navbar = () => {
     <nav className="z-50 fixed top-0 left-0 right-0 h-16 backdrop-blur-md flex items-center justify-between px-5 md:px-10">
       {/* Brand Logo */}
       <div className="w-1/4">
-        <img src={img} alt="App logo" className="h-40"/>
+        <Link to="/">
+          <img src={img} alt="App logo" className="h-40"/>
+        </Link>
       </div>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex space-x-6">
         <Link className="text-lg font-semibold" to="/">Home</Link>
-        <Link className="text-lg font-semibold" to="/dashboard/blog">Blogs</Link>
-        <Link className="text-lg font-semibold" to="/hotels">Hotels</Link>
+        <Link className="text-lg font-semibold" to="/blog">Blogs</Link>
+        <Link className="text-lg font-semibold" to="/newtrip">Create trip</Link>
       </div>
 
       {/* Login & Signup (Desktop) */}
@@ -60,17 +62,17 @@ const Navbar = () => {
 
       {/* Mobile Navigation Menu */}
       {isOpen && (
-  <div className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center py-5 space-y-4">
-    <Link className="text-lg font-semibold text-gray-800" to="/">Home</Link>
-    <Link className="text-lg font-semibold text-gray-800" to="/blogs">Blogs</Link>
-    <Link className="text-lg font-semibold text-gray-800" to="/hotels">Hotels</Link>
-    {isSignedIn==false ? (
-        <>
-          <Link className="text-lg font-semibold text-gray-900" to="/login">Log in</Link>
-          <Link className="text-lg font-semibold text-gray-900" to="/register">Sign up</Link>
-        </>
-      ):<Link className="text-lg font-semibold text-gray-900" to="/profile">Profile</Link>}
-  </div>
+      <div onClick={() => setIsOpen(!isOpen)} className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center py-5 space-y-4">
+        <Link className="text-lg font-semibold text-gray-800" to="/">Home</Link>
+        <Link className="text-lg font-semibold text-gray-800" to="/blog">Blogs</Link>
+        <Link className="text-lg font-semibold text-gray-800" to="/newTrip">Create trip</Link>
+        {isSignedIn==false ? (
+            <>
+              <Link className="text-lg font-semibold text-gray-900" to="/login">Log in</Link>
+              <Link className="text-lg font-semibold text-gray-900" to="/register">Sign up</Link>
+            </>
+          ):<Link className="text-lg font-semibold text-gray-900" to="/profile">Profile</Link>}
+      </div>
 )}
 
     </nav>

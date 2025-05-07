@@ -5,12 +5,13 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import NewTrip from './components/NewTrip'
 import DashBoardLayout from './pages/usersDashboard'
-import TripDescription from './components/tripDescription'
+// import TripDescription from './components/tripDescription'
 import Itinerary from './components/Itinerary'
-import TravelExperience from './components/travelExperience'
+// import TravelExperience from './components/travelExperience'
 import Blog from './components/blog'
 import ImageUpload from "./components/ImageUpload";
 import Logout from './components/logout'
+import Experiences from './components/experiences'
 
 function App() {
 
@@ -26,9 +27,9 @@ function App() {
         <Route path='uploadimage' element={<ImageUpload/>}/>
         <Route path='logout' element={<Logout/>}/>
         <Route path='dashboard' element={<DashBoardLayout/>}>
-          <Route index element={<TripDescription/>}/> 
+          <Route index element={<Experiences/>}/> 
           <Route path='itinerary' element={<Itinerary/>}/>
-          <Route path='experience' element={<TravelExperience/>}/> 
+          <Route path='experience' element={<Experiences/>}/> 
         </Route>
       </Route>
     </Routes>

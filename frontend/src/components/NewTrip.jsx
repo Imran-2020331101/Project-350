@@ -1,145 +1,145 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { postTrip } from "../redux/tripSlice";
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete'
+import { SelectTravelList, SelectBudgetOptions } from "../DemoInfo/options";
 
 const NewTrip = () => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    const [tripDetails, setTripDetails] = useState({
-        destination: "",
-        days: "",
-        tripBudget: "Budget",
-        selectedOption: "",
-        journeyDate: null,
-        returnDate: null,
-    });
+  const [tripDetails, setTripDetails] = useState({
+    destination: "",
+    days: "",
+    budget: "",
+    persons:""
+  });
 
-    const options = ["cheap", "moderate", "luxury"];
-    const numOfPersons = ["Solo","Couple","Family","Friends"];
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setTripDetails((prev) => ({ ...prev, [name]: value }));
-    };
+  const handleChange = (name,value) => {
+    setTripDetails((prev) => ({ ...prev, [name]: value }));
+    console.log(tripDetails)
+  };
 
-    const handleSubmit = useCallback(() => {
-        const { destination, tripBudget, journeyDate, returnDate } = tripDetails;
-        const source = "User's Location"; // Define `source` (or fetch from user input)
+  const handleSubmit = useCallback(() => {
+    const { destination,days,tripBudget,persons} = tripDetails;
 
-        dispatch(postTrip({ journeyDate, returnDate, destination, startingPoint: source, tripBudget }));
+    dispatch(postTrip({ destination,days,tripBudget,persons}));
 
-        setTripDetails({
-            destination: "",
-            days: "",
-            tripBudget: "Budget",
-            selectedOption: "",
-            journeyDate: null,
-            returnDate: null,
-        });
-    }, [tripDetails, dispatch]);
+    // setTripDetails({
+    //   destination: "",
+    //   days: "",
+    //   tripBudget: "Budget",
+    //   persons:""
+    // });
+  }, [tripDetails, dispatch]);
 
-    return (
-        <section className="fixed top-0 left-0 backdrop-blur-[7px] h-screen w-full font-sans z-10">
-            <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-xl xl:p-0">
-                    <div className="flex justify-end">
-                        <p
-                            onClick={() => navigate("/")}
-                            className="px-4 text-gray-600 text-[20px] cursor-pointer hover:text-gray-900 transition ease-in-out delay-75 hover:-translate-y-1 hover:scale-110 duration-100"
-                        >
-                            ×
-                        </p>
-                    </div>
-                    
-                    {/* Apply text-gray-900 at the wrapper level */}
-                    <div className="m-2 text-gray-900">
-                        <h1 className="font-bold text-xl pb-5">Plan a new trip</h1>
+  return (
+    <section className="fixed top-0 left-0 backdrop-blur-[7px] h-screen w-full font-sans z-10 overflow-auto overflow-y-auto mt-20">
+      <div className="flex flex-col items-center justify-center px-4 py-8 mx-auto md:h-screen">
+        <div className="w-full bg-white rounded-xl shadow-md border sm:max-w-xl p-6 text-gray-900">
+          <div className="flex justify-end">
+            <p
+              onClick={() => navigate(-1)}
+              className="text-xl font-bold text-gray-500 cursor-pointer hover:text-gray-800 transition transform hover:scale-110"
+            >
+              ×
+            </p>
+          </div>
 
-                        {/* Destination Input */}
-                        <div className="mb-4">
-                            <label className="font-semibold text-lg mb-2">
-                                Destination
-                                <input
-                                    className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm"
-                                    name="destination"
-                                    value={tripDetails.destination}
-                                    onChange={handleChange}
-                                    placeholder="Enter destination"
-                                    required
-                                />
-                            </label>
+          <h1 className="text-2xl font-bold mb-6 text-center">Plan a New Trip</h1>
+
+          {/* Destination */}
+          <div className="mb-5">
+            <label className="block text-sm font-medium mb-1">
+              Destination
+            </label>
+            {/* <GooglePlacesAutocomplete
+            apiKey={import.meta.env.GOOGLE_PLACES_API_KEY} 
+            seletcProps={{
+                place,
+                onChange:handleChange}}
+            /> */}
+            <input
+              name="destination"
+              value={tripDetails.destination}
+              onChange={(e)=>handleChange("destination",e.target.value)}
+              placeholder="Enter destination"
+              className="w-full border rounded-lg px-4 py-2 text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
+
+          {/* Days */}
+          <div className="mb-5">
+            <label className="block text-sm font-medium mb-1">
+              Duration (Days)
+            </label>
+            <input
+              name="days"
+              type="number"
+              value={tripDetails.days}
+              onChange={(e)=>handleChange('days',e.target.value)}
+              placeholder="Ex. 5"
+              className="w-full border rounded-lg px-4 py-2 text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
+
+          {/* Budget */}
+          <div className="mb-5">
+            <label className="block text-sm font-medium mb-1">Budget Preference</label>
+            <div className="grid grid-cols-3 gap-5 mt-5">
+
+                {
+                    SelectBudgetOptions.map((item,index)=>(
+                        <div key={index} 
+                            onClick={()=>handleChange('budget',item.title)}
+                            className={`p-4 cursor-pointer border rounded-lg hover:shadow-lg
+                                        ${ tripDetails?.budget == item.title && 'shadow-lg border-black'}
+                                `}>
+                            <h2>{item.icon}</h2>
+                            <h2 className="font-bold text-lg">{item.title}</h2>
+                            <h2 className="text-sm text-gray-500">{item.desc}</h2>
                         </div>
+                    ))
+                }
 
-                        {/* Days Input */}
-                        <div className="mb-4">
-                            <label className="font-semibold text-lg mb-2">
-                                Duration (Days)
-                                <input
-                                    className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md mt-2 px-3 py-2 transition focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm"
-                                    name="days"
-                                    value={tripDetails.days}
-                                    onChange={handleChange}
-                                    placeholder="Ex. 5"
-                                    required
-                                />
-                            </label>
-                        </div>
-
-                        {/* Budget Options (Radio Buttons) */}
-                        <div className="mt-4">
-                            <label className="font-semibold">Budget Preference:</label>
-                            <div className="flex gap-4 mt-2">
-                                {options.map((option, index) => (
-                                    <label key={index} className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            name="selectedOption"
-                                            value={option}
-                                            checked={tripDetails.selectedOption === option}
-                                            onChange={handleChange}
-                                            className="mr-2"
-                                        />
-                                        {option}
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Number of Persons (Radio Buttons) */}
-                        <div className="mt-4">
-                            <label className="font-semibold">Who do you plan on traveling with on your next adventure?</label>
-                            <div className="flex gap-4 mt-2">
-                                {numOfPersons.map((person, index) => (
-                                    <label key={index} className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            name="selectedOption"
-                                            value={person}
-                                            checked={tripDetails.selectedOption === person}
-                                            onChange={handleChange}
-                                            className="mr-2"
-                                        />
-                                        {person}
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {/* Submit Button */}
-                    <button
-                        onClick={handleSubmit}
-                        className="p-2 border text-white font-semibold hover:bg-slate-700 border-gray-200 m-2 rounded-lg bg-slate-500"
-                    >
-                        Create Trip Plan
-                    </button>
-                </div>
             </div>
-        </section>
-    );
+          </div>
+
+          {/* Persons */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-1">Travel Group</label>
+            <div className="grid grid-cols-3 gap-5 mt-5">
+
+                {
+                    SelectTravelList.map((item,index)=>(
+                        <div key={index}
+                            onClick={()=>handleChange('budget',item.people)}
+                            className={`p-4 cursor-pointer border rounded-lg hover:shadow-lg
+                                ${ tripDetails?.persons== item.people && 'shadow-lg border-red-100'}
+                            `}>
+                            <h2>{item.icon}</h2>
+                            <h2 className="font-bold text-lg">{item.title}</h2>
+                            <h2 className="text-sm text-gray-500">{item.desc}</h2>
+                        </div>
+                    ))
+                }
+
+            </div>
+          </div>
+
+          {/* Submit */}
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition shadow-md"
+          >
+            Create Trip Plan
+          </button>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default NewTrip;

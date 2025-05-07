@@ -52,7 +52,7 @@ const ImageUpload = () => {
                     <div className="flex justify-end">
                         <p
                             className="px-4  text-gray-600 text-[20px] cursor-pointer hover:text-gray-900 transition ease-in-out delay-75 hover:-translate-y-1 hover:scale-110 duration-100"
-                            onClick={() => navigate("/")}
+                            onClick={() => navigate(-1)}
                         >
                             x
                         </p>

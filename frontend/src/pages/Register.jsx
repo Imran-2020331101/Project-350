@@ -28,7 +28,7 @@ const Register = () => {
                 <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0">
                     <div
                         className="flex justify-end"
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate(-1)}
                     >
                         <p className="px-4 hover:cursor-pointer text-black">x</p>
                     </div>
