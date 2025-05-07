@@ -35,6 +35,9 @@ const Navbar = () => {
         <Link to="/">
           <img src={img} alt="App logo" className="h-40"/>
         </Link>
+        <Link to="/">
+          <img src={img} alt="App logo" className="h-40"/>
+        </Link>
       </div>
 
       {/* Desktop Navigation */}
