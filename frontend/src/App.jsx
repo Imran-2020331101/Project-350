@@ -9,10 +9,11 @@ import DashBoardLayout from './pages/usersDashboard'
 // import TripDescription from './components/tripDescription'
 import Itinerary from './components/Itinerary'
 // import TravelExperience from './components/travelExperience'
-import Blog from './components/blog'
+import Blog from './components/Blog'
 import ImageUpload from "./components/ImageUpload";
 import Logout from './components/logout'
-import Experiences from './components/experiences'
+import Dashboard from './components/Dashboard'
+import AllBlogs from './pages/AllBlogs'
 
 function App() {
 
@@ -23,14 +24,14 @@ function App() {
         <Route path='login' element={<Login/>}/>
         <Route path='register' element={<Register/>}/>
         <Route path='newtrip' element={<NewTrip/>}/>
-        <Route path='blog' element={<Blog/>}/>
-        <Route path='newtrip' element={<NewTrip/>}/>
         <Route path='uploadimage' element={<ImageUpload/>}/>
         <Route path='logout' element={<Logout/>}/>
+        <Route path='blogs' element={<AllBlogs/>}/>
+        <Route path='blogs/:id' element={<Blog/>}/>
         <Route path='dashboard' element={<DashBoardLayout/>}>
-          <Route index element={<Experiences/>}/> 
+          <Route index element={<Dashboard/>}/> 
           <Route path='itinerary' element={<Itinerary/>}/>
-          <Route path='experience' element={<Experiences/>}/> 
+          <Route path='experience' element={<Dashboard/>}/> 
         </Route>
       </Route>
     </Routes>

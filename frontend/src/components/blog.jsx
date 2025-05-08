@@ -1,57 +1,56 @@
-import React from 'react'
+import React from 'react';
+import { Blogs } from '../DemoInfo/BlogsData';
+import { useParams } from 'react-router-dom';
 
 const Blog = () => {
-  return (
-    <div className='w-screen min-h-screen pt-14  flex flex-col justify-start items-center gap-4 pb-6'>
-      <h1 className='text-3xl font-semibold'>Blog Title</h1>
-      <div className='w-[60%] h-[300px] bg-gray-900'>
-        <p className='text-xl'>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Adipisci eum ipsum excepturi a beatae vitae, quidem eligendi, 
-            reiciendis natus magnam, incidunt iste labore? Voluptas tempore 
-            laudantium mollitia eos explicabo ab!
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Adipisci eum ipsum excepturi a beatae vitae, quidem eligendi, 
-            reiciendis natus magnam, incidunt iste labore? Voluptas tempore 
-            laudantium mollitia eos explicabo ab!
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Adipisci eum ipsum excepturi a beatae vitae, quidem eligendi, 
-            reiciendis natus magnam, incidunt iste labore? Voluptas tempore 
-            laudantium mollitia eos explicabo ab!
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Adipisci eum ipsum excepturi a beatae vitae, quidem eligendi, 
-            reiciendis natus magnam, incidunt iste labore? Voluptas tempore 
-            laudantium mollitia eos explicabo ab!
-        </p>
-      </div>
-      <div className='w-[60%] h-[400px] bg-gray-900'>
-            <img className='w-full h-full' src="https://cdn.pixabay.com/photo/2018/03/20/14/00/sea-3243357_1280.jpg" alt="cox" />
-      </div>
-      <div className='w-[60%] h-[300px] bg-gray-900'>
-            <p className='text-xl'>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Adipisci eum ipsum excepturi a beatae vitae, quidem eligendi, 
-            reiciendis natus magnam, incidunt iste labore? Voluptas tempore 
-            laudantium mollitia eos explicabo ab!
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Adipisci eum ipsum excepturi a beatae vitae, quidem eligendi, 
-            reiciendis natus magnam, incidunt iste labore? Voluptas tempore 
-            laudantium mollitia eos explicabo ab!
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Adipisci eum ipsum excepturi a beatae vitae, quidem eligendi, 
-            reiciendis natus magnam, incidunt iste labore? Voluptas tempore 
-            laudantium mollitia eos explicabo ab!
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Adipisci eum ipsum excepturi a beatae vitae, quidem eligendi, 
-            reiciendis natus magnam, incidunt iste labore? Voluptas tempore 
-            laudantium mollitia eos explicabo ab!
-        </p>
-      </div>
-      <div className='w-[60%] h-[400px] bg-gray-900'>
-            <img className='w-full h-full' src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGNveCUyMGJhemFyJTIwc2VhJTIwYmVhY2h8ZW58MHx8MHx8fDA%3D" alt="cox" />
-      </div>
-    </div>
-  )
-}
+  const { id } = useParams();
+  const blog = Blogs.find((b) => b.id === id);
 
-export default Blog
+  if (!blog) {
+    return <div className="text-center text-red-500 pt-20">Blog not found</div>;
+  }
+
+  return (
+    <div className="w-screen min-h-screen pt-14 flex flex-col items-center gap-4 pb-6 px-4">
+      <h1 className="text-3xl font-semibold text-center">{blog.title}</h1>
+      <p className="text-gray-400 text-center">By {blog.author} | {new Date(blog.publishDate).toLocaleDateString()}</p>
+      <p className="text-blue-400 text-sm text-center">Destination: {blog.destination}</p>
+
+      {/* Tags */}
+      <div className="flex flex-wrap justify-center gap-2 mt-2">
+        {blog.tags.map((tag, idx) => (
+          <span
+            key={idx}
+            className="bg-blue-800 text-white px-3 py-1 rounded-full text-sm"
+          >
+            #{tag}
+          </span>
+        ))}
+      </div>
+
+      {/* Story */}
+      <div className="w-full md:w-[60%] bg-gray-900 text-white p-6 rounded-lg mt-4 shadow-lg">
+        <p className="text-lg leading-relaxed">{blog.story}</p>
+      </div>
+
+      {/* Images */}
+      {blog.images.map((img, index) => (
+        <div
+          key={index}
+          className="w-full md:w-[60%] h-[400px] mt-4 rounded-lg overflow-hidden shadow-md"
+        >
+          <img
+            src={img.url}
+            alt={`blog-img-${index}`}
+            className="w-full h-full object-cover"
+          />
+          {img.description && (
+            <p className="text-center text-gray-400 mt-2 text-sm italic">{img.description} hello</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default Blog;

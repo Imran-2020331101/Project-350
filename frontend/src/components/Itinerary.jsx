@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate , Link} from 'react-router-dom'
-import Travel from './travel';
+import TravelDetails from './travelDetails';
 
 
 const Itinerary = () => {
@@ -16,7 +16,7 @@ const Itinerary = () => {
                 </button>
             </Link>
             </div>
-            <Travel/>
+            <TravelDetails/>
         
         </section>
       

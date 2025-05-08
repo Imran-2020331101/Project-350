@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // For responsive menu icons
 import { useSelector } from "react-redux";
 import img from '../assets/logo.png'
+import defaultUser from '../assets/defaultUser.png'
 
 /**
  * Navbar Component
@@ -25,7 +26,7 @@ const Navbar = () => {
 
   // Extract auth state from Redux
   const { isSignedIn, user } = useSelector((state) => state.auth);
-  const profilePhotoLink = user?.profilePhoto || "/defaultUser.jpg";
+  const profilePhotoLink = user?.profilePhoto || defaultUser;
 
   
   return (
@@ -35,15 +36,12 @@ const Navbar = () => {
         <Link to="/">
           <img src={img} alt="App logo" className="h-40"/>
         </Link>
-        <Link to="/">
-          <img src={img} alt="App logo" className="h-40"/>
-        </Link>
       </div>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex space-x-6">
         <Link className="text-lg font-semibold" to="/">Home</Link>
-        <Link className="text-lg font-semibold" to="/blog">Blogs</Link>
+        <Link className="text-lg font-semibold" to="/blogs">Blogs</Link>
         <Link className="text-lg font-semibold" to="/newtrip">Create trip</Link>
       </div>
 

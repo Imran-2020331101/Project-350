@@ -1,130 +1,158 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import preview from "../assets/preview.png";
+import axios from "axios";
+
 const ImageUpload = () => {
-    const navigate = useNavigate();
-    const [description, setDescription] = useState("");
-    const [uploading, setUploading] = useState(false);
-    const [uploaded, setUploaded] = useState(false);
-    const [upload, setUpload] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [image, setImage] = useState(null);
- 
-    const [imgData, setImgData] = useState(null);
+  const navigate = useNavigate();
+  const [description, setDescription] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [showUploadArea, setShowUploadArea] = useState(true);
+  const [image, setImage] = useState(null);
+  const [imgData, setImgData] = useState(null);
 
-    const handleImageChange = (event) => {
-        const file = event.target.files[0];
-        setImgData(event.target.files[0]);
-        const reader = new FileReader();
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-        reader.onloadend = () => {
-            setImage(reader.result);
-            setUpload(false);
-        };
-        reader.readAsDataURL(file);
+    setImgData(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImage(reader.result);
+      setShowUploadArea(false);
     };
-    const handleUpload = async () => {
-        setLoading(true);
-        const formData = new FormData();
-        formData.append("image", imgData);
+    reader.readAsDataURL(file);
+  };
 
-        console.log(formData);
-        try {
-            const response = await axios.post(
-                // http://${url}/public/image/upload,
-                // formData
-            );
-            if (response.status === 200) {
-                setUpload(true);
-            } else {
-                alert("Network error. Try again");
-            }
-        } catch (error) {
-            alert("Network error. Try again");
-            console.log(error);
-        }
-    };
-    return (
-        <section className=" fixed w-full backdrop-blur-[6px] bg-black/15 h-[110vh] font-sans z-[100]">
-            <div className="flex w-[800px] flex-col items-center justify-center px-6 py-8 mx-auto ">
-                <div className="w-full bg-[#faf6f6] rounded-lg border h-[90vh] shadow-md mt-[20px] overflow-scroll">
-                    <div className="flex justify-end">
-                        <p
-                            className="px-4  text-gray-600 text-[20px] cursor-pointer hover:text-gray-900 transition ease-in-out delay-75 hover:-translate-y-1 hover:scale-110 duration-100"
-                            onClick={() => navigate(-1)}
-                        >
-                            x
-                        </p>
-                    </div>
-                    <div class="flex flex-col justify-center items-center p-4">
-                        <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-800 md:text-2xl flex justify-center">
-                            <span class="text-blue-700 px-2 font-bold">
-                                Save
-                            </span>
-                            {} Save your experiences
-                        </h1>
-                        <h2 class="text-gray-600 font-semibold flex justify-center ">
-                            Upload an images you took during your trip
-                        </h2>
-                        {upload ? (
-                            <div class="flex items-center justify-center w-4/5 h-1/6 p-10">
-                                <label
-                                    for="dropzone-file"
-                                    class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-200  hover:bg-gray-300 "
-                                >
-                                    <div class="flex flex-col items-center justify-center pt-4 pb-4">
-                                        <svg
-                                            class="w-8 h-8 mb-4 text-gray-500"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 20 16"
-                                        >
-                                            <path
-                                                stroke="currentColor"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                                            />
-                                        </svg>
-                                        <p class="mb-2 text-sm text-gray-500">
-                                            <span class="font-semibold">
-                                                Click to upload
-                                            </span>{" "}
-                                            or drag and drop
-                                        </p>
-                                        <p class="text-xs text-gray-500">
-                                            JPEG, JPG or PNG
-                                        </p>
-                                    </div>
-                                    <input
-                                        id="dropzone-file"
-                                        type="file"
-                                        name="myImage"
-                                        accept="image/png, image/jpg, image/jpeg"
-                                        class="hidden"
-                                        onChange={handleImageChange}
-                                    />
-                                </label>
-                            </div>
-                        ) : (
-                            <div class="flex flex-col justify-center items-center p-2 m-2">
-                                <img
-                                    class="size-80 border border-gray-200 rounded-md shadow-sm"
-                                    src={image}
-                                    alt="image"
-                                />                                
-                            </div>
-                        )}
-                        <textarea className="border-solid border-1 w-[45%] h-20 text-black px-2" placeholder="write down what you wise" value={description} onChange={(e)=>setDescription(e.target.value)}/>
-                        <button onClick={handleUpload} className=" mt-2 w-[100px] h-[40px] rounded-lg bg-indigo-500 opacity-100 hover:opacity-75">Upload</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
+  const handleUpload = async () => {
+    if (!imgData) return alert("Please select an image first!");
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("image", imgData);
+    formData.append("description", description);
+
+    try {
+      const response = await axios.post(
+        // Replace with your actual backend URL
+        // `http://${url}/public/image/upload`,
+        "", // <-- TEMP placeholder
+        formData
+      );
+
+      if (response.status === 200) {
+        alert("Upload successful!");
+        navigate(-1);
+      } else {
+        alert("Upload failed. Try again.");
+      }
+    } catch (error) {
+      alert("Network error. Try again.");
+      console.error(error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <section className="fixed w-full h-screen z-50 backdrop-blur-md bg-black/30 font-sans flex justify-center items-center">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto">
+        {/* Close button */}
+        <div className="flex justify-end">
+          <button
+            className="text-gray-600 text-xl hover:text-gray-900 transition-transform transform hover:scale-110"
+            onClick={() => navigate(-1)}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Title */}
+        <div className="text-center mb-4">
+          <h1 className="text-2xl font-bold text-gray-800">
+            <span className="text-blue-700">Save</span> your experiences
+          </h1>
+          <p className="text-gray-600 font-medium">
+            Upload images you took during your trip
+          </p>
+        </div>
+
+        {/* Upload area */}
+        {showUploadArea ? (
+          <div className="flex justify-center mb-6">
+            <label
+              htmlFor="dropzone-file"
+              className="flex flex-col items-center justify-center w-full max-w-md h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+            >
+              <div className="flex flex-col items-center justify-center p-4">
+                <svg
+                  className="w-10 h-10 text-gray-400 mb-3"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M7 16l-4-4m0 0l4-4m-4 4h18m-5 4v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1"
+                  />
+                </svg>
+                <p className="text-gray-500 font-semibold">
+                  Click to upload or drag and drop
+                </p>
+                <p className="text-xs text-gray-400">PNG, JPG, JPEG</p>
+              </div>
+              <input
+                id="dropzone-file"
+                type="file"
+                accept="image/png, image/jpg, image/jpeg"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+            </label>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center mb-4">
+            <img
+              src={image}
+              alt="Uploaded Preview"
+              className="w-64 h-64 object-cover rounded-lg border shadow-md"
+            />
+            <button
+              className="text-sm text-blue-600 mt-2 underline"
+              onClick={() => setShowUploadArea(true)}
+            >
+              Change image
+            </button>
+          </div>
+        )}
+
+        {/* Description Input */}
+        <textarea
+          className="w-full border rounded-md p-3 text-sm text-gray-800 h-24 resize-none mb-4"
+          placeholder="Write about your experience..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        {/* Upload Button */}
+        <div className="flex justify-center">
+          <button
+            onClick={handleUpload}
+            disabled={uploading}
+            className={`w-32 h-10 rounded-lg font-semibold ${
+              uploading
+                ? "bg-indigo-300 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-500 text-white"
+            }`}
+          >
+            {uploading ? "Uploading..." : "Upload"}
+          </button>
+        </div>
+      </div>
+    </section>
+  );
 };
 
-export default ImageUpload;
+export default ImageUpload;
