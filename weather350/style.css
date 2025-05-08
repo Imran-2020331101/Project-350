@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  #weather-box {
+    display: inline-block;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    background: #e0f7fa;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  input {
+    padding: 8px;
+    font-size: 16px;
+  }
+  
+  button {
+    padding: 8px 12px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
