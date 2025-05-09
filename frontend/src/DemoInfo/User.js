@@ -24,7 +24,7 @@ export const social_media = [
     },
 ]
 
-const dummyUser = {
+export const dummyUser = {
     id: 'user_001',
     name: 'Imran Hossain',
     username: 'imran_travels',
@@ -36,22 +36,6 @@ const dummyUser = {
     followers: 1289,
     following: 523,
     joinedDate: '2023-02-15T10:00:00Z',
-    blogs: [
-      {
-        id: 'blog_101',
-        title: 'Exploring the Hills of Bandarban',
-        thumbnail: 'https://source.unsplash.com/400x300/?hill,travel',
-        createdAt: '2024-11-10T14:30:00Z',
-        likes: 120,
-      },
-      {
-        id: 'blog_102',
-        title: 'A Day in Cox’s Bazar',
-        thumbnail: 'https://source.unsplash.com/400x300/?beach,sunset',
-        createdAt: '2024-12-01T08:15:00Z',
-        likes: 95,
-      }
-    ],
     images: [
       'https://source.unsplash.com/300x300/?mountain',
       'https://source.unsplash.com/300x300/?city,night',

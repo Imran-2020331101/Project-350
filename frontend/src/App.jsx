@@ -1,6 +1,6 @@
 import Home from './pages/home'
 import { Route, Routes} from 'react-router-dom'
-import ParentLayout from './components/parentLayout'
+import ParentLayout from './components/ParentLayout'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NewTrip from './components/NewTrip'
@@ -10,9 +10,9 @@ import DashBoardLayout from './pages/usersDashboard'
 import Itinerary from './components/Itinerary'
 // import TravelExperience from './components/travelExperience'
 import Blog from './components/Blog'
-import ImageUpload from "./components/ImageUpload";
-import Logout from './components/logout'
-import Dashboard from './components/Dashboard'
+import ImageUpload from "./components/Dashboard/ImageUpload";
+import Logout from './components/Auth/logout'
+import Dashboard from './components/Dashboard/Dashboard'
 import AllBlogs from './pages/AllBlogs'
 
 function App() {

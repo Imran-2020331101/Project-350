@@ -1,7 +1,7 @@
 export const Trips = [
     {
       "id": "trip_001",
-      "owner": "user_01",
+      "owner": "user_001",
       "destination": "Kyoto, Japan",
       "tripTypes": ["Cultural", "Historic", "Scenic"],
       "transportOptions": {
@@ -68,7 +68,7 @@ export const Trips = [
     },
     {
       "id": "trip_002",
-      "owner": "user_02",
+      "owner": "user_002",
       "destination": "Cape Town, South Africa",
       "tripTypes": ["Adventure", "Nature", "Wildlife"],
       "transportOptions": {
@@ -128,7 +128,7 @@ export const Trips = [
     },
     {
       "id": "trip_003",
-      "owner": "user_03",
+      "owner": "user_003",
       "destination": "Istanbul, Turkey",
       "tripTypes": ["Historic", "Cultural", "City Tour"],
       "transportOptions": {
@@ -185,7 +185,7 @@ export const Trips = [
     },
     {
       "id": "trip_004",
-      "owner": "user_04",
+      "owner": "user_004",
       "destination": "Reykjavik, Iceland",
       "tripTypes": ["Nature", "Adventure", "Winter"],
       "transportOptions": {
@@ -239,7 +239,7 @@ export const Trips = [
     },
     {
       "id": "trip_005",
-      "owner": "user_05",
+      "owner": "user_005",
       "destination": "Barcelona, Spain",
       "tripTypes": ["City", "Beach", "Cultural"],
       "transportOptions": {

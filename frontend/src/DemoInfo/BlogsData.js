@@ -1,7 +1,7 @@
 export const Blogs = [
   {
     "id": "blog_001",
-    "owner": "user_01",
+    "owner": "user_001",
     "author": "John Doe",
     "destination": "Kyoto, Japan",
     "title": "A Cultural Journey Through Kyoto's Temples and Streets",
@@ -21,7 +21,7 @@ export const Blogs = [
   },
   {
     "id": "blog_002",
-    "owner": "user_02",
+    "owner": "user_002",
     "author": "Emily Smith",
     "destination": "Cape Town, South Africa",
     "title": "Safari and Serenity: My Adventure in Cape Town",
@@ -41,7 +41,7 @@ export const Blogs = [
   },
   {
     "id": "blog_003",
-    "owner": "user_03",
+    "owner": "user_003",
     "author": "Mike Johnson",
     "destination": "Istanbul, Turkey",
     "title": "Walking Through History in Istanbul",
@@ -61,7 +61,7 @@ export const Blogs = [
   },
   {
     "id": "blog_004",
-    "owner": "user_04",
+    "owner": "user_004",
     "author": "Alice Williams",
     "destination": "Paris, France",
     "title": "Parisian Dreams: Art, Romance, and River Walks",
@@ -81,7 +81,7 @@ export const Blogs = [
   },
   {
     "id": "blog_005",
-    "owner": "user_05",
+    "owner": "user_005",
     "author": "Robert Taylor",
     "destination": "Rome, Italy",
     "title": "When in Rome: History, Food, and Ancient Wonders",
@@ -101,7 +101,7 @@ export const Blogs = [
   },
   {
     "id": "blog_006",
-    "owner": "user_06",
+    "owner": "user_006",
     "author": "Sarah Lee",
     "destination": "New York City, USA",
     "title": "5 Days in NYC: Lights, Culture, and Endless Energy",
