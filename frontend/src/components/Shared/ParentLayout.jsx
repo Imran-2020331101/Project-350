@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import Navbar from './HomePage/Navbar';
+import Navbar from '../HomePage/Navbar';
 
 const ParentLayout = () => {
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Trips } from '../../DemoInfo/Trips';
 
@@ -37,12 +37,12 @@ const UserProfile = () => {
       {/* Trip Items */}
       <section className="w-[80%] max-h-[300px] overflow-y-auto flex flex-col items-center gap-4 pb-2">
         {myTrips.map((trip, index) => (
-          <div
+          <Link to={`itinerary/${trip.id}`}
             key={index}
             className="w-full min-h-10 bg-gray-100 shadow rounded-lg flex items-center justify-center text-sm font-medium text-black hover:bg-gray-200 transition"
           >
             {trip.destination}
-          </div>
+          </Link>
         ))}
       </section>
 

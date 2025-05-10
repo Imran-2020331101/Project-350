@@ -3,6 +3,7 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import TripCard from '../TripCard';
+import { Link } from 'react-router-dom';
 
 export default function Category({Packages}) {
 
@@ -41,7 +42,10 @@ export default function Category({Packages}) {
         <h2 className="text-3xl font-bold mb-6">Join a Trekking group</h2>
         <Slider {...settings}>
           {
-            Packages.map((pack)=><TripCard key={pack.id} trip={pack}/>)
+            Packages.map((pack)=>
+            <Link key={pack.id} to={`/group/${pack.id}`}>
+              <TripCard  trip={pack}/>
+            </Link>)
           }
         </Slider>
       </div>

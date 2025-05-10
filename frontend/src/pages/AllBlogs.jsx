@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import BlogCard from '../components/blogCard'; 
 import { Blogs } from '../DemoInfo/BlogsData';
-import Loader from '../components/Loader';
+import Loader from '../components/Shared/Loader';
 
 const AllBlogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -30,7 +30,7 @@ const AllBlogs = () => {
 
   return (
     <div className="min-h-screen bg-[#111827] py-8 px-4 md:px-12">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-200">All Travel Blogs</h1>
+      <h1 className="text-3xl font-bold text-center mb-10 py-5 text-gray-200">All Travel Blogs</h1>
 
       {loading ? (
         <div className="flex justify-center items-center h-48">

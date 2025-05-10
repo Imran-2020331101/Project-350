@@ -2,10 +2,11 @@ import Footer from '../components/HomePage/Footer'
 import Welcome from '../components/HomePage/HeroSection'
 import Slider from '../components/HomePage/Slider'
 import BlogCard from '../components/blogCard'
+import Contacts from '../components/HomePage/Contacts'
 import { Packages } from '../DemoInfo/Packages'
 import { Blogs } from '../DemoInfo/BlogsData'
 import { Link } from 'react-router-dom'
-import Loader from '../components/Loader'
+import Loader from '../components/Shared/Loader'
 
 
 const Home = () => {
@@ -31,6 +32,7 @@ const Home = () => {
           </div>
       }
       <Link to={'Blogs'}>See all Stories</Link>
+      <Contacts/>
       <Footer/>
     </div>
   )
