@@ -42,22 +42,6 @@ export const dummyUser = {
       'https://source.unsplash.com/300x300/?desert',
       'https://source.unsplash.com/300x300/?forest',
     ],
-    recentTrips: [
-      {
-        id: 'trip_001',
-        destination: 'Sylhet',
-        date: '2025-01-10',
-        members: 3,
-        budget: 'Standard',
-      },
-      {
-        id: 'trip_002',
-        destination: 'Sundarbans',
-        date: '2025-03-02',
-        members: 2,
-        budget: 'Economy',
-      }
-    ],
     preferences: {
       travelStyle: 'Backpacker',
       preferredClimate: 'Cool',

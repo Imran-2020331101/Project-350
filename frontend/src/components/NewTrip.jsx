@@ -39,7 +39,7 @@ const NewTrip = () => {
         </div>
 
         {/* Destination */}
-        <div className="mb-6">
+        <div className="mb-6 text-gray-700">
           <label className="block text-sm font-medium text-gray-700 mb-1">Destination</label>
           <input
             name="destination"
@@ -51,7 +51,7 @@ const NewTrip = () => {
         </div>
 
         {/* Days */}
-        <div className="mb-6">
+        <div className="mb-6 text-gray-700">
           <label className="block text-sm font-medium text-gray-700 mb-1">Duration (Days)</label>
           <input
             name="days"
