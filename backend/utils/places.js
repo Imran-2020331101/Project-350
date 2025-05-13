@@ -1,5 +1,5 @@
 const Places=require('../models/Places');
-const {getPlaces,generateResponse} = require('../utils/utils')
+const {getPlaces,generateResponse} = require('./utils')
 
 const createplaces = async (email,name,location, place, budget, resultCount) => {
     try {

@@ -1,14 +1,14 @@
-const Itinerary=require('../models/Itinerary');
+const Transport=require('../models/transports');
+
+const {getTransport}=require('./utils');
 
 
-const createItinerary=async ( req,res)=>{
-    const {
-        email, name, destination, date, budget, weather, costs
-    }=req.body;
+const createItinerary=async (type, startingPoint, destination,name,email)=>{
     
     try {
-        Itinerary.create({
-            email, name, destination, date, budget, costs
+        const transport= await getTransport();
+        Transport.create({
+            email, name, transport
         })
         res.status(201).json({message: "Itinerary created successfully"});
     } catch (error) {
