@@ -7,32 +7,40 @@
 
 const express = require('express');
 const multer = require('multer');
-const helmet = require('helmet');
+// const helmet = require('helmet');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require("@google/generative-ai"); // Uncomment and configure if using Gemini API
+const swaggerUi = require('swagger-ui-express');
+const swaggerFile = require('./config/swagger-output.json');
+
+// const { GoogleGenerativeAI } = require("@google/generative-ai"); // Uncomment and configure if using Gemini API
 const { getAllBlogs, createBlog, deleteBlog, updateBlog } = require('./Service/BlogService');
 const { handleLogin, handleRegister, handleLogout, handleProfileUpdate } = require('./Service/AuthService');
 const { createTrip, getAllTrips } = require('./Service/TripService');
 const { uploadImage } = require('./Service/ImageService');
-const { createGroup, getAllGroups } = require('./Service/GroupSevice');
+const { createGroup, getAllGroups } = require('./Service/GroupService');
 
 const app = express();
 const port = process.env.PORT || 3000;
 const upload = multer();
 
+const connectDB = require('./config/MongoConfig'); 
+require('dotenv').config();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+connectDB();
+
 // Middleware
-app.use(helmet());
+// app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// Routes - Trips
 app.route('/api/trips')
     .post(createTrip)
     .get(getAllTrips);
 
-// Routes - Blogs
 app.route('/api/blogs')
     .get(getAllBlogs)
     .post(createBlog)
@@ -40,7 +48,6 @@ app.route('/api/blogs')
 
 app.delete('/api/blogs/:id', deleteBlog); // Assumes blog ID is passed as URL param
 
-// Routes - Authentication
 app.post('/api/auth/login', handleLogin);
 app.post('/api/auth/register', handleRegister);
 app.post('/api/auth/logout', handleLogout);
@@ -82,6 +89,9 @@ app.use((err, req, res, next) => {
 });
 
 // Server Start
+
+
+
 app.listen(port, () => {
     console.log(`✅ Server listening on port ${port}`);
 });

@@ -52,11 +52,11 @@ const handleLogin = async (req, res) => {
 
 const handleRegister = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    const { name,username, email, password } = req.body;
+    if (!name || !username || !email || !password) {
       return res
         .status(400)
-        .json({ message: "Name, email, and password are required." });
+        .json({ message: "Name,Username , email, and password are required." });
     }
     const duplicateUser = await User.findOne({ email: email });
     if (duplicateUser)
@@ -65,6 +65,7 @@ const handleRegister = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const userEntity = await User.create({
       name: name,
+      username: username,
       email: email,
       password: hashedPassword,
       role: "user",
@@ -74,6 +75,7 @@ const handleRegister = async (req, res) => {
       .status(201)
       .json({ message: "User registered successfully.", userEntity });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

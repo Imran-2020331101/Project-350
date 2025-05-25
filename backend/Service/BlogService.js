@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const asyncWrapper = require("../middleware/asyncWrapper");
 const Blog = require("../models/Blog");
 const Trip = require("../models/Trip");
-const { generateResponse } = require("../utils/utils");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+// const { generateResponse } = require("../utils/utils");
+// const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 
 const getAllBlogs = async (req, res) => {
