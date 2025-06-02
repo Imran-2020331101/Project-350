@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
-const Trip = require("../models/Trip");
-// const { generateResponse } = require("../utils/utils");
+const Trip = require("../models/trip");
+const { generateResponse } = require("../utils/utils");
 // const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 
 const getAllBlogs = async (req, res) => {
   try {
@@ -24,19 +23,44 @@ const getAllBlogs = async (req, res) => {
 // Function to create a new blog
 const createBlog = async (req, res) => {
   try {
-    const { tripId } = req.body;
+    const { tripId, images } = req.body;
     const trip = await Trip.findOne({ _id: tripId });
 
-    const prompt =
-      "Write a blog about my trip to " +
-      trip.Place +
-      " that started on " +
-      trip.StartDate +
-      ".\n\n";
+    const prompt = `
+    I want you to generate a detailed, engaging, and well-structured travel blog post based on the following fields. The content should feel personal and immersive, as if written by a real traveler reflecting on their journey. Use a storytelling tone and vivid descriptions.
+    Blog Details:
+    - Destination: ${trip.destination},
+    - Tags: ${trip.tripTypes},
+    - Story: (Write a vivid and personal narrative here)
+      - Begin with how and why the trip to Bagan happened.
+      - Describe the journey and first impressions.
+      - Highlight key experiences like temple visits, meeting locals, food tasting, and the sunrise hot air balloon ride.
+      - Add cultural insights, personal thoughts, challenges, and meaningful moments.
+      - Wrap up with reflections, what the trip meant to the author, and advice for future travelers.
+    - Image Captions: 
+    Additional Instructions:
+    - Keep the blog between 800–1500 words.
+    - Break it into sections with meaningful headings.
+    - Include a short summary paragraph at the beginning.
+    - Maintain an informal yet insightful tone.
+    - You may invent plausible details to fill the story if not all are given, as long as they feel authentic.
+    `;
     const result = generateResponse(prompt);
 
-    res.status(201).json(result.response.text());
+    const newBlog = await Blog.create({
+      owner: trip.owner,
+      author: owner,
+      destination: trip.destination,
+      title: "",
+      tags: trip.tripTypes,
+      story: result.response.text(),
+      images: images,
+      publishDate: Date.now(),
+    });
+
+    res.status(201).json(newBlog);
   } catch (error) {
+    console.log("Error generating Blog : " + error);
     res.status(500).json({ error: "Failed to create Blog" });
   }
 };
@@ -58,7 +82,9 @@ const deleteBlog = async (req, res) => {
 
     // 3. Ownership check (assumes req.user is set by auth middleware)
     if (blog.authorEmail !== req.user.email) {
-      return res.status(403).json({ success: false, msg: "Forbidden: Not the blog owner" });
+      return res
+        .status(403)
+        .json({ success: false, msg: "Forbidden: Not the blog owner" });
     }
 
     await blog.deleteOne();
@@ -87,7 +113,9 @@ const updateBlog = async (req, res) => {
 
     // 3. Check if the current user owns the blog
     if (blog.owner !== req.user.id) {
-      return res.status(403).json({ success: false, msg: "Forbidden: Not the blog owner" });
+      return res
+        .status(403)
+        .json({ success: false, msg: "Forbidden: Not the blog owner" });
     }
 
     // 4. Update allowed fields only
@@ -98,7 +126,7 @@ const updateBlog = async (req, res) => {
       "tags",
       "story",
       "images",
-      "publishDate"
+      "publishDate",
     ];
 
     allowedFields.forEach((field) => {
@@ -117,7 +145,9 @@ const updateBlog = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating blog:", error);
-    return res.status(500).json({ success: false, msg: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal server error" });
   }
 };
 

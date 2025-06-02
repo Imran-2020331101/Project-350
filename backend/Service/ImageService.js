@@ -1,4 +1,4 @@
-const Trip = require('../models/Trip');
+const Trip = require('../models/trip');
 // const { getStorage, ref, uploadBytes, getDownloadURL } = require('firebase/storage');
 const firebaseApp = require('../config/firebase');
 const multer = require('multer');

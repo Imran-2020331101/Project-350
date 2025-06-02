@@ -25,11 +25,46 @@
         "tags": ["Trips"],
         "description": "",
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
+    },
+    "/api/trips/{id}":{
+      "delete": {
+      "tags": ["Trips"],
+      "summary": "Delete a trip",
+      "description": "Deletes a specific trip based on the provided ID",
+      "parameters": [
+        {
+          "name": "tripId",
+          "in": "query",
+          "required": true,
+          "description": "The ID of the trip to delete",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Trip deleted successfully"
+        },
+        "400": {
+          "description": "Bad Request - Missing or invalid trip ID"
+        },
+        "404": {
+          "description": "Trip not found"
+        },
+        "500": {
+          "description": "Internal Server Error"
+        }
+      }
+    }
     },
     "/api/blogs": {
       "get": {
@@ -135,10 +170,10 @@
               "type": "object",
               "properties": {
                 "email": {
-                  "example": "any"
+                  "example": "imranbinazad777@gmail.com"
                 },
                 "password": {
-                  "example": "any"
+                  "example": "password"
                 }
               }
             }
@@ -215,6 +250,23 @@
       "post": {
         "tags": ["Auth"],
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "example": {
+                "name": "Imran Bin Azad",
+                "username": "imran_travels",
+                "bio": "Travel lover"
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -239,6 +291,7 @@
     },
     "/api/groups": {
       "get": {
+        "tags":["Group"],
         "description": "",
         "responses": {
           "default": {
@@ -246,14 +299,52 @@
           }
         }
       },
-      "post": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
+  "post": {
+    "tags": ["Group"],
+    "description": "Creates a new travel group for an existing trip.",
+    "parameters": [
+      {
+        "name": "body",
+        "in": "body",
+        "schema": {
+          "type": "object",
+          "required": ["tripId", "groupName", "gatheringPoint", "availableSpots"],
+          "properties": {
+            "tripId": {
+              "type": "string",
+              "example": "6659c97b3f3a123456789012"
+            },
+            "groupName": {
+              "type": "string",
+              "example": "Adventurers from Yangon"
+            },
+            "gatheringPoint": {
+              "type": "string",
+              "example": "Yangon Central Station"
+            },
+            "availableSpots": {
+              "type": "integer",
+              "example": 4
+            }
           }
         }
       }
+    ],
+    "responses": {
+      "201": {
+        "description": "Group created successfully"
+      },
+      "400": {
+        "description": "Bad Request - Missing or invalid fields"
+      },
+      "404": {
+        "description": "Trip not found"
+      },
+      "500": {
+        "description": "Internal Server Error"
+      }
+    }
+  }
     },
     "/api/upload-image": {
       "post": {

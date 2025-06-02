@@ -1,13 +1,16 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { generateAccessToken, generateRefreshToken } = require("../utils/token");
 require("dotenv").config();
 
 const handleLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
-      return res.status(400).json({ message: "Email and password are required." });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required." });
 
     const foundUser = await User.findOne({ email });
     if (!foundUser)
@@ -17,18 +20,17 @@ const handleLogin = async (req, res) => {
     if (!match)
       return res.status(401).json({ msg: "Invalid email or password" });
 
-    const accessToken = jwt.sign(
-      {
-        userInfo: {
-          id: foundUser._id,
-          email: foundUser.email,
-        },
-      },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1d" }
-    );
+    const accessToken = generateAccessToken(foundUser);
+    const refreshToken = generateRefreshToken(foundUser);
 
-    res.cookie("token", accessToken, {
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       sameSite: "None",
       secure: true,
@@ -37,11 +39,7 @@ const handleLogin = async (req, res) => {
 
     res.status(200).json({
       msg: "Login successful",
-      user: {
-        id: foundUser._id,
-        email: foundUser.email,
-        name: foundUser.name,
-      },
+      user: foundUser,
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -49,10 +47,9 @@ const handleLogin = async (req, res) => {
   }
 };
 
-
 const handleRegister = async (req, res) => {
   try {
-    const { name,username, email, password } = req.body;
+    const { name, username, email, password } = req.body;
     if (!name || !username || !email || !password) {
       return res
         .status(400)
@@ -81,11 +78,11 @@ const handleRegister = async (req, res) => {
 };
 
 const handleLogout = (req, res) => {
-
-  res.clearCookie('token', {
+  res.clearCookie("refreshToken", { httpOnly: true, sameSite: "None" });
+  res.clearCookie("accessToken", {
     httpOnly: true,
     secure: true,
-    sameSite: 'None', // or 'Strict' if you're not doing cross-site
+    sameSite: "None", // or 'Strict' if you're not doing cross-site
   });
 
   return res.status(200).json({ msg: "Logout successful" });
@@ -109,7 +106,14 @@ const handleProfileUpdate = async (req, res) => {
     const updates = req.body;
 
     // Prevent updating sensitive or restricted fields
-    const restrictedFields = ["email", "username", "id", "followers", "following", "joinedDate"];
+    const restrictedFields = [
+      "email",
+      "username",
+      "id",
+      "followers",
+      "following",
+      "joinedDate",
+    ];
     for (const field of restrictedFields) {
       if (field in updates) {
         return res.status(400).json({ msg: `Cannot update field: ${field}` });
@@ -140,9 +144,22 @@ const handleProfileUpdate = async (req, res) => {
   }
 };
 
+const refreshToken = (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token) return res.status(401).json({ message: "No refresh token" });
+
+  jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid refresh token" });
+
+    const newAccessToken = generateAccessToken(user);
+    res.json({ accessToken: newAccessToken });
+  });
+};
+
 module.exports = {
   handleLogin,
   handleRegister,
   handleLogout,
   handleProfileUpdate,
+  refreshToken,
 };

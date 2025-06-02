@@ -4,7 +4,7 @@
  * This file sets up the Express server, imports necessary middleware and controllers,
  * defines the API routes, and starts the server.
  */
-
+const mongoose = require('mongoose');
 const express = require('express');
 const multer = require('multer');
 // const helmet = require('helmet');
@@ -14,8 +14,8 @@ const swaggerFile = require('./config/swagger-output.json');
 
 // const { GoogleGenerativeAI } = require("@google/generative-ai"); // Uncomment and configure if using Gemini API
 const { getAllBlogs, createBlog, deleteBlog, updateBlog } = require('./Service/BlogService');
-const { handleLogin, handleRegister, handleLogout, handleProfileUpdate } = require('./Service/AuthService');
-const { createTrip, getAllTrips } = require('./Service/TripService');
+const { handleLogin, handleRegister, handleLogout, handleProfileUpdate, refreshToken } = require('./Service/AuthService');
+const { createTrip, getAllTrips, deleteTrip } = require('./Service/TripService');
 const { uploadImage } = require('./Service/ImageService');
 const { createGroup, getAllGroups } = require('./Service/GroupService');
 
@@ -36,10 +36,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+console.log('Registered Mongoose models:', mongoose.modelNames());
 
 app.route('/api/trips')
     .post(createTrip)
     .get(getAllTrips);
+
+app.delete('/api/trips/:id',deleteTrip);
 
 app.route('/api/blogs')
     .get(getAllBlogs)
@@ -52,6 +55,7 @@ app.post('/api/auth/login', handleLogin);
 app.post('/api/auth/register', handleRegister);
 app.post('/api/auth/logout', handleLogout);
 app.post('/api/auth/profile/update', handleProfileUpdate);
+app.post('/api/auth/refresh', refreshToken)
 
 // Routes - Groups
 app.route('/api/groups')

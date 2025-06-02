@@ -13,4 +13,9 @@ function fileToGenerativePart(data, mimeType) {
     };
 }
 
-export {fileToGenerativePart}
+
+const generateResponse= async (prompt)=>{
+    console.log("Ai called");
+}
+
+export {fileToGenerativePart, generateResponse}
