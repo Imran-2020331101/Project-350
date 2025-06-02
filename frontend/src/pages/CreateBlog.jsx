@@ -7,7 +7,7 @@ const uploadedImages = [
   // Add more as needed
 ];
 
-const BlogCreatePage = () => {
+const CreateBlog = () => {
   const [blogInfo, setBlogInfo] = useState({
     selectedImageIds: [],
     howWhy: '',
@@ -110,4 +110,4 @@ const TextArea = ({ label, value, onChange }) => (
   </div>
 );
 
-export default BlogCreatePage;
+export default CreateBlog;
