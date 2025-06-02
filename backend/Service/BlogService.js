@@ -23,7 +23,7 @@ const getAllBlogs = async (req, res) => {
 // Function to create a new blog
 const createBlog = async (req, res) => {
   try {
-    const { tripId, images } = req.body;
+    const { tripId, images, blogInfo } = req.body;
     const trip = await Trip.findOne({ _id: tripId });
 
     const prompt = `
@@ -31,12 +31,12 @@ const createBlog = async (req, res) => {
     Blog Details:
     - Destination: ${trip.destination},
     - Tags: ${trip.tripTypes},
-    - Story: (Write a vivid and personal narrative here)
-      - Begin with how and why the trip to Bagan happened.
-      - Describe the journey and first impressions.
-      - Highlight key experiences like temple visits, meeting locals, food tasting, and the sunrise hot air balloon ride.
-      - Add cultural insights, personal thoughts, challenges, and meaningful moments.
-      - Wrap up with reflections, what the trip meant to the author, and advice for future travelers.
+    - Story: 
+      - beginning: ${blogInfo.howWhy}
+      - Journe: ${blogInfo.journey}
+      - Highlights: ${blogInfo.experiences}
+      - Insights: ${blogInfo.insights}
+      - conclusion: ${blogInfo.conclusion}
     - Image Captions: 
     Additional Instructions:
     - Keep the blog between 800–1500 words.
