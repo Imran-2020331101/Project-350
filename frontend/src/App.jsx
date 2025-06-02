@@ -7,11 +7,13 @@ import NewTrip from './components/NewTrip'
 import DashBoardLayout from './pages/usersDashboard'
 import Itinerary from './components/Dashboard/Itinerary'
 import Blog from './components/Blog'
+import CreateBlog from './pages/CreateBlog'
 import ImageUpload from "./components/Dashboard/ImageUpload";
 import Logout from './components/Auth/logout'
 import Dashboard from './components/Dashboard/Dashboard'
 import AllBlogs from './pages/AllBlogs'
 import PackageDetail from './pages/PackageDetail'
+import CreateGroup from './pages/CreateGroup'
 
 function App() {
 
@@ -24,7 +26,9 @@ function App() {
         <Route path='newtrip' element={<NewTrip/>}/>
         <Route path='uploadimage' element={<ImageUpload/>}/>
         <Route path='logout' element={<Logout/>}/>
+        <Route path='group/create' element={<CreateGroup/>}/>
         <Route path='group/:id' element={<PackageDetail/>}/>
+        <Route path='blogs/new' element={<CreateBlog/>}/>
         <Route path='blogs' element={<AllBlogs/>}/>
         <Route path='blogs/:id' element={<Blog/>}/>
         <Route path='dashboard' element={<DashBoardLayout/>}>

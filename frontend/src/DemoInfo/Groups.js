@@ -1,4 +1,4 @@
-export const Packages = [
+export const Groups = [
     {
       id: 1,
       title: "Discover the Ancient Temples of Bagan",

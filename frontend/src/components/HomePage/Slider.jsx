@@ -39,7 +39,7 @@ export default function Category({Packages}) {
   return (
     <section id="works" className="py-6 bg-gray-800 w-[90%]">
       <div className="container mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-6">Join a Trekking group</h2>
+        <h2 className="text-3xl font-bold mb-6">Embark on a trail adventure</h2>
         <Slider {...settings}>
           {
             Packages.map((pack)=>

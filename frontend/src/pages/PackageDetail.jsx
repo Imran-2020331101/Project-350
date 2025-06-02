@@ -1,12 +1,12 @@
 import React from 'react';
 import { CalendarDays, MapPin, DollarSign, Users, PlaneTakeoff, Info, Camera, Compass, Mountain, Sun } from 'lucide-react';
-import { Packages } from '../DemoInfo/Packages';
+import { Groups } from '../DemoInfo/Groups';
 import { useParams } from 'react-router-dom';
 import Footer from '../components/HomePage/Footer';
 
 const PackageDetail = () => {
   const { id } = useParams();
-  const [trip] = Packages.filter((p) => p.id == id);
+  const [trip] = Groups.filter((p) => p.id == id);
 
   if (!trip) return <div className="text-center py-10">Trip data not available.</div>;
 
