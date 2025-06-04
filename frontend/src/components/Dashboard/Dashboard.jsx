@@ -17,12 +17,6 @@ const Experiences = () => {
         <h1 className="text-3xl font-bold text-gray-300">Your Experiences</h1>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            to="/blogs/new"
-            className="px-5 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-indigo-700 transition text-center"
-          >
-            Create Blog
-          </Link>
-          <Link
             to="/uploadimage"
             className="px-5 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-indigo-700 transition text-center"
           >

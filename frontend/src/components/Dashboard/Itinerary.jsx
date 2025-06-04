@@ -113,6 +113,7 @@ const Itinerary = () => {
       {/* Join Group Button */}
       <Link
         to="/group/new"
+        state={{ trip: myTrip }}
         className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-md transition"
       >
         Create Travel Group

@@ -15,6 +15,7 @@ export default function Category({Packages}) {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
+    arrows: false,
     responsive: [
       {
         breakpoint: 1024,
@@ -22,7 +23,8 @@ export default function Category({Packages}) {
           slidesToShow: 2,
           slidesToScroll: 1,
           infinite: true,
-          dots: false
+          dots: false,
+          arrows: false
         }
       },
       {
@@ -30,7 +32,8 @@ export default function Category({Packages}) {
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
-          dots: false
+          dots: false,
+          arrows: false
         }
       }
     ]
@@ -39,7 +42,6 @@ export default function Category({Packages}) {
   return (
     <section id="works" className="py-6 bg-gray-800 w-[90%]">
       <div className="container mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-6">Embark on a trail adventure</h2>
         <Slider {...settings}>
           {
             Packages.map((pack)=>

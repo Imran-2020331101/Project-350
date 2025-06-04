@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { CalendarDays, Sun, MapPin, Tag, Info, ImagePlus, Users, DollarSign, Flag, Camera } from 'lucide-react';
 
 const CreateGroup = () => {
+
+  const location = useLocation();
+  const tripFromState = location.state?.trip;
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  
   const [groupData, setGroupData] = useState({
     title: '',
     place: '',
@@ -16,6 +24,25 @@ const CreateGroup = () => {
     image: '',
   });
 
+  useEffect(() => {
+    if (tripFromState) {
+      
+      setGroupData((prev) => ({
+        ...prev,
+        title: `Trip to ${tripFromState.destination}`,
+        place: tripFromState.destination,
+        days: Object.keys(tripFromState.placesToVisit).length,
+        about: tripFromState.description,
+        image: `https://source.unsplash.com/featured/?${tripFromState.destination}`,
+      }));
+      setIsLoading(false);
+
+    }
+  }, [tripFromState]);
+  
+  
+  if (isLoading) return <div>Loading...</div>; 
+  
   const handleChange = (e) => {
     setGroupData({ ...groupData, [e.target.name]: e.target.value });
   };
@@ -28,14 +55,14 @@ const CreateGroup = () => {
 
   return (
     <div className="bg-gray-900 py-12">
-      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
-        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-8">
+      <div className="max-w-3xl mx-auto bg-gray-900 shadow-xl rounded-2xl p-8 border border-gray-200">
+        <h2 className="text-3xl font-semibold text-center text-gray-200 mb-8">
           <Tag className="inline-block mr-2 text-blue-500" size={32} /> Create a Travel Group
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 text-black">
           <div>
-            <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">
-              <Info className="inline-block mr-1 text-gray-500" size={16} /> Group Title
+            <label htmlFor="title" className="block text-gray-200 text-sm font-bold mb-2">
+              <Info className="inline-block mr-1 text-gray-200" size={16} /> Group Title
             </label>
             <input
               type="text"
@@ -49,14 +76,14 @@ const CreateGroup = () => {
             />
           </div>
           <div>
-            <label htmlFor="place" className="block text-gray-700 text-sm font-bold mb-2">
+            <label htmlFor="place" className="block text-gray-200 text-sm font-bold mb-2">
               <MapPin className="inline-block mr-1 text-red-500" size={16} /> Destination
             </label>
             <input
               type="text"
               id="place"
               name="place"
-              placeholder="e.g., Giza, Egypt"
+              placeholder='{groupData.place}'
               value={groupData.place}
               onChange={handleChange}
               required
@@ -65,7 +92,7 @@ const CreateGroup = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="startDate" className="block text-gray-700 text-sm font-bold mb-2">
+              <label htmlFor="startDate" className="block text-gray-200 text-sm font-bold mb-2">
                 <CalendarDays className="inline-block mr-1 text-green-500" size={16} /> Start Date
               </label>
               <input
@@ -79,7 +106,7 @@ const CreateGroup = () => {
               />
             </div>
             <div>
-              <label htmlFor="endDate" className="block text-gray-700 text-sm font-bold mb-2">
+              <label htmlFor="endDate" className="block text-gray-200 text-sm font-bold mb-2">
                 <CalendarDays className="inline-block mr-1 text-orange-500" size={16} /> End Date
               </label>
               <input
@@ -94,7 +121,7 @@ const CreateGroup = () => {
             </div>
           </div>
           <div>
-            <label htmlFor="days" className="block text-gray-700 text-sm font-bold mb-2">
+            <label htmlFor="days" className="block text-gray-200 text-sm font-bold mb-2">
               <Sun className="inline-block mr-1 text-yellow-500" size={16} /> Duration (Days)
             </label>
             <input
@@ -110,7 +137,7 @@ const CreateGroup = () => {
             />
           </div>
           <div>
-            <label htmlFor="about" className="block text-gray-700 text-sm font-bold mb-2">
+            <label htmlFor="about" className="block text-gray-200 text-sm font-bold mb-2">
               <Info className="inline-block mr-1 text-gray-500" size={16} /> About the Trip
             </label>
             <textarea
@@ -125,7 +152,7 @@ const CreateGroup = () => {
             />
           </div>
           <div>
-            <label htmlFor="activities" className="block text-gray-700 text-sm font-bold mb-2">
+            <label htmlFor="activities" className="block text-gray-200 text-sm font-bold mb-2">
               <Camera className="inline-block mr-1 text-purple-500" size={16} /> Activities (Separate by comma)
             </label>
             <input
@@ -141,7 +168,7 @@ const CreateGroup = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="availableSpots" className="block text-gray-700 text-sm font-bold mb-2">
+              <label htmlFor="availableSpots" className="block text-gray-200 text-sm font-bold mb-2">
                 <Users className="inline-block mr-1 text-blue-500" size={16} /> Available Spots
               </label>
               <input
@@ -156,7 +183,7 @@ const CreateGroup = () => {
               />
             </div>
             <div>
-              <label htmlFor="expectedCost" className="block text-gray-700 text-sm font-bold mb-2">
+              <label htmlFor="expectedCost" className="block text-gray-200 text-sm font-bold mb-2">
                 <DollarSign className="inline-block mr-1 text-green-500" size={16} /> Expected Cost ($)
               </label>
               <input
@@ -172,7 +199,7 @@ const CreateGroup = () => {
             </div>
           </div>
           <div>
-            <label htmlFor="startingPointOfGroup" className="block text-gray-700 text-sm font-bold mb-2">
+            <label htmlFor="startingPointOfGroup" className="block text-gray-200 text-sm font-bold mb-2">
               <Flag className="inline-block mr-1 text-orange-500" size={16} /> Starting Point
             </label>
             <input
@@ -187,7 +214,7 @@ const CreateGroup = () => {
             />
           </div>
           <div>
-            <label htmlFor="image" className="block text-gray-700 text-sm font-bold mb-2">
+            <label htmlFor="image" className="block text-gray-200 text-sm font-bold mb-2">
               <ImagePlus className="inline-block mr-1 text-indigo-500" size={16} /> Cover Image URL
             </label>
             <input

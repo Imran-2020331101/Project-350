@@ -26,21 +26,21 @@ const NewTrip = () => {
   }, [tripDetails, dispatch, navigate]);
 
   return (
-    <section className="w-full min-h-screen flex items-center justify-center py-12 px-4 bg-gray-800">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8">
+    <section className="w-full min-h-screen flex items-center justify-center py-12 px-4 bg-gray-900">
+      <div className="w-full max-w-2xl bg-gray-800 rounded-2xl shadow-md p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Plan a New Trip</h1>
+          <h1 className="text-2xl font-bold text-gray-200">Plan a New Trip</h1>
           <p
             onClick={() => navigate(-1)}
-            className="text-2xl font-semibold text-gray-400 cursor-pointer hover:text-gray-600"
+            className="text-2xl font-semibold text-gray-600 cursor-pointer hover:text-gray-400"
           >
             ×
           </p>
         </div>
 
         {/* Destination */}
-        <div className="mb-6 text-gray-700">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+        <div className="mb-6 text-black">
+          <label className="block text-sm font-medium text-gray-200 mb-1">Destination</label>
           <input
             name="destination"
             value={tripDetails.destination}
@@ -51,8 +51,8 @@ const NewTrip = () => {
         </div>
 
         {/* Days */}
-        <div className="mb-6 text-gray-700">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Duration (Days)</label>
+        <div className="mb-6 text-black">
+          <label className="block text-sm font-medium text-gray-200 mb-1">Duration (Days)</label>
           <input
             name="days"
             type="number"
@@ -65,14 +65,14 @@ const NewTrip = () => {
 
         {/* Budget */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Budget Preference</label>
+          <label className="block text-sm font-medium text-gray-200 mb-3">Budget Preference</label>
           <div className="grid grid-cols-3 gap-4">
             {SelectBudgetOptions.map((item, index) => (
               <div
                 key={index}
                 onClick={() => handleChange("budget", item.title)}
-                className={`cursor-pointer p-4 border rounded-lg hover:shadow-md transition ${
-                  tripDetails.budget === item.title ? "border-indigo-500 bg-indigo-50" : ""
+                className={`cursor-pointer p-4 border rounded-lg hover:shadow-md transition bg-gray-100 ${
+                  tripDetails.budget === item.title ? "border-indigo-500 bg-green-400" : ""
                 }`}
               >
                 <div className="text-2xl mb-2">{item.icon}</div>
@@ -85,14 +85,14 @@ const NewTrip = () => {
 
         {/* Persons */}
         <div className="mb-8">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Travel Group</label>
+          <label className="block text-sm font-medium text-gray-200 mb-3">Travel Group</label>
           <div className="grid grid-cols-3 gap-4">
             {SelectTravelList.map((item, index) => (
               <div
                 key={index}
                 onClick={() => handleChange("persons", item.people)}
-                className={`cursor-pointer p-4 border rounded-lg hover:shadow-md transition ${
-                  tripDetails.persons === item.people ? "border-red-400 bg-red-50" : ""
+                className={`cursor-pointer p-4 border rounded-lg hover:shadow-md bg-gray-100 transition ${
+                  tripDetails.persons === item.people ? "border-red-400 bg-green-400" : ""
                 }`}
               >
                 <div className="text-2xl mb-2">{item.icon}</div>
