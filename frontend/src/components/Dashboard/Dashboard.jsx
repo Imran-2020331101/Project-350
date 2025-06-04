@@ -1,31 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {useSelector} from 'react-redux'
+import { useSelector } from 'react-redux';
 import ImageCard from './imageCard';
 import BlogCard from '../blogCard';
 import { Blogs } from '../../DemoInfo/BlogsData';
 
 const Experiences = () => {
-
   const user = useSelector((state) => state.auth.user);
-  
-  // const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-
-  const myBlogs = Blogs.filter((blog)=>blog.owner==user.id);
+  const myBlogs = Blogs.filter((blog) => blog.owner == user.id);
 
   return (
-    <div className="fixed right-0 w-[70%] h-full px-10 py-8 overflow-y-auto flex flex-col gap-8 bg-inherit">
+    <div className="w-full max-w-7xl px-4 sm:px-6 md:px-10 py-8 overflow-y-auto flex flex-col gap-10 bg-inherit mx-auto">
 
       {/* Header Action Row */}
-      <div className="flex justify-between items-center w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl font-bold text-gray-300">Your Experiences</h1>
-        <div className="flex gap-4">
-          <Link to="/blogs/new" className="px-5 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-indigo-700 transition">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            to="/blogs/new"
+            className="px-5 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-indigo-700 transition text-center"
+          >
             Create Blog
           </Link>
           <Link
             to="/uploadimage"
-            className="px-5 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-indigo-700 transition flex items-center justify-center"
+            className="px-5 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-indigo-700 transition text-center"
           >
             Upload Photos
           </Link>

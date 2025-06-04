@@ -25,7 +25,7 @@ export const social_media = [
 ]
 
 export const dummyUser = {
-    userId: 'user_003',
+    userId: 'user_001',
     name: 'Imran Hossain',
     username: 'imran_travels',
     email: 'imran@example.com',

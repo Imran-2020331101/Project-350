@@ -26,7 +26,7 @@ function App() {
         <Route path='newtrip' element={<NewTrip/>}/>
         <Route path='uploadimage' element={<ImageUpload/>}/>
         <Route path='logout' element={<Logout/>}/>
-        <Route path='group/create' element={<CreateGroup/>}/>
+        <Route path='group/new' element={<CreateGroup/>}/>
         <Route path='group/:id' element={<PackageDetail/>}/>
         <Route path='blogs/new' element={<CreateBlog/>}/>
         <Route path='blogs' element={<AllBlogs/>}/>

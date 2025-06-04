@@ -27,7 +27,7 @@ const CreateGroup = () => {
   };
 
   return (
-    <div className="bg-gray-100 py-12">
+    <div className="bg-gray-900 py-12">
       <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
         <h2 className="text-3xl font-semibold text-center text-gray-800 mb-8">
           <Tag className="inline-block mr-2 text-blue-500" size={32} /> Create a Travel Group
