@@ -45,8 +45,10 @@ const createTrip = async (req, res) => {
         console.error(err);
       });
 
-    //fetch: hotels from trivago
-
+    //fetch: hotels from google travel api's
+    //refer to : https://developers.google.com/hotels/hotel-prices/api-reference#hotelviewservice
+    //Api req address: https://travelpartner.googleapis.com/v3/accounts/4200042/hotelViews
+    
     //fetch: places to visit
 
     const newTrip = await Trip.create(initialTrip);
