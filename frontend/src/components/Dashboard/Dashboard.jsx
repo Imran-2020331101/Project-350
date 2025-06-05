@@ -7,8 +7,8 @@ import { Blogs } from '../../DemoInfo/BlogsData';
 
 const Experiences = () => {
   const user = useSelector((state) => state.auth.user);
-  const myBlogs = Blogs.filter((blog) => blog.owner == user.id);
-
+  const myBlogs = Blogs.filter((blog) => blog.owner == user.userId);
+  
   return (
     <div className="w-full max-w-7xl px-4 sm:px-6 md:px-10 py-8 overflow-y-auto flex flex-col gap-10 bg-inherit mx-auto">
 
