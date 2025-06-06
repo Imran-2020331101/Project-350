@@ -13,7 +13,7 @@
     "@react-google-maps/api": "^2.20.3",
     "@reduxjs/toolkit": "^2.3.0",
     "@vis.gl/react-google-maps": "^1.5.2",
-    "axios": "^1.7.7",
+    "axios": "^1.9.0",
     "dotenv": "^16.4.5",
     "lucide-react": "^0.482.0",
     "react": "^18.3.1",
@@ -23,6 +23,7 @@
     "react-router-dom": "^6.27.0",
     "react-slick": "^0.30.3",
     "react-tailwindcss-datepicker": "^1.7.2",
+    "react-toastify": "^11.0.5",
     "slick-carousel": "^1.8.1"
   },
   "devDependencies": {

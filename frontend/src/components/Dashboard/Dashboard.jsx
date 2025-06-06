@@ -46,6 +46,18 @@ const Experiences = () => {
           ))}
         </div>
       </section>
+
+      {/* Trips Section */}
+      <section className="w-full mb-10">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">Your Trip plans</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {myBlogs.map((blog) => (
+            <Link key={blog.id} to={`/blogs/${blog.id}`}>
+              <BlogCard blogData={blog} />
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };

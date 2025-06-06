@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import {useNavigate} from 'react-router-dom'
+import axios from 'axios'
+import {ToastContainer, toast} from 'react-toastify';
 
 const steps = [
   'images',
@@ -14,6 +17,8 @@ const steps = [
 const CreateBlog = () => {
   const user = useSelector((state) => state.auth.user);
   const uploadedImages = user.images;
+
+  const navigate =useNavigate();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [blogInfo, setBlogInfo] = useState({
@@ -40,6 +45,20 @@ const CreateBlog = () => {
   const handleChange = (field, value) => {
     setBlogInfo((prev) => ({ ...prev, [field]: value }));
   };
+
+  /* global process */
+  const publishBlog = async ()=>{
+    const res = await axios.post(`${process.env.REACT_APP_BASE_ADDRESS}/blogs`,{ blogInfo })
+    const {status,body} = res;
+    if(status==201){
+      toast("Blog created successfully");
+      /* TODO:
+      * 1. check what is returned & add the returned blog to the user's state
+      * 2. Test it
+      */
+      navigate(`/blogs/${body.id}`)
+    }
+  }
 
   const stepComponent = () => {
     switch (steps[currentStep]) {
@@ -120,7 +139,7 @@ const CreateBlog = () => {
             <p><strong>Insights:</strong> {blogInfo.insights}</p>
             <p><strong>Conclusion:</strong> {blogInfo.conclusion}</p>
             <button
-              onClick={() => console.log(blogInfo)}
+              onClick={() => publishBlog()}
               className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-xl transition"
             >
               Publish Blog
@@ -154,6 +173,7 @@ const CreateBlog = () => {
           {currentStep === steps.length - 2 ? 'Review' : 'Next'}
         </button>
       </div>
+      <ToastContainer/>
     </div>
   );
 };
