@@ -15,7 +15,7 @@ export default function Category({Packages}) {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
-    arrows: false,
+    // arrows: false,
     responsive: [
       {
         breakpoint: 1024,
@@ -24,7 +24,7 @@ export default function Category({Packages}) {
           slidesToScroll: 1,
           infinite: true,
           dots: false,
-          arrows: false
+          // arrows: false
         }
       },
       {
@@ -33,14 +33,14 @@ export default function Category({Packages}) {
           slidesToShow: 1,
           slidesToScroll: 1,
           dots: false,
-          arrows: false
+          // arrows: false
         }
       }
     ]
   };
 
   return (
-    <section id="works" className="py-6 bg-gray-800 w-[90%]">
+    <section id="works" className="py-6 bg-gray-900 w-[90%]">
       <div className="container mx-auto text-center">
         <Slider {...settings}>
           {

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { selectCurrentUser, selectStatus, postUsers } from "../../redux/authSlice"; // Updated imports
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Auth = () => {
     const [email, setEmail] = useState("");
@@ -18,14 +19,18 @@ const Auth = () => {
         }
     }, [currentStatus, currentUser, navigate]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        try {
-            dispatch(postUsers({ email, password }));
-        } catch (error) {
-            console.log(error.message);
-        }
-    };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const user = await dispatch(postUsers({ email, password })).unwrap(); // unwrap throws on error
+    toast.success('Logged in successfully');
+    console.log('Logged in user:', user);
+  } catch (error) {
+    toast.error(`Login failed: ${error}`);
+    console.error('Login error:', error);
+  }
+};
+
 
     return (
         <section className="fixed top-0 left-0 backdrop-blur-[7px] h-screen w-full  font-sans z-10">

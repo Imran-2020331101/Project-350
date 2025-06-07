@@ -18,7 +18,7 @@ const Home = () => {
     <div className="w-full h-auto flex flex-col items-center justify-start px-4 sm:px-6 lg:px-10">
       <Welcome />
       
-      <h2 className="text-3xl font-bold my-12">Embark on a trail adventure</h2>
+      <h2 className="text-3xl font-bold my-12 pt-12">Embark on a trail adventure</h2>
       <Slider Packages={Groups} />
 
       <h2 className="text-3xl font-bold text-center py-16">Tales from the Road</h2>

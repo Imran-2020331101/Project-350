@@ -14,10 +14,12 @@ import Dashboard from './components/Dashboard/Dashboard'
 import AllBlogs from './pages/AllBlogs'
 import PackageDetail from './pages/PackageDetail'
 import CreateGroup from './pages/CreateGroup'
+import { ToastContainer } from 'react-toastify'
 
 function App() {
 
   return (
+    <>
     <Routes>
       <Route path='/' element={<ParentLayout/>} >
         <Route index element={<Home/>}/>
@@ -38,6 +40,8 @@ function App() {
         </Route>
       </Route>
     </Routes>
+    <ToastContainer/>
+    </>
   )
 }
 

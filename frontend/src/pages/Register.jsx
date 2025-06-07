@@ -1,25 +1,37 @@
-import React from 'react'
+import {useState} from 'react'
 import { useNavigate} from 'react-router-dom'
 import { useDispatch } from 'react-redux';
 import {registerUser} from '../redux/authSlice'
+import { toast } from 'react-toastify';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 const Register = () => {
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("");
-    const [name, setName] = React.useState("");
-    const [confirmPassword, setConfirmPassword] = React.useState("");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword,setShowPassword] = useState(false);
+    const [showConfirmPassword,setShowConfirmPassword] = useState(false);
+
+
     const reg=true;
     const navigate= useNavigate();
     const dispatch = useDispatch();
 
-    const signUp = (e) => {
+    const signUp = async (e) => {
         e.preventDefault();
+        
         if(!password || !email || !name || !confirmPassword || password!==confirmPassword){
             alert('Please fill all fields correctly')
         }
-
-        dispatch(registerUser({email, password, name}))
-        
+        try {
+            const res = await dispatch(registerUser({ name, email, password })).unwrap();
+            toast.success("Registered successfully!");
+            console.log(res);
+        } catch (err) {
+            toast.error(`Registration failed: ${err}`);
+            console.log("Error signing up : " + err);
+        }
     }
 
     return (
@@ -32,17 +44,14 @@ const Register = () => {
                     >
                         <p className="px-4 hover:cursor-pointer text-black">x</p>
                     </div>
-                    
-                    {
-                        reg?(
-                            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+                      <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                             Create an account
                         </h1>
                         <div className="space-y-4 md:space-y-6" action="#">
                             <div>
                                 <label
-                                    for="name"
+                                    htmlFor="name"
                                     className="block mb-2 text-sm font-medium text-gray-900"
                                 >
                                     Full Name
@@ -59,7 +68,7 @@ const Register = () => {
                             </div>
                             <div>
                                 <label
-                                    for="email"
+                                    htmlFor="email"
                                     className="block mb-2 text-sm font-medium text-gray-900"
                                 >
                                     Your email
@@ -75,38 +84,59 @@ const Register = () => {
                                 />
                             </div>
                             <div>
-                                <label
-                                    for="rePassword"
-                                    className="block mb-2 text-sm font-medium text-gray-900"
-                                >
-                                    Password
-                                </label>
+                            <label
+                                htmlFor="password"
+                                className="block mb-2 text-sm font-medium text-gray-900"
+                            >
+                                Password
+                            </label>
+                            <div className="relative">
                                 <input
-                                    type="password"
-                                    name="password"
-                                    id="password"
-                                    placeholder="••••••••"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 "
-                                    required={true}
-                                    onChange={(e)=>setPassword(e.target.value)}
+                                type={showPassword ? 'text' : 'password'}
+                                name="password"
+                                id="password"
+                                placeholder="••••••••"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 pr-10"
+                                required
+                                onChange={(e) => setPassword(e.target.value)}
                                 />
+                                <button
+                                type="button"
+                                onClick={() => setShowPassword((prev) => !prev)}
+                                className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600"
+                                tabIndex={-1}
+                                >
+                                {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                                </button>
                             </div>
+                            </div>
+
                             <div>
                                 <label
-                                    for="confirm-password"
+                                    htmlFor="confirm-password"
                                     className="block mb-2 text-sm font-medium text-gray-900"
                                 >
                                     Confirm password
                                 </label>
-                                <input
-                                    type="confirm-password"
-                                    name="rePassword"
-                                    id="confirm-password"
-                                    placeholder="••••••••"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
-                                    required={true}
-                                    onChange={(e)=>setConfirmPassword(e.target.value)}  
-                                />
+                                <div className='relative'>
+                                    <input
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        name="rePassword"
+                                        id="confirm-password"
+                                        placeholder="••••••••"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+                                        required
+                                        onChange={(e)=>setConfirmPassword(e.target.value)}  
+                                        />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword((prev) => !prev)}
+                            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600"
+                            tabIndex={-1}
+                            >
+                            {showConfirmPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                            </button>
+                                </div>
                             </div>
                             <button
                                 onClick={signUp}
@@ -125,30 +155,7 @@ const Register = () => {
                                 </p>
                             </p>
                         </div>
-                    </div>
-                        ):(
-                            <div className="p-4 m-2">
-                                <label
-                                    for="otp"
-                                    className="block mb-2 text-sm font-medium text-gray-900"
-                                >
-                                    Confirm Email
-                                </label>
-                                <input
-                                    
-                                    id="email"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
-                                    placeholder="check mail for otp"
-                                    required={true}
-                                    onChange={handleOtp}
-                                />
-                                <button onClick={verifyOtp} className="mt-2 w-1/2 text-white font-semibold bg-slate-700 hover:bg-slate-800 focus:ring-4 focus:outline-none rounded-lg text-sm px-5 py-2.5 text-center ">
-                                    Confirm
-                                </button>
-                            </div>
-                        )
-                    }
-                    
+                    </div>                    
                 </div>
             </div>
         </section>

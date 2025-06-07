@@ -1,10 +1,12 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { postTrip } from "../redux/tripSlice";
 import { SelectTravelList, SelectBudgetOptions } from "../DemoInfo/options";
+import { toast } from "react-toastify";
 
 const NewTrip = () => {
+  const isSignedIn = useSelector((state) => state.auth.isSignedIn);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -20,9 +22,16 @@ const NewTrip = () => {
   };
 
   const handleSubmit = useCallback(() => {
+    
+    if(!isSignedIn){
+      toast.error('You need to Sign In to create a Trip');
+      return navigate('/login');
+    }
+
     const { destination, days, budget, persons } = tripDetails;
     dispatch(postTrip({ destination, days, budget, persons }));
     navigate("/dashboard"); // or wherever you want to go after submission
+    toast.success("Trip created successfully");
   }, [tripDetails, dispatch, navigate]);
 
   return (

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CalendarDays, Sun, MapPin, Tag, Info, ImagePlus, Users, DollarSign, Flag, Camera } from 'lucide-react';
+import {toast} from 'react-toastify';
+import axios from 'axios'
 
 const CreateGroup = () => {
 
@@ -8,6 +10,7 @@ const CreateGroup = () => {
   const tripFromState = location.state?.trip;
 
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   
   const [groupData, setGroupData] = useState({
@@ -47,10 +50,26 @@ const CreateGroup = () => {
     setGroupData({ ...groupData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+
+  /* global process */
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Group Created:", groupData);
     // TODO: Send to backend here
+    const res = await axios({
+      method:'post',
+      url:`${process.env.REACT_APP_BACKEND_ADDRESS}/groups`,
+      data: groupData,
+      headers:{
+        
+      }
+    });
+    if(res.status == 200){
+      toast.success("Group Created Successfully");
+      navigate('/group/2');
+    }else{
+      toast.error("Failed to create group");
+    }
+
   };
 
   return (
@@ -236,6 +255,7 @@ const CreateGroup = () => {
           </button>
         </form>
       </div>
+      
     </div>
   );
 };

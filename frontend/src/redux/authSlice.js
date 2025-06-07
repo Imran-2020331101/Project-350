@@ -2,52 +2,60 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import {dummyUser} from '../DemoInfo/User'
 
-const baseUrl = 'http://localhost:3000/api/v1';
 
 const initialState = {
   user: dummyUser, 
   status: 'idle', 
   error: null,
-  isSignedIn: true,
+  isSignedIn: false,
 };
 
-export const postUsers = createAsyncThunk('auth/login', async (user) => {
+/* global process */
+export const postUsers = createAsyncThunk('auth/login', async (user,{dispatch, rejectWithValue}) => {
   try {
-    console.log('testing login');
-    const response = await axios.post(`${baseUrl}/auth/login`, user);
-    console.log(response, 'login success');
-    return response.data; // Expecting a single user object or relevant auth data
+    const res = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/auth/login`, user);
+    const {token, user:userData} = res.data;
+
+    dispatch(setUser({user:userData,token}))
+
+    console.log(userData , 'login success');
+
+    return userData; // Expecting a single user object or relevant auth data
   } catch (error) {
-    return error.message;
+    return rejectWithValue(error.response?.data?.message || error.message);
   }
 });
 
 export const registerUser = createAsyncThunk(
   'auth/register',
-  async (user) => {
+  async (user, { rejectWithValue }) => {
     try {
-      console.log('registering user');
-      const response = await axios.post(`${baseUrl}/auth/register`, user);
-      console.log(response, 'registration success');
-      return response.data; // Expecting a single user object or relevant registration data
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/auth/register`, user);
+      return response.data;
     } catch (error) {
-      return error.message;
+      if (error.response && error.response.data && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      }
+      return rejectWithValue('Registration failed. Please try again.');
     }
   }
 );
+
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     setUser: (state, action) => {
-      state.user = action.payload;
-      state.isSignedIn = !!action.payload; // Update isSignedIn based on user presence
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isSignedIn = !!action.payload.user; // Update isSignedIn based on user presence
       state.status = 'success'; // Optionally update status
       state.error = null; // Clear any previous error
     },
     signedOut: (state) => {
       state.user = null;
+      state.token = null;
       state.isSignedIn = false;
       state.status = 'idle'; // Reset status on sign out
     },
@@ -64,11 +72,12 @@ const authSlice = createSlice({
       .addCase(postUsers.fulfilled, (state, action) => {
         state.status = 'success';
         state.isSignedIn = true;
-        state.user = action.payload; // Store the logged-in user data
+        state.token = action.payload.accessToken;
+        state.user = action.payload.user; // Store the logged-in user data
       })
       .addCase(postUsers.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload;
+        state.error = action.payload.error;
         state.isSignedIn = false;
         state.user = null;
       })

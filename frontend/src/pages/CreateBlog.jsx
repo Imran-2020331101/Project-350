@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import {useNavigate} from 'react-router-dom'
 import axios from 'axios'
-import {ToastContainer, toast} from 'react-toastify';
+import {toast} from 'react-toastify';
 
 const steps = [
   'images',
@@ -173,7 +173,6 @@ const CreateBlog = () => {
           {currentStep === steps.length - 2 ? 'Review' : 'Next'}
         </button>
       </div>
-      <ToastContainer/>
     </div>
   );
 };
