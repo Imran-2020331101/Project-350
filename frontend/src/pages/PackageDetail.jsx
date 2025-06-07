@@ -1,12 +1,19 @@
 import React from 'react';
 import { CalendarDays, MapPin, DollarSign, Users, PlaneTakeoff, Info, Camera, Compass, Mountain, Sun } from 'lucide-react';
 import { Groups } from '../DemoInfo/Groups';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Footer from '../components/HomePage/Footer';
 
 const PackageDetail = () => {
   const { id } = useParams();
   const [trip] = Groups.filter((p) => p.id == id);
+
+  // Find related trips based on shared tags
+  const relatedGroups = Groups.filter(
+    (g) =>
+      g.id !== trip.id &&
+      g.tags?.some((tag) => trip.tags?.includes(tag))
+  ).slice(0, 3); 
 
   if (!trip) return <div className="text-center py-10">Trip data not available.</div>;
 
@@ -153,28 +160,31 @@ const PackageDetail = () => {
       </section>
 
       {/* Related Trips Section (Example - you'd likely fetch this data) */}
-      <section className="max-w-6xl mx-auto p-6 mt-12 bg-gray-50 rounded-xl shadow-md">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center"><Mountain className="mr-2 text-gray-700" size={24} /> You Might Also Like</h2>
+      <section className="max-w-6xl mx-auto p-6 mt-12 bg-gray-800 rounded-xl shadow-md">
+        <h2 className="text-2xl font-semibold text-gray-200 mb-6 flex items-center"><Mountain className="mr-2 text-gray-200" size={24} /> You Might Also Like</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Example related trips - replace with actual data */}
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden">
+          {relatedGroups.map((group) => (
+            <div key={group.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <img
-                src={`https://source.unsplash.com/random/400x250?landscape&sig=${i + 10}`}
-                alt={`Related Trip ${i}`}
+                src={`https://source.unsplash.com/random/400x250?landscape&sig=`}
+                alt={`Related Trip ${group.id}`}
                 className="w-full h-32 object-cover"
               />
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-800 text-lg mb-2">Adventure in the Alps</h3>
-                <p className="text-gray-600 text-sm">5 Days | Switzerland</p>
-                <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mt-2 text-sm">View Details</button>
+              <div className="p-4 bg-gray-900 text-gray-50">
+                <h3 className="font-semibold text-lg mb-2">{group.title}</h3>
+                <p className="text-sm">{group.days} | {group.place}</p>
+                <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mt-2 text-sm">
+                  <Link to={`/group/${group.id}`}>
+                    View Details
+                  </Link>
+                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      <Footer/>
     </div>
   );
 };

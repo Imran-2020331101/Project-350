@@ -1,6 +1,7 @@
 import React from 'react';
 import { Blogs } from '../DemoInfo/BlogsData';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { Mountain } from 'lucide-react';
 
 const mockUser = {
   name: "John Doe",
@@ -10,6 +11,13 @@ const mockUser = {
 const Blog = () => {
   const { id } = useParams();
   const blog = Blogs.find((b) => b.id === id);
+
+  // Find related blogs based on shared tags
+  const relatedBlogs = Blogs.filter(
+    (b) =>
+      b.id !== blog.id &&
+      b.tags?.some((tag) => blog.tags?.includes(tag))
+  ).slice(0, 3); 
 
   const coverImage = blog.images?.[0];
 
@@ -68,7 +76,7 @@ const Blog = () => {
   }
 
   return (
-    <div className="w-screen min-h-screen pt-14 flex flex-col items-center gap-4 pb-6 px-4">
+    <div className="min-h-screen pt-14 flex flex-col items-center gap-4 pb-6 px-4">
       {coverImage && (
         <div className="w-full h-[300px] md:h-[500px] overflow-hidden">
           <img
@@ -125,6 +133,43 @@ const Blog = () => {
           🔗 Share
         </button>
       </div>
+      
+<section className="max-w-6xl mx-auto p-6 m-12 bg-gray-800 rounded-xl shadow-md">
+  <h2 className="text-2xl font-semibold text-gray-200 mb-6 flex items-center">
+    <Mountain className="mr-2 text-gray-200" size={24} /> Simillar Blogs
+  </h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {relatedBlogs.map((blog) => (
+      <div
+        key={blog.id}
+        className="bg-gray-900 rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-[1.015] hover:shadow-lg h-full"
+      >
+        {/* Consistent image aspect ratio */}
+        <div className="w-full h-32 md:h-40 overflow-hidden">
+          <img
+            src={`https://source.unsplash.com/random/400x250?landscape&sig=${blog.id}`}
+            alt={`Related Trip ${blog.id}`}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          />
+        </div>
+
+        <div className="p-4 text-gray-50">
+          <h3 className="font-semibold text-lg mb-2">{blog.title}</h3>
+          <p className="text-sm">{blog.author}</p>
+          <p className="text-sm">{blog.publishDate}</p>
+
+          <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mt-2 text-sm">
+            <Link to={`/blogs/${blog.id}`}>
+              View Details
+            </Link>
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
 
       {/* Comment Section */}
       <div className="w-full md:w-[60%] mt-6 bg-[#0f172a] rounded-xl p-6 shadow-lg border border-blue-900">
