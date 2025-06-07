@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { selectCurrentUser, selectStatus, postUsers } from "../../redux/authSlice"; // Updated imports
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { EyeIcon,EyeOffIcon } from "lucide-react";
 
 const Auth = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword,setShowPassword] = useState(false);
     const dispatch = useDispatch();
     const currentStatus = useSelector(selectStatus); // Use the new selector name
     const currentUser = useSelector(selectCurrentUser); // Use the new selector name
@@ -70,17 +72,27 @@ const handleSubmit = async (e) => {
                                 >
                                     Password
                                 </label>
-                                <input
-                                    type="password"
+                                <div className="relative">
+                                    <input
+                                    type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     id="password"
                                     placeholder="••••••••"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
-                                    required={true}
-                                    value={password}
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 pr-10"
+                                    required
                                     onChange={(e) => setPassword(e.target.value)}
-                                />
+                                    />
+                                    <button
+                                    type="button"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                    className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600"
+                                    tabIndex={-1}
+                                    >
+                                    {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                                    </button>
+                                </div>
                             </div>
+
                             <button onClick={handleSubmit} className="w-full text-white bg-slate-700 hover:bg-slate-800 focus:ring-4 focus:outline-none  font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                                 Sign in
                             </button>
