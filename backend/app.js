@@ -28,7 +28,7 @@ require('dotenv').config();
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
-connectDB();
+
 
 // Middleware
 // app.use(helmet());
@@ -56,6 +56,32 @@ app.post('/api/auth/register', handleRegister);
 app.post('/api/auth/logout', handleLogout);
 app.post('/api/auth/profile/update', handleProfileUpdate);
 app.post('/api/auth/refresh', refreshToken)
+
+app.post('blogs/:id/comments', async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    blog.comments.push(req.body); // assumes { user: {}, text: "" }
+    await blog.save();
+    res.status(200).json(blog.comments);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add a reply to a comment
+app.post('blogs/:id/comments/:commentId/replies', async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.blogId);
+    const comment = blog.comments.id(req.params.commentId);
+    comment.replies.push(req.body); // assumes { user: {}, text: "" }
+    await blog.save();
+    res.status(200).json(comment.replies);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 // Routes - Groups
 app.route('/api/groups')
@@ -94,7 +120,7 @@ app.use((err, req, res, next) => {
 
 // Server Start
 
-
+connectDB();
 
 app.listen(port, () => {
     console.log(`✅ Server listening on port ${port}`);

@@ -1,55 +1,44 @@
-const Trip = require("../models/trip")
+const Trip = require("../models/trip");
 const User = require("../models/User");
+const { getWeatherForecast } = require("./WeatherService");
 
 // Create a new trip
+// Incoming req.body
+// {
+//     destination: "",
+//     days: "",
+//     budget: "",
+//     persons: ""
+// }
+
 const createTrip = async (req, res) => {
+
+  const {destination, days, budget, persons} = req.body;
+
   try {
     const initialTrip = {
       owner: req.owner,
       destination: req.destination,
       tags: req.tags,
+      weatherForecast: {
+        temparature: "",
+        condition: "",
+        alerts: "",
+        suggestions: "",
+      },
     };
 
-    //fetch: transports
+    //TODO: fetch: transports
 
     console.log("hello");
 
     //fetch: weather forecast
-    fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${req.city}&appid=${apiKey}&units=metric`
-    )
-      .then((res) => {
-        if (!res.ok) throw new Error("City not found");
-        return res.json();
-      })
-      .then((data) => {
-        const temp = data.main.temp + "°C";
-        const condition = data.weather[0].description;
-        const alerts =
-          condition.includes("rain") || condition.includes("storm")
-            ? "Weather Alert: Take precautions"
-            : "No severe alerts";
+    initialTrip.weatherForecast = getWeatherForecast(destination);
+    /**
+     * TODO: Add hotels from serpapi
+     */
 
-        const suggestions = condition.includes("rain")
-          ? "Bring an umbrella and raincoat"
-          : "Light clothes are fine";
-
-        initialTrip.weatherForecast = {
-          temparature: temp,
-          condition: condition,
-          alerts: alerts,
-          suggestions: suggestions,
-        };
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-
-    //fetch: hotels from google travel api's
-    //refer to : https://developers.google.com/hotels/hotel-prices/api-reference#hotelviewservice
-    //Api req address: https://travelpartner.googleapis.com/v3/accounts/4200042/hotelViews
-    
-    //fetch: places to visit
+    //TODO: fetch: places to visit
 
     const newTrip = await Trip.create(initialTrip);
     res.status(201).json(newTrip);

@@ -13,9 +13,16 @@ function fileToGenerativePart(data, mimeType) {
     };
 }
 
+const {GoogleGenAI} =require("@google/genai");
 
-const generateResponse= async (prompt)=>{
-    console.log("Ai called");
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+async function generateResponse(prompt) {
+  const response = await ai.models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: prompt,
+  });
+  return response.text;
 }
 
-export {fileToGenerativePart, generateResponse}
+module.exports =  {fileToGenerativePart, generateResponse}
