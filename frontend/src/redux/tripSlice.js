@@ -1,67 +1,51 @@
-import { createSlice } from '@reduxjs/toolkit';
+// src/features/trips/tripsSlice.js
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { createAsyncThunk } from '@reduxjs/toolkit';
 
-const baseUrl = 'http://localhost:3000/api/v1';
-
-export const fetchTrips = createAsyncThunk('trips/fetchTrips', async () => {
-  try {
-    const response = await axios.get('/api/trips');
+/* global process */
+export const fetchTrips = createAsyncThunk(
+  'trips/fetchAll',
+  async () => {
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_ADDRESS}/api/trips`);
     return response.data;
-  } catch (error) {
-    return error.message;
   }
-});
+);
 
-export const postTrip = createAsyncThunk('trips/postTrip', async (trip) => {
-  try {
-    const response = await axios.post(`${baseUrl}/itinerary`, trip);
+
+export const postTrip = createAsyncThunk(
+  'trips/postTrip',
+  async (newTrip) => {
+    const response = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/api/trips`, newTrip);
     return response.data;
-  } catch (error) {
-    return error.message;
   }
-});
+);
 
-const initialState = {
-  trips: [],
-  status: 'loading',
-  error: null,
-};
 
-const tripSlice = createSlice({
+const tripsSlice = createSlice({
   name: 'trips',
-  initialState,
-  reducers: {
-    addTrip: {
-      reducer(state, action) {},
-      prepare(trip) {
-        return {
-          payload: {},
-        };
-      },
-    },
+  initialState: {
+    trips: [],
+    status: 'idle',
+    error: null,
   },
-  extraReducers(builder) {
+  reducers: {},
+  extraReducers: (builder) => {
     builder
-      .addCase(fetchTrips.pending, (state, action) => {
+      .addCase(fetchTrips.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(fetchTrips.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.trips = state.trips.concat(action.payload);
+        state.trips = action.payload;
       })
       .addCase(fetchTrips.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       })
       .addCase(postTrip.fulfilled, (state, action) => {
-        // state.trips.push(action.payload);
-        console.log(action.payload);
+        state.trips.push(action.payload); // Add the new trip to the list
       });
   },
 });
 
-export const { addTrip } = tripSlice.actions;
-export default tripSlice.reducer;
-
-const selectAllTrips = (state) => state.trips.trips;
+export default tripsSlice.reducer;

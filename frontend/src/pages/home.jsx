@@ -1,16 +1,40 @@
-import Footer from '../components/HomePage/Footer';
 import Welcome from '../components/HomePage/HeroSection';
 import Slider from '../components/HomePage/Slider';
 import BlogCard from '../components/blogCard';
 import Contacts from '../components/HomePage/Contacts';
-import { Blogs } from '../DemoInfo/BlogsData';
 import { Link } from 'react-router-dom';
 import Loader from '../components/Shared/Loader';
 import { Groups } from '../DemoInfo/Groups';
 
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchBlogs } from '../redux/blogSlice';
+
 const Home = () => {
-  const getRandomBlogs = (Blogs, count = 5) => {
-    const shuffled = [...Blogs].sort(() => 0.5 - Math.random());
+
+  const dispatch = useDispatch();
+  const { blogs, status, error } = useSelector((state) => state.blogs);
+
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchBlogs());
+    }
+  }, [dispatch, status]);
+
+  if (status === 'loading'){
+    return (
+      <div className="text-white text-center">
+        <Loader/>
+      </div>
+    )
+  } 
+  if (status === 'failed') return <div className="text-red-500">{error}</div>;
+
+  console.log(blogs)
+
+  const getRandomBlogs = (blogs, count = 5) => {
+    const shuffled = [...blogs].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
   };
 
@@ -24,8 +48,8 @@ const Home = () => {
       <h2 className="text-3xl font-bold text-center py-16">Tales from the Road</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10 w-full max-w-7xl">
-        {getRandomBlogs(Blogs, 4).map((blog) => (
-          <Link key={blog.id} to={`/blogs/${blog.id}`}>
+        {getRandomBlogs(blogs, 4).map((blog) => (
+          <Link key={blog._id} to={`/blogs/${blog._id}`}>
             <BlogCard blogData={blog} />
           </Link>
         ))}

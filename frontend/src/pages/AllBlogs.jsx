@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import BlogCard from '../components/blogCard'; 
 import { Blogs } from '../DemoInfo/BlogsData';
 import Loader from '../components/Shared/Loader';
+import { Link } from 'react-router-dom';
 
 const AllBlogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -42,7 +43,9 @@ const AllBlogs = () => {
       ) : (
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {blogs.map((blog) => (
-            <BlogCard key={blog.id} blogData={blog} />
+            <Link to={`/blogs/${blog.id}`} key={blog.id}>
+              <BlogCard blogData={blog} />
+            </Link>
           ))}
         </div>
       )}

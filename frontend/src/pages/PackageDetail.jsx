@@ -167,8 +167,8 @@ const PackageDetail = () => {
           {relatedGroups.map((group) => (
             <div key={group.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <img
-                src={`https://source.unsplash.com/random/400x250?landscape&sig=`}
-                alt={`Related Trip ${group.id}`}
+                src={group.image}
+                alt={`Related group ${group.id}`}
                 className="w-full h-32 object-cover"
               />
               <div className="p-4 bg-gray-900 text-gray-50">

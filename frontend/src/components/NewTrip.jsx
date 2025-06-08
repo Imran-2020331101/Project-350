@@ -19,7 +19,7 @@ const NewTrip = () => {
 
   const handleChange = (name, value) => {
     setTripDetails((prev) => ({ ...prev, [name]: value }));
-  };
+  }; 
 
   const handleSubmit = useCallback(() => {
     
