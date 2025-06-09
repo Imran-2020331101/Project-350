@@ -61,8 +61,10 @@ const deleteTrip = async (req, res) => {
 };
 
 const getAllTrips = async (req, res) => {
-  try {
-    const { userId } = req.query;
+  try { 
+    const { id:userId } = req.params;
+    console.log(userId);
+    if(!userId) return res.status(404).json({error: "must send user Id"})
     const trips = await Trip.find({ owner: userId });
     res.status(200).json(trips);
   } catch (error) {

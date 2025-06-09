@@ -11,10 +11,20 @@
     "http"
   ],
   "paths": {
-    "/api/trips": {
+    "/api/trips/{id}": {
       "get": {
         "tags": ["Trips"],
         "description": "",
+                "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],  
         "responses": {
           "default": {
             "description": ""
@@ -34,7 +44,6 @@
         }
       }
     },
-    "/api/trips/{id}":{
       "delete": {
       "tags": ["Trips"],
       "summary": "Delete a trip",
@@ -64,7 +73,6 @@
           "description": "Internal Server Error"
         }
       }
-    }
     },
     "/api/blogs": {
       "get": {
