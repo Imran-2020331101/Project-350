@@ -4,32 +4,38 @@ import BlogCard from '../components/blogCard';
 import Contacts from '../components/HomePage/Contacts';
 import { Link } from 'react-router-dom';
 import Loader from '../components/Shared/Loader';
-import { Groups } from '../DemoInfo/Groups';
 
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchBlogs } from '../redux/blogSlice';
+import { fetchGroups } from '../redux/groupSlice';
 
 const Home = () => {
-
   const dispatch = useDispatch();
-  const { blogs, status, error } = useSelector((state) => state.blogs);
-
-
+  
+  const { items: groups, status: groupStatus } = useSelector((state) => state.groups);
+  const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
+  
   useEffect(() => {
-    if (status === 'idle') {
+    dispatch(fetchGroups());
+  }, [dispatch]);
+  
+  useEffect(() => {
+    if (blogStatus === 'idle') {
       dispatch(fetchBlogs());
     }
-  }, [dispatch, status]);
+  }, [dispatch, blogStatus]);
 
-  if (status === 'loading'){
+  if (groupStatus === "loading") return <Loader />;
+  
+  if (blogStatus === 'loading'){
     return (
       <div className="text-white text-center">
         <Loader/>
       </div>
     )
   } 
-  if (status === 'failed') return <div className="text-red-500">{error}</div>;
+  if (blogStatus === 'failed') return <div className="text-red-500">{blogError}</div>;
 
   console.log(blogs)
 
@@ -43,7 +49,7 @@ const Home = () => {
       <Welcome />
       
       <h2 className="text-3xl font-bold my-12 pt-12">Embark on a trail adventure</h2>
-      <Slider Packages={Groups} />
+      <Slider Packages={groups} />
 
       <h2 className="text-3xl font-bold text-center py-16">Tales from the Road</h2>
 
