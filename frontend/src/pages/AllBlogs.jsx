@@ -1,43 +1,23 @@
-import React, { useEffect, useState } from 'react';
 import BlogCard from '../components/blogCard'; 
-import { Blogs } from '../DemoInfo/BlogsData';
 import Loader from '../components/Shared/Loader';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const AllBlogs = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
 
-  // Mock fetch for demonstration – replace with real API call
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        // Simulated API delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Replace with your API call (e.g., axios.get)
-        const mockData = Blogs;
-
-        setBlogs(mockData); // replace with actual fetched data
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to load blogs:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchBlogs();
-  }, []);
+  const isLoading = blogStatus === 'loading';
 
   return (
     <div className="min-h-screen bg-[#111827] py-8 px-4 md:px-12">
       <h1 className="text-3xl font-bold text-center mb-10 py-5 text-gray-200">All Travel Blogs</h1>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center h-48">
-          <Loader/>
-          <div className="text-gray-500 animate-pulse">Loading blogs...</div>
+          <Loader />
         </div>
+      ) : blogError ? (
+        <p className="text-center text-red-400">Error loading blogs: {blogError}</p>
       ) : blogs.length === 0 ? (
         <p className="text-center text-gray-500">No blogs found.</p>
       ) : (
@@ -52,5 +32,6 @@ const AllBlogs = () => {
     </div>
   );
 };
+
 
 export default AllBlogs;

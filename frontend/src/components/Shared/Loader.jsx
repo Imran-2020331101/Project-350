@@ -21,6 +21,8 @@ const Loader = () => (
                 fill="currentFill"
             />
         </svg>
+        <br></br>
+        <h1 className="pl-4">Crunching the latest data, just for you. Hang tight ......</h1>
     </div>
 );
 
