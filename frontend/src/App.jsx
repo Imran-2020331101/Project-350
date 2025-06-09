@@ -16,6 +16,7 @@ import PackageDetail from './pages/PackageDetail'
 import CreateGroup from './pages/CreateGroup'
 import { ToastContainer } from 'react-toastify'
 import SubscriptionPlans from './pages/SubscriptionPlans'
+import NotFound from './pages/NotFound'
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
           <Route path='itinerary/:id' element={<Itinerary/>}/>
           <Route path='experience' element={<Dashboard/>}/> 
         </Route>
+        <Route path="*" element={<NotFound/>} />
       </Route>
     </Routes>
     <ToastContainer/>

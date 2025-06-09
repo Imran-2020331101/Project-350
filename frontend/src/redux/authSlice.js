@@ -14,11 +14,12 @@ const initialState = {
 /* global process */
 export const postUsers = createAsyncThunk('auth/login', async (user,{dispatch, rejectWithValue}) => {
   try {
+    console.log('sending login request ');
     const res = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/auth/login`, user,{
       withCredentials:true,
     });
     const {accessToken, user:userData} = res.data;
-
+    
     dispatch(setUser({user:userData,token: accessToken}))
 
     console.log(userData , 'login success');

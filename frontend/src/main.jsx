@@ -12,9 +12,7 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <Router>
         <ScrollToTop />
-        <Routes>
-          <Route path='/*' element={<App />} />
-        </Routes>
+        <App/>
       </Router>
     </Provider>
   </StrictMode>,
