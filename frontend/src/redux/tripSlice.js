@@ -5,17 +5,28 @@ import axios from 'axios';
 /* global process */
 export const fetchTrips = createAsyncThunk(
   'trips/fetchAll',
-  async () => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_ADDRESS}/api/trips`);
-    return response.data;
+  async (userId, { rejectWithValue }) => {
+    try {
+      const url = `${process.env.REACT_APP_BACKEND_ADDRESS}/trips/${userId}`;
+      console.log('👉 Requesting:', url);
+      const response = await axios.get(url,{
+        withCredentials:true,
+      });
+      return response.data;
+    } catch (err) {
+      console.error('❌ Error fetching trips:', err.response?.data || err.message);
+      return rejectWithValue(err.response?.data || 'Unknown error');
+    }
   }
 );
+
+
 
 
 export const postTrip = createAsyncThunk(
   'trips/postTrip',
   async (newTrip) => {
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/api/trips`, newTrip);
+    const response = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/trips`, newTrip);
     return response.data;
   }
 );

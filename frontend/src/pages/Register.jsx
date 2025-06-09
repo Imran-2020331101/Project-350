@@ -6,21 +6,31 @@ import { toast } from 'react-toastify';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 const Register = () => {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
+
     const [showPassword,setShowPassword] = useState(false);
     const [showConfirmPassword,setShowConfirmPassword] = useState(false);
 
-
-    const reg=true;
     const navigate= useNavigate();
     const dispatch = useDispatch();
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    console.log(formData)
 
     const signUp = async (e) => {
         e.preventDefault();
         
+        const {name,email,password,confirmPassword} = formData;
+
         if(!password || !email || !name || !confirmPassword || password!==confirmPassword){
             alert('Please fill all fields correctly')
         }
@@ -62,8 +72,8 @@ const Register = () => {
                                     id="name"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
                                     placeholder="full name"
-                                    required={true}
-                                    onChange={(e)=>setName(e.target.value)}
+                                    required
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div>
@@ -80,7 +90,7 @@ const Register = () => {
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
                                     placeholder="example@gmail.com"
                                     required={true}
-                                    onChange={(e)=>setEmail(e.target.value)}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div>
@@ -92,13 +102,13 @@ const Register = () => {
                             </label>
                             <div className="relative">
                                 <input
-                                type={showPassword ? 'text' : 'password'}
-                                name="password"
-                                id="password"
-                                placeholder="••••••••"
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 pr-10"
-                                required
-                                onChange={(e) => setPassword(e.target.value)}
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    id="password"
+                                    placeholder="••••••••"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 pr-10"
+                                    required
+                                    onChange={handleChange}
                                 />
                                 <button
                                 type="button"
@@ -113,7 +123,7 @@ const Register = () => {
 
                             <div>
                                 <label
-                                    htmlFor="confirm-password"
+                                    htmlFor="confirmPassword"
                                     className="block mb-2 text-sm font-medium text-gray-900"
                                 >
                                     Confirm password
@@ -121,12 +131,12 @@ const Register = () => {
                                 <div className='relative'>
                                     <input
                                         type={showConfirmPassword ? 'text' : 'password'}
-                                        name="rePassword"
-                                        id="confirm-password"
+                                        name="confirmPassword"
+                                        id="confirmPassword"
                                         placeholder="••••••••"
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
                                         required
-                                        onChange={(e)=>setConfirmPassword(e.target.value)}  
+                                        onChange={handleChange}  
                                         />
                           <button
                             type="button"

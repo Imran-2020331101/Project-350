@@ -14,7 +14,7 @@ const Logout = () => {
       <div className="relative bg-white dark:bg-[#1e293b] text-gray-800 dark:text-white w-[90%] sm:w-[400px] rounded-2xl shadow-xl p-8 space-y-6 transition-all duration-300">
         {/* Close Icon */}
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate(-1)}
           className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white text-xl transition"
         >
           &times;
@@ -31,13 +31,16 @@ const Logout = () => {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-6">
           <button
-            onClick={() => dispatch(signedOut())}
+            onClick={() =>{ 
+              dispatch(signedOut());
+              navigate('/')
+            }}
             className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-semibold shadow transition duration-150"
           >
             Yes, Log Out
           </button>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate(-1)}
             className="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-2 px-4 rounded-lg font-semibold shadow transition duration-150"
           >
             Cancel

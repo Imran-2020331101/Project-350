@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Trips } from '../../DemoInfo/Trips';
 import { Edit } from 'lucide-react';
+import Loader from '../Shared/Loader';
 
 const UpdateProfilePage = () => {
+
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
-  const myTrips = Trips.filter((trip) => trip.owner === user.id);
 
-  const [userData, setUserData] = useState(user);
+  const [userData, setUserData] = useState(user || {});
   const [updatedData, setUpdatedData] = useState(user);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -17,6 +17,15 @@ const UpdateProfilePage = () => {
     setUserData(user);
     setUpdatedData(user);
   }, [user]);
+
+  if (!userData) {
+  return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        <Loader/>
+      </div>
+    );
+  }
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,14 +60,14 @@ const UpdateProfilePage = () => {
   {/* Cover Photo */}
   <div className="relative w-full h-48 sm:h-56 md:h-64 bg-gray-800">
     <img
-      src={userData.coverPhoto}
+      src={userData?.coverPhoto}
       alt="Cover"
       className="object-cover w-full h-full"
     />
     {/* Profile Image Overlay */}
     <div className="absolute left-1/2 transform -translate-x-1/2 bottom-[-48px] w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-gray-900 shadow-md">
       <img
-        src={userData.profilePicture}
+        src={userData?.profilePicture}
         alt="Profile"
         className="w-full h-full object-cover"
       />
@@ -67,8 +76,8 @@ const UpdateProfilePage = () => {
 
   {/* User Info */}
   <div className="pt-20 sm:pt-24 text-center px-4 sm:px-6 lg:px-8">
-    <h2 className="text-2xl font-bold">{userData.name}</h2>
-    <p className="text-sm text-gray-400">{userData.bio}</p>
+    <h2 className="text-2xl font-bold">{userData?.name}</h2>
+    <p className="text-sm text-gray-400">{userData?.bio}</p>
 
     {!isEditing ? (
       <button

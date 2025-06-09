@@ -7,25 +7,41 @@ import { fetchTrips } from '../../redux/tripSlice';
 import ImageCard from './imageCard';
 import BlogCard from '../blogCard';
 import TripCard from '../TripCard';
+import Loader from '../Shared/Loader';
 const Experiences = () => {
   const user = useSelector((state) => state.auth.user);
   const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
   const { trips, status: tripStatus, error: tripError } = useSelector((state) => state.trips);
   
   const dispatch = useDispatch();
+  
+useEffect(() => {
+  if (!user || !user._id) return; // ✅ Wait for user to be ready
+  console.log("dashboard useeffect : ", tripStatus);
+  if (tripStatus === 'idle' || tripStatus === 'failed') {
+    console.log("🚀 Dispatching fetchTrips");
+    dispatch(fetchTrips(user._id));
+  }
+}, [dispatch, tripStatus, user]); // ✅ safer dependency array
 
-    useEffect(() => {
-      if (tripStatus === 'idle') {
-        dispatch(fetchTrips());
-      }
-    }, [dispatch, tripStatus]);
 
+useEffect(() => {
+  if (blogError) toast(`Error fetching blog: ${blogError}`);
+}, [blogError]);
 
-  if(blogError) toast("Error fetching blog: ", blogError);
-  if(tripError) toast("Error fetching blog: ", tripError);
+useEffect(() => {
+  if (tripError) toast(`Error fetching trips: ${tripError}`);
+}, [tripError]);
 
+  if(!user){
+    return <Loader/>
+  }
+  
+  
+  const myBlogs = blogs?.filter((blog) => blog.owner == user._id);
 
-  const myBlogs = blogs?.filter((blog) => blog.owner == user.userId);
+  //user._id = 683316c96055d600aa184970
+  console.log("trips from dashboard : " , trips);
    
   return (
     <div className="w-full max-w-7xl px-4 sm:px-6 md:px-10 py-8 overflow-y-auto flex flex-col gap-10 bg-inherit mx-auto">
