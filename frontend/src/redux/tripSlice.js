@@ -47,5 +47,5 @@ const tripsSlice = createSlice({
       });
   },
 });
-
+ 
 export default tripsSlice.reducer;

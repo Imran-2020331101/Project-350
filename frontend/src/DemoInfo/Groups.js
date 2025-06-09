@@ -1,6 +1,5 @@
 export const Groups = [
     {
-      id: 1,
       title: "Discover the Ancient Temples of Bagan",
       days: 3,
       place: "Bagan, Myanmar",
@@ -17,7 +16,6 @@ export const Groups = [
       image: "https://example.com/images/bagan.jpg"
     },
     {
-      id: 2,
       title: "Sahara Desert Adventure",
       days: 4,
       place: "Merzouga, Morocco",
@@ -34,7 +32,6 @@ export const Groups = [
       image: "https://example.com/images/sahara.jpg"
     },
     {
-      id: 3,
       title: "Tokyo Tech and Tradition Tour",
       days: 5,
       place: "Tokyo, Japan",
@@ -51,7 +48,6 @@ export const Groups = [
       image: "https://example.com/images/tokyo.jpg"
     },
     {
-      id: 4,
       title: "Highlands and Lochs",
       days: 4,
       place: "Scottish Highlands, UK",
@@ -68,7 +64,6 @@ export const Groups = [
       image: "https://example.com/images/highlands.jpg"
     },
     {
-      id: 5,
       title: "Andean Escape",
       days: 6,
       place: "Cusco & Machu Picchu, Peru",
@@ -85,7 +80,6 @@ export const Groups = [
       image: "https://example.com/images/machu-picchu.jpg"
     },
     {
-      id: 6,
       title: "Bali Island Retreat",
       days: 7,
       place: "Bali, Indonesia",
@@ -102,7 +96,6 @@ export const Groups = [
       image: "https://example.com/images/bali.jpg"
     },
     {
-      id: 7,
       title: "Patagonia Hiking Tour",
       days: 5,
       place: "El Chaltén, Argentina",
@@ -119,7 +112,6 @@ export const Groups = [
       image: "https://example.com/images/patagonia.jpg"
     },
     {
-      id: 8,
       title: "Desert Mirage Tour",
       days: 3,
       place: "Wadi Rum, Jordan",
@@ -136,7 +128,6 @@ export const Groups = [
       image: "https://example.com/images/wadi-rum.jpg"
     },
     {
-      id: 9,
       title: "Canadian Rockies Expedition",
       days: 5,
       place: "Banff & Jasper, Canada",
@@ -153,7 +144,6 @@ export const Groups = [
       image: "https://example.com/images/rockies.jpg"
     },
     {
-      id: 10,
       title: "Historic Cities of Europe",
       days: 10,
       place: "Rome, Paris, Prague",
@@ -170,7 +160,6 @@ export const Groups = [
       image: "https://example.com/images/europe.jpg"
     },
     {
-      id: 11,
       title: "Amazon Rainforest Discovery",
       days: 6,
       place: "Manaus, Brazil",
@@ -187,7 +176,6 @@ export const Groups = [
       image: "https://example.com/images/amazon.jpg"
     },
     {
-      id: 12,
       title: "Dolomites Alpine Adventure",
       days: 4,
       place: "Dolomites, Italy",
@@ -204,7 +192,6 @@ export const Groups = [
       image: "https://example.com/images/dolomites.jpg"
     },
     {
-      id: 13,
       title: "Cultural Colors of India",
       days: 7,
       place: "Rajasthan, India",
@@ -221,7 +208,6 @@ export const Groups = [
       image: "https://example.com/images/rajasthan.jpg"
     },
     {
-      id: 14,
       title: "New Zealand Road Trip",
       days: 8,
       place: "South Island, New Zealand",
@@ -238,7 +224,6 @@ export const Groups = [
       image: "https://example.com/images/new-zealand.jpg"
     },
     {
-      id: 15,
       title: "Vietnam Heritage Trail",
       days: 7,
       place: "Hanoi to Hoi An",

@@ -13,12 +13,14 @@ import { fetchGroups } from '../redux/groupSlice';
 const Home = () => {
   const dispatch = useDispatch();
   
-  const { items: groups, status: groupStatus } = useSelector((state) => state.groups);
+  const { groups, status: groupStatus } = useSelector((state) => state.groups);
   const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
   
   useEffect(() => {
-    dispatch(fetchGroups());
-  }, [dispatch]);
+    if(groupStatus === 'idle'){
+      dispatch(fetchGroups());
+    }
+  }, [dispatch, groupStatus]);
   
   useEffect(() => {
     if (blogStatus === 'idle') {
@@ -37,7 +39,7 @@ const Home = () => {
   } 
   if (blogStatus === 'failed') return <div className="text-red-500">{blogError}</div>;
 
-  console.log(blogs)
+  console.log(groups)
 
   const getRandomBlogs = (blogs, count = 5) => {
     const shuffled = [...blogs].sort(() => 0.5 - Math.random());
@@ -49,7 +51,7 @@ const Home = () => {
       <Welcome />
       
       <h2 className="text-3xl font-bold my-12 pt-12">Embark on a trail adventure</h2>
-      <Slider Packages={groups} />
+      {groups.length > 0 ? <Slider Packages={groups} />: <h1>No groups found</h1>}
 
       <h2 className="text-3xl font-bold text-center py-16">Tales from the Road</h2>
 
