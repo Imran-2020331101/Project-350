@@ -1,6 +1,6 @@
 const Trip = require("../models/trip");
 const User = require("../models/User");
-const { getWeatherForecast } = require("./WeatherService");
+const { getWeatherForecast, getHotels, getFlights } = require("./HelperServices");
 
 // Create a new trip
 // Incoming req.body
@@ -13,32 +13,39 @@ const { getWeatherForecast } = require("./WeatherService");
 
 const createTrip = async (req, res) => {
 
-  const {destination, days, budget, persons} = req.body;
+  const {destination, tags, owner,travelDate} = req.body;
 
   try {
     const initialTrip = {
-      owner: req.owner,
-      destination: req.destination,
-      tags: req.tags,
-      weatherForecast: {
-        temparature: "",
-        condition: "",
-        alerts: "",
-        suggestions: "",
-      },
+      owner: owner,
+      destination: destination,
+      tags: tags,
+      weatherForecast: null,
+      travelDate: travelDate,
+      transportOptions: {
+        trains:[],
+        flights:[]
+      }
+
     };
 
     //TODO: fetch: transports
-
-    console.log("hello");
+    initialTrip.transportOptions.flights = getFlights();
+    console.log(initialTrip.transportOptions.flights);
 
     //fetch: weather forecast
     initialTrip.weatherForecast = getWeatherForecast(destination);
-    /**
-     * TODO: Add hotels from serpapi
-     */
+
+    console.log(initialTrip.weatherForecast);
+
+    //TODO: Testing
+    initialTrip.hotelsToStay = getHotels(destination,travelDate,tags.days);
+
+    console.log(initialTrip.hotelsToStay);
 
     //TODO: fetch: places to visit
+
+    
 
     const newTrip = await Trip.create(initialTrip);
     res.status(201).json(newTrip);
