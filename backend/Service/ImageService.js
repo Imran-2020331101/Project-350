@@ -1,56 +1,52 @@
-const Trip = require('../models/trip');
-// const { getStorage, ref, uploadBytes, getDownloadURL } = require('firebase/storage');
-const firebaseApp = require('../config/firebase');
+const cloudinary = require('../config/cloudinary');
 const multer = require('multer');
 const upload = multer();
+const Photo = require('../models/photo');
 
 const uploadImage = async (req, res) => {
+    const files = req.files;
+    const { description, userID } = req.body;
 
-    // const file = req.file;
+    if (!files || files.length === 0) {
+        return res.status(400).json({ error: 'No files uploaded' });
+    }
 
-    // const { tripId, caption,email,name } = req.body;
-    // console.log(caption)
+    if (!description || !userID) {
+        return res.status(400).json({ error: 'Description and User ID are required.' });
+    }
 
-    // if (!file || !details) {
-    //     return res.status(400).json({ error: 'No file or details uploaded from user' });
-    // }
+    try {
+        const photoArray = [];
 
-    // const storage = getStorage(firebaseApp);
-    // const storageRef = ref(storage, `images/${req.file.originalname}`);
-    
-    // try {
-    //     const snapshot = await uploadBytes(storageRef, req.file.buffer);
-    //     const downloadURL = await getDownloadURL(snapshot.ref);
+        for (const file of files) {
+            const b64 = Buffer.from(file.buffer).toString('base64');
+            const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
 
-    //     //Update the trip with the new image address        
-    //     const trip = await Trip.find({email:email,name:name}); 
-    //     if (!trip) {
-    //         trip = await Trip.create({ email, name, Images: [] });
-    //     }
-    //     trip.Images.push({ downloadURL,getImageDescription(downloadURL), caption });
-    //     const updatedTrip = await trip.save();
-    //     res.status(200).json(updatedTrip);
+            const result = await cloudinary.uploader.upload(dataURI, {
+                folder: 'trip-images',
+                resource_type: 'auto'
+            });
 
-    // } catch (error) {
-    //     res.status(500).json({ error: 'Failed to upload image' });
-    // }
+            photoArray.push({
+                photoID: result.public_id,
+                url: result.secure_url
+            });
+        }
+
+        const newPhotoEntry = new Photo({
+            userID: userID,
+            caption: description,
+            photos: photoArray
+        });
+
+        await newPhotoEntry.save();
+
+        res.status(200).json(newPhotoEntry);
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ error: 'Failed to upload image(s)' });
+    }
 };
 
-const searchImages = async (req, res) => {
-    // const { searchTerm } = req.body;
-
-    // if (!searchTerm) {
-    //     return res.status(400).json({ error: 'Search term is required' });
-    // }
-
-    // try {
-    //     const regex = new RegExp(searchTerm, 'i');
-    //     const trips = await Trip.find({ 'Images.imageDetails': regex });
-    //     const images = trips.flatMap(trip => trip.Images.filter(image => regex.test(image.imageDetails)));
-    //     res.status(200).json({ images });
-    // } catch (error) {
-    //     res.status(500).json({ error: 'Failed to search images' });
-    // }
-};
-
-module.exports = { uploadImage, searchImages };
+module.exports = { uploadImage };
