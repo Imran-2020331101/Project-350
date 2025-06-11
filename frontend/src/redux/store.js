@@ -7,7 +7,7 @@ import blogsReducer from './blogSlice';
 import groupReducer from './groupSlice';
 
 import storage from 'redux-persist/lib/storage';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, createTransform } from 'redux-persist';
 
 // Combine all slices
 const rootReducer = combineReducers({
@@ -17,11 +17,24 @@ const rootReducer = combineReducers({
   groups: groupReducer,
 });
 
+
+const authTransform = createTransform(
+  // transform state on its way to being serialized and persisted
+  (inboundState) => ({
+    user: inboundState.user,
+    isAuthenticated: inboundState.isAuthenticated,
+  }),
+  // transform state being rehydrated
+  (outboundState) => outboundState,
+  { whitelist: ['auth'] }
+);
+
 // Persist configuration
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['blogs', 'trips', 'groups'], // persist only selected slices
+  whitelist: ['auth', 'blogs', 'trips', 'groups'],
+  transforms: [authTransform],
 };
 
 // Create persisted reducer

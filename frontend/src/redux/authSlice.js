@@ -7,6 +7,7 @@ const initialState = {
   error: null,
   isSignedIn: false,
   token: null,
+  limit: 1,
 };
 
 /* global process */

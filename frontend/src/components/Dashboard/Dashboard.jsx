@@ -73,7 +73,7 @@ useEffect(() => {
       <section className="w-full mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Your Travel Blogs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {myBlogs.map((blog) => (
+          {myBlogs?.map((blog) => (
             <Link key={blog._id} to={`/blogs/${blog._id}`}>
               <BlogCard blogData={blog} />
             </Link>
@@ -85,8 +85,8 @@ useEffect(() => {
       <section className="w-full mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Your Trip plans</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {trips.map((trip) => (
-            <Link key={trip._id} to={`/blogs/${trip._id}`}>
+          {trips?.map((trip) => (
+            <Link key={trip._id} to={`/trips/${trip._id}`}>
               <TripCard trip={trip} />
             </Link>
           ))}
