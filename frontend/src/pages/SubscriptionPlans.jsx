@@ -16,7 +16,7 @@ const plans = [
   },
   {
     name: 'Monthly',
-    price: '৳499 / month',
+    price: '৳299 / month',
     features: [
       'Unlimited Trips',
       'Full Blog Access',
@@ -28,7 +28,7 @@ const plans = [
   },
   {
     name: 'Yearly',
-    price: '৳4999 / year',
+    price: '৳1999 / year',
     features: [
       'Everything in Monthly',
       '2 Months Free',
@@ -52,7 +52,7 @@ const SubscriptionPlans = () => {
               key={index}
               className={`rounded-xl shadow-lg p-6 ${
                 plan.name === 'Monthly'
-                  ? 'bg-blue-600 border-4 border-blue-400'
+                  ? 'bg-blue-900 border-4 border-blue-800'
                   : 'bg-gray-800'
               }`}
             >
