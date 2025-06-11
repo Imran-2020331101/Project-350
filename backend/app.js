@@ -63,7 +63,7 @@ app.route('/api/groups')
     .get(getAllGroups);
 
 // Routes - Image Upload
-app.post('/api/upload-image', upload.single("file"), uploadImage);
+app.post('/api/upload-image', upload.array("images"), uploadImage);
 
 
 /*
