@@ -87,8 +87,8 @@ const createTrip = async (req, res) => {
 // Delete a trip
 const deleteTrip = async (req, res) => {
   try {
-    const { tripId } = req.params; // Corrected this line
-    const deletedTrip = await Trip.findByIdAndDelete(tripId); // Corrected this line as well
+    const { tripId } = req.params; 
+    const deletedTrip = await Trip.findByIdAndDelete(tripId); 
     if (!deletedTrip) {
       return res.status(404).json({ message: "Trip not found" });
     }
@@ -101,7 +101,7 @@ const deleteTrip = async (req, res) => {
 
 const getAllTrips = async (req, res) => {
   try {
-    const { userId } = req.params; // Corrected this line
+    const { userId } = req.params; 
     if (!userId) return res.status(400).json({ error: "Must send user ID" });
 
     const trips = await Trip.find({ owner: userId });
