@@ -1,20 +1,20 @@
 const Trip = require("../models/trip");
 const User = require("../models/User");
-const { getWeatherForecast, getHotels, getFlights } = require("./HelperServices");
+const {
+  getWeatherForecast,
+  getHotels,
+  getFlights,
+} = require("./HelperServices");
 const { getTransport } = require("../utils/utils");
 const { getPlaces, generateResponse } = require("../utils/utils");
 
 // Create a new trip
-// Incoming req.body
-// {
-//     destination: "",
-//     days: "",
-//     budget: "",
-//     persons: ""
-// }
-
 const createTrip = async (req, res) => {
   const { destination, tags, owner, travelDate } = req.body;
+
+  if (!destination || !tags || !owner || !travelDate) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
 
   try {
     const initialTrip = {
@@ -25,15 +25,22 @@ const createTrip = async (req, res) => {
       travelDate: travelDate,
       transportOptions: {
         trains: [],
-        flights: []
+        flights: [],
       },
-      placesToVisit: new Map()
+      placesToVisit: new Map(),
     };
 
     // Fetch transport options
-    initialTrip.transportOptions.flights = await getFlights(travelDate, tags.days);
-    initialTrip.transportOptions.trains = await getTransport("train", destination, travelDate, tags.days);
-    
+    initialTrip.transportOptions.flights = await getFlights(
+      travelDate,
+      tags.days
+    );
+    initialTrip.transportOptions.trains = await getTransport(
+      "train",
+      destination,
+      travelDate,
+      tags.days
+    );
     console.log("Transport options:", initialTrip.transportOptions);
 
     // Fetch weather forecast
@@ -41,21 +48,32 @@ const createTrip = async (req, res) => {
     console.log("Weather forecast:", initialTrip.weatherForecast);
 
     // Fetch hotels
-    initialTrip.hotelsToStay = await getHotels(destination, travelDate, tags.days);
+    initialTrip.hotelsToStay = await getHotels(
+      destination,
+      travelDate,
+      tags.days
+    );
     console.log("Hotels:", initialTrip.hotelsToStay);
 
     // Fetch places to visit
     const places = await getPlaces(destination, "tourist", tags.budget, 5);
-    const placesPrompt = `Give me a detailed itinerary for visiting these places in ${destination} over ${tags.days} days, considering a budget of ${tags.budget}: ${places.join(", ")}`;
+    const placesPrompt = `Give me a detailed itinerary for visiting these places in ${destination} over ${
+      tags.days
+    } days, considering a budget of ${tags.budget}: ${places.join(", ")}`;
     const itineraryResponse = await generateResponse(placesPrompt);
-    
+
     // Parse and structure the places data
     places.forEach((place, index) => {
-      initialTrip.placesToVisit.set(`Day ${Math.floor(index / 2) + 1} - ${index % 2 === 0 ? "Morning" : "Afternoon"}`, {
-        time: index % 2 === 0 ? "Morning" : "Afternoon",
-        name: place,
-        details: itineraryResponse
-      });
+      initialTrip.placesToVisit.set(
+        `Day ${Math.floor(index / 2) + 1} - ${
+          index % 2 === 0 ? "Morning" : "Afternoon"
+        }`,
+        {
+          time: index % 2 === 0 ? "Morning" : "Afternoon",
+          name: place,
+          details: itineraryResponse,
+        }
+      );
     });
 
     const newTrip = await Trip.create(initialTrip);
@@ -69,9 +87,12 @@ const createTrip = async (req, res) => {
 // Delete a trip
 const deleteTrip = async (req, res) => {
   try {
-    const { tripId } = req.params.id;
-    const deletedTrip = Trip.findByIdAndDelete({ id: tripId });
-    res.status(200).json({ deletedTrip });
+    const { tripId } = req.params; // Corrected this line
+    const deletedTrip = await Trip.findByIdAndDelete(tripId); // Corrected this line as well
+    if (!deletedTrip) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+    res.status(200).json({ message: "Trip successfully deleted", deletedTrip });
   } catch (error) {
     console.log("error while deleting trip " + error);
     res.status(500).json({ error: "Failed to delete Trip" });
@@ -79,15 +100,18 @@ const deleteTrip = async (req, res) => {
 };
 
 const getAllTrips = async (req, res) => {
-  try { 
-    const { id:userId } = req.params;
-    console.log(userId);
-    if(!userId) return res.status(404).json({error: "must send user Id"})
+  try {
+    const { userId } = req.params; // Corrected this line
+    if (!userId) return res.status(400).json({ error: "Must send user ID" });
+
     const trips = await Trip.find({ owner: userId });
+    if (!trips.length) {
+      return res.status(404).json({ message: "No trips found for this user" });
+    }
     res.status(200).json(trips);
   } catch (error) {
     console.log("error while fetching all trips " + error);
-    res.status(500).json({ error: "failed to fetch trips" });
+    res.status(500).json({ error: "Failed to fetch trips" });
   }
 };
 
