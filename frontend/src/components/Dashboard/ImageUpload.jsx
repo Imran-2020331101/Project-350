@@ -7,36 +7,43 @@ const ImageUpload = () => {
   const [description, setDescription] = useState("");
   const [uploading, setUploading] = useState(false);
   const [showUploadArea, setShowUploadArea] = useState(true);
-  const [image, setImage] = useState(null);
-  const [imgData, setImgData] = useState(null);
+  const [images, setImages] = useState([]);
+  const [imgData, setImgData] = useState([]);
 
   const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
 
-    setImgData(file);
+    setImgData(files);
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImage(reader.result);
-      setShowUploadArea(false);
-    };
-    reader.readAsDataURL(file);
+    const newImagePreviews = [];
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        newImagePreviews.push(reader.result);
+        if (newImagePreviews.length === files.length) {
+          setImages(newImagePreviews);
+          setShowUploadArea(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleUpload = async () => {
-    if (!imgData) return alert("Please select an image first!");
+    if (imgData.length === 0) return alert("Please select at least one image!");
 
     setUploading(true);
     const formData = new FormData();
-    formData.append("image", imgData);
+    imgData.forEach((file) => {
+      formData.append("images", file);
+    });
     formData.append("description", description);
+    formData.append("userID", "dummyUserID123");
 
     try {
       const response = await axios.post(
-        // Replace with your actual backend URL
-        // `http://${url}/public/image/upload`,
-        "", // <-- TEMP placeholder
+        `http://localhost:3000/api/upload-image`,
         formData
       );
 
@@ -109,21 +116,31 @@ const ImageUpload = () => {
                 accept="image/png, image/jpg, image/jpeg"
                 className="hidden"
                 onChange={handleImageChange}
+                multiple
               />
             </label>
           </div>
         ) : (
           <div className="flex flex-col items-center mb-4">
-            <img
-              src={image}
-              alt="Uploaded Preview"
-              className="w-64 h-64 object-cover rounded-lg border shadow-md"
-            />
+            <div className="flex flex-wrap justify-center gap-4">
+              {images.map((imgSrc, index) => (
+                <img
+                  key={index}
+                  src={imgSrc}
+                  alt={`Uploaded Preview ${index}`}
+                  className="w-64 h-64 object-cover rounded-lg border shadow-md mb-2"
+                />
+              ))}
+            </div>
             <button
               className="text-sm text-blue-600 mt-2 underline"
-              onClick={() => setShowUploadArea(true)}
+              onClick={() => {
+                setShowUploadArea(true);
+                setImages([]);
+                setImgData([]);
+              }}
             >
-              Change image
+              Change image(s)
             </button>
           </div>
         )}
