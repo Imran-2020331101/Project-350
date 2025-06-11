@@ -1,6 +1,8 @@
 const Trip = require("../models/trip");
 const User = require("../models/User");
 const { getWeatherForecast, getHotels, getFlights } = require("./HelperServices");
+const { getTransport } = require("../utils/utils");
+const { getPlaces, generateResponse } = require("../utils/utils");
 
 // Create a new trip
 // Incoming req.body
@@ -12,8 +14,7 @@ const { getWeatherForecast, getHotels, getFlights } = require("./HelperServices"
 // }
 
 const createTrip = async (req, res) => {
-
-  const {destination, tags, owner,travelDate} = req.body;
+  const { destination, tags, owner, travelDate } = req.body;
 
   try {
     const initialTrip = {
@@ -23,29 +24,39 @@ const createTrip = async (req, res) => {
       weatherForecast: null,
       travelDate: travelDate,
       transportOptions: {
-        trains:[],
-        flights:[]
-      }
-
+        trains: [],
+        flights: []
+      },
+      placesToVisit: new Map()
     };
 
-    //TODO: fetch: transports
-    initialTrip.transportOptions.flights = getFlights();
-    console.log(initialTrip.transportOptions.flights);
-
-    //fetch: weather forecast
-    initialTrip.weatherForecast = getWeatherForecast(destination);
-
-    console.log(initialTrip.weatherForecast);
-
-    //TODO: Testing
-    initialTrip.hotelsToStay = getHotels(destination,travelDate,tags.days);
-
-    console.log(initialTrip.hotelsToStay);
-
-    //TODO: fetch: places to visit
-
+    // Fetch transport options
+    initialTrip.transportOptions.flights = await getFlights(travelDate, tags.days);
+    initialTrip.transportOptions.trains = await getTransport("train", destination, travelDate, tags.days);
     
+    console.log("Transport options:", initialTrip.transportOptions);
+
+    // Fetch weather forecast
+    initialTrip.weatherForecast = await getWeatherForecast(destination);
+    console.log("Weather forecast:", initialTrip.weatherForecast);
+
+    // Fetch hotels
+    initialTrip.hotelsToStay = await getHotels(destination, travelDate, tags.days);
+    console.log("Hotels:", initialTrip.hotelsToStay);
+
+    // Fetch places to visit
+    const places = await getPlaces(destination, "tourist", tags.budget, 5);
+    const placesPrompt = `Give me a detailed itinerary for visiting these places in ${destination} over ${tags.days} days, considering a budget of ${tags.budget}: ${places.join(", ")}`;
+    const itineraryResponse = await generateResponse(placesPrompt);
+    
+    // Parse and structure the places data
+    places.forEach((place, index) => {
+      initialTrip.placesToVisit.set(`Day ${Math.floor(index / 2) + 1} - ${index % 2 === 0 ? "Morning" : "Afternoon"}`, {
+        time: index % 2 === 0 ? "Morning" : "Afternoon",
+        name: place,
+        details: itineraryResponse
+      });
+    });
 
     const newTrip = await Trip.create(initialTrip);
     res.status(201).json(newTrip);

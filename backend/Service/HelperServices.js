@@ -1,6 +1,9 @@
-const fetch = require("node-fetch"); // If needed
-const apiKey = process.env.OPENWEATHER_API_KEY;
+const fetch = require("node-fetch");
+const axios = require("axios");
 const { getJson } = require("serpapi");
+
+const apiKey = process.env.OPENWEATHER_API_KEY;
+const serpApiKey = process.env.SERP_API_KEY;
 
 const getWeatherForecast = async (city) => {
   try {
@@ -25,50 +28,65 @@ const getWeatherForecast = async (city) => {
         : "Light clothes are fine",
     };
   } catch (err) {
-    console.error(err);
-    return null; // Or throw the error to let the calling function decide
+    console.error("Error fetching weather:", err);
+    throw new Error("Failed to fetch weather data");
   }
 };
 
 const getHotels = async (destination, check_in, days) => {
   try {
+    // Convert check_in to proper date format if it's not already
+    const checkInDate = new Date(check_in);
+    const checkOutDate = new Date(checkInDate);
+    checkOutDate.setDate(checkOutDate.getDate() + parseInt(days));
+
     const params = {
       engine: "google_hotels",
       q: destination,
       hl: "en",
       gl: "bd",
-      check_in_date: check_in,
-      check_out_date: check_in + days,
+      check_in_date: checkInDate.toISOString().split('T')[0],
+      check_out_date: checkOutDate.toISOString().split('T')[0],
       currency: "BDT",
-      api_key: proccess.env.SERP_API_KEY,
+      api_key: serpApiKey,
     };
 
     const res = await axios.get("https://serpapi.com/search", { params });
-    console.log(res.data);
-    return res.data;
+    if (!res.data) throw new Error("No hotel data received");
+    
+    return res.data.hotels || [];
   } catch (error) {
-    console.log("Error fetching hotels : ", error);
+    console.error("Error fetching hotels:", error);
+    throw new Error("Failed to fetch hotel data");
   }
 };
 
-const getFlights = async (travelDate, days) => {
+const getFlights = async (travelDate, days, from = "DAC") => {
   try {
-    const res = await getJson(
-      {
-        api_key: process.env.SERP_API_KEY,
-        engine: "google_flights",
-        hl: "en",
-        gl: "us",
-        departure_id: "CDG",
-        arrival_id: "AUS",
-        outbound_date: travelDate,
-        return_date: travelDate + days,
-        currency: "BDT",
-      });
-    console.log(res);
-    return res;
+    // Convert travelDate to proper date format if it's not already
+    const departureDate = new Date(travelDate);
+    const returnDate = new Date(departureDate);
+    returnDate.setDate(returnDate.getDate() + parseInt(days));
+
+    const params = {
+      api_key: serpApiKey,
+      engine: "google_flights",
+      hl: "en",
+      gl: "bd",
+      departure_id: from,
+      arrival_id: "AUS", // This should ideally come from a mapping of the destination
+      outbound_date: departureDate.toISOString().split('T')[0],
+      return_date: returnDate.toISOString().split('T')[0],
+      currency: "BDT",
+    };
+
+    const res = await getJson(params);
+    if (!res) throw new Error("No flight data received");
+    
+    return res.flights || [];
   } catch (error) {
-    console.log("Error fetching flights : ", error);
+    console.error("Error fetching flights:", error);
+    throw new Error("Failed to fetch flight data");
   }
 };
 
