@@ -19,12 +19,10 @@ const rootReducer = combineReducers({
 
 
 const authTransform = createTransform(
-  // transform state on its way to being serialized and persisted
   (inboundState) => ({
     user: inboundState.user,
     isAuthenticated: inboundState.isAuthenticated,
   }),
-  // transform state being rehydrated
   (outboundState) => outboundState,
   { whitelist: ['auth'] }
 );
@@ -45,7 +43,7 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // redux-persist needs this turned off
+      serializableCheck: false, 
     }),
 });
 

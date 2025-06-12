@@ -18,7 +18,7 @@ const createTrip = async (req, res) => {
   try {
     const initialTrip = {
       owner: owner,
-      destination: destination,
+      destination: destination, 
       tags: tags,
       weatherForecast: null,
       travelDate: travelDate,
@@ -26,7 +26,6 @@ const createTrip = async (req, res) => {
         trains:[],
         flights:[]
       }
-
     };
 
     //TODO: fetch: transports

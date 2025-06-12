@@ -43,11 +43,12 @@ app.use(express.urlencoded({ extended: true }));
 
 console.log('Registered Mongoose models:', mongoose.modelNames());
 
+app.route('/api/trips')
+    .post(createTrip);
+    
 app.route('/api/trips/:id')
-    .post(createTrip)
+    .delete(deleteTrip)
     .get(getAllTrips);
-
-app.delete('/api/trips/:id',deleteTrip);
 
 app.route('/api/blogs')
     .get(getAllBlogs)

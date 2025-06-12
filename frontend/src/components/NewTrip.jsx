@@ -6,11 +6,12 @@ import { SelectTravelList, SelectBudgetOptions } from "../DemoInfo/options";
 import { toast } from "react-toastify";
 
 const NewTrip = () => {
-  const {isSignedIn,limit} = useSelector((state) => state.auth);
+  const {isSignedIn, limit, user} = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [tripDetails, setTripDetails] = useState({
+    owner: user._id,
     destination: "",
     days: "",
     budget: "",
@@ -32,9 +33,10 @@ const NewTrip = () => {
       return navigate('/upgrade');
     }
 
-    const { destination, days, budget, persons } = tripDetails;
-    dispatch(postTrip({ destination, days, budget, persons }));
-    navigate("/dashboard"); // or wherever you want to go after submission
+    const { destination, days, budget, persons, owner } = tripDetails;
+    dispatch(postTrip({ destination, days, budget, persons, owner }));
+
+    navigate("/dashboard"); 
     toast.success("Trip created successfully");
   }, [tripDetails, dispatch, navigate]);
 
