@@ -1,14 +1,13 @@
-const fetch = require("node-fetch");
 const axios = require("axios");
 const { getJson } = require("serpapi");
 
-const apiKey = "8bd995f770b1dc341a8f681fd3bac658";
-const serpApiKe ="46a31540b59d93a796fd74ccb6b348740ba68616a7e17a957f48af1984604e29";
+const serpApiKey = process.env.SERP_API_KEY;
+const weatherApiKey = process.env.API_KEY;
 
 const getWeatherForecast = async (city) => {
   try {
     const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weatherApiKey}&units=metric`
     );
     if (!res.ok) throw new Error("City not found");
 
