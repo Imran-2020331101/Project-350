@@ -2,15 +2,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-/* global process */
+/* global process */ 
 export const fetchTrips = createAsyncThunk(
   'trips/fetchAll',
   async (userId, { rejectWithValue }) => {
     try {
-      const url = `${process.env.REACT_APP_BACKEND_ADDRESS}/trips/${userId}`;
-      console.log('Requesting:', url);
-      const response = await axios.get(url);
-      return response.data;
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_BACKEND_ADDRESS}/trips/${userId}`
+      );
+      
+      return data.trips;
     } catch (err) {
       console.error('Error fetching trips:', err.response?.data || err.message);
       return rejectWithValue(err.response?.data || 'Unknown error');

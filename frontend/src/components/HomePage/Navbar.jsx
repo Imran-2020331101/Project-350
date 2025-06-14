@@ -69,7 +69,7 @@ const Navbar = () => {
             className={`text-lg font-semibold transition-colors duration-200 ${
               isActive(button.to) 
                 ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-700 hover:text-blue-600'
+                : 'text-gray-200 hover:text-blue-600'
             }`}
             to={button.to}
           >

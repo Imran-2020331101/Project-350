@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { postPhoto } from "../../redux/photoSlice";
 
 const ImageUpload = () => {
+  const dispatch =useDispatch();
   const navigate = useNavigate();
   const [caption, setCaption] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -38,25 +41,16 @@ const ImageUpload = () => {
     formData.append("userID", user._id || "dummyUserID123");
 
     try {
-      const response = await axios.post(
-        `http://localhost:3000/api/upload-image`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-
-      if (response.data.success) {
-        alert("Upload successful!");
+      const response = await dispatch(postPhoto(formData)).unwrap();
+      if (response.success) {
+        toast.success("Upload successful!");
         navigate(-1);
       } else {
-        alert(response.data.error || "Upload failed. Try again.");
+        toast.error(response.error || "Upload failed. Try again.");
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert(error.response?.data?.error || "Network error. Try again.");
+      toast.error(error.response?.error || "Network error. Try again.");
     } finally {
       setUploading(false);
     }

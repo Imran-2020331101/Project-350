@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Edit } from 'lucide-react';
 import Loader from '../Shared/Loader';
+import defaultUser from '../../assets/defaultUser.png'
 
 const UpdateProfilePage = () => {
 
@@ -67,7 +68,7 @@ const UpdateProfilePage = () => {
     {/* Profile Image Overlay */}
     <div className="absolute left-1/2 transform -translate-x-1/2 bottom-[-48px] w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-gray-900 shadow-md">
       <img
-        src={userData?.profilePicture}
+        src={userData?.profilePicture || defaultUser}
         alt="Profile"
         className="w-full h-full object-cover"
       />

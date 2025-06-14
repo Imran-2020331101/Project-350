@@ -11,7 +11,7 @@ const initialState = {
 };
 
 /* global process */
-export const postUsers = createAsyncThunk('auth/login', async (user,{dispatch, rejectWithValue}) => {
+export const postUsers = createAsyncThunk('auth/login', async (user,{rejectWithValue}) => {
   try {
     console.log('sending login request ');
     const res = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/auth/login`, user,{
@@ -20,11 +20,7 @@ export const postUsers = createAsyncThunk('auth/login', async (user,{dispatch, r
     
     const {accessToken, user:userData} = res.data;
     
-    // dispatch(setUser({user:userData,token: accessToken}))
-
-    console.log(userData , 'login success');
-
-    return {user:userData,accessToken}; // Expecting a single user object or relevant auth data
+    return {user:userData,accessToken}; 
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || error.message);
   }
@@ -69,15 +65,15 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
-      state.isSignedIn = !!action.payload.user; // Update isSignedIn based on user presence
-      state.status = 'success'; // Optionally update status
-      state.error = null; // Clear any previous error
+      state.isSignedIn = !!action.payload.user; 
+      state.status = 'success'; 
+      state.error = null; 
     },
     signedOut: (state) => {
       state.user = null;
       state.token = null;
       state.isSignedIn = false;
-      state.status = 'idle'; // Reset status on sign out
+      state.status = 'idle'; 
     },
     clearError: (state) => {
       state.error = null;
@@ -87,13 +83,13 @@ const authSlice = createSlice({
     builder
       .addCase(postUsers.pending, (state) => {
         state.status = 'loading';
-        state.error = null; // Clear any previous error
+        state.error = null; 
       })
       .addCase(postUsers.fulfilled, (state, action) => {
         state.status = 'success';
         state.isSignedIn = true;
         state.token = action.payload.accessToken;
-        state.user = action.payload.user; // Store the logged-in user data
+        state.user = action.payload.user;
       })
       .addCase(postUsers.rejected, (state, action) => {
         state.status = 'failed';
@@ -103,11 +99,10 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.pending, (state) => {
         state.status = 'loading';
-        state.error = null; // Clear any previous error
+        state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.status = 'success';
-        // Don't set isSignedIn to true after registration
         state.isSignedIn = false;
         state.user = null;
         state.token = null;

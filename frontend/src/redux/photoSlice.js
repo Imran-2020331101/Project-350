@@ -6,12 +6,11 @@ export const fetchUserPhotos = createAsyncThunk(
   "photo/fetchAll",
   async (userID, { rejectWithValue }) => {
     try {
-      console.log(userID);
+      
       const { data } = await axios.get(
         `${process.env.REACT_APP_BACKEND_ADDRESS}/photos/${userID}`
       );
-      console.log("data from fetch user photos : ",data.photos);
-      return data.photos ;
+      return data.photos;
     } catch (error) {
       if (
         error.response &&
@@ -27,13 +26,19 @@ export const fetchUserPhotos = createAsyncThunk(
 
 export const postPhoto = createAsyncThunk(
   "photo/postPhoto",
-  async (newPhoto, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_ADDRESS}/photos`,
-        newPhoto
+      const {data} = await axios.post(
+        `${process.env.REACT_APP_BACKEND_ADDRESS}/upload-image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
-      return response.data;
+      console.log(data)
+      return data;
     } catch (err) {
       console.error(
         "Error uploading photo :",
@@ -66,7 +71,7 @@ const photoSlice = createSlice({
         state.error = action.payload || action.error.message;
       })
       .addCase(postPhoto.fulfilled, (state, action) => {
-        state.photos.push(action.payload);
+        state.photos.push(action.payload.data);
       });
   },
 });
