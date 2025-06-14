@@ -17,6 +17,7 @@ import CreateGroup from './pages/CreateGroup'
 import { ToastContainer } from 'react-toastify'
 import SubscriptionPlans from './pages/SubscriptionPlans'
 import NotFound from './pages/NotFound'
+import ProtectedRoute from './components/Auth/ProtectedRoute'
 
 function App() {
 
@@ -36,7 +37,11 @@ function App() {
         <Route path='blogs/new' element={<CreateBlog/>}/>
         <Route path='blogs' element={<AllBlogs/>}/>
         <Route path='blogs/:_id' element={<Blog/>}/>
-        <Route path='dashboard' element={<DashBoardLayout/>}>
+        <Route path='dashboard' element={
+          <ProtectedRoute>
+            <DashBoardLayout/>
+          </ProtectedRoute>
+        }>
           <Route index element={<Dashboard/>}/> 
           <Route path='itinerary/:id' element={<Itinerary/>}/>
           <Route path='experience' element={<Dashboard/>}/> 
