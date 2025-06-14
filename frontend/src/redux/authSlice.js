@@ -91,9 +91,10 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = 'success';
-        // Optionally sign in the user after successful registration
-        // state.isSignedIn = true;
-        state.user = action.payload; // Store the registered user data
+        // Don't set isSignedIn to true after registration
+        state.isSignedIn = false;
+        state.user = null;
+        state.token = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.status = 'failed';

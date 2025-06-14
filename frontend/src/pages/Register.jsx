@@ -29,16 +29,24 @@ const Register = () => {
     const signUp = async (e) => {
         e.preventDefault();
         
-        const {name,email,password,confirmPassword} = formData;
+        const {name, email, password, confirmPassword} = formData;
 
         if(!password || !email || !name || !confirmPassword || password!==confirmPassword){
-            alert('Please fill all fields correctly')
+            toast.error('Please fill all fields correctly and ensure passwords match');
+            return;
         }
         try {
-            const res = await dispatch(registerUser({ name, email, password })).unwrap();
-            toast.success("Registered successfully!");
-            navigate('/login')
-            console.log(res);
+            await dispatch(registerUser({ name, email, password })).unwrap();
+            toast.success("Registration successful! Please log in to continue.");
+            // Clear form data
+            setFormData({
+                name: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            });
+            // Redirect to login page
+            navigate('/login');
         } catch (err) {
             toast.error(`Registration failed: ${err}`);
             console.log("Error signing up : " + err);

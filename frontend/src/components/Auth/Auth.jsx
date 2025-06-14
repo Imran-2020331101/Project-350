@@ -26,9 +26,8 @@ const Auth = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    const user = await dispatch(postUsers({ email, password })).unwrap(); // unwrap throws on error
-    toast.success('Logged in successfully');
-    console.log('Logged in user:', user);
+    const user = await dispatch(postUsers({ email, password })).unwrap();
+    toast.success('Logged in successfully! Redirecting to dashboard...');
   } catch (error) {
     toast.error(`Login failed: ${error?.toString()}`);
     console.error('Login error:', error);
@@ -99,7 +98,7 @@ const handleSubmit = async (e) => {
                                 Sign in
                             </button>
                             <p className="text-sm font-light text-gray-600">
-                                Don’t have an account yet?{" "}
+                                Don't have an account yet?{" "}
                                 <p className="font-medium hover:underline cursor-pointer" onClick={() => navigate('/register')}>
                                     Sign up
                                 </p>
