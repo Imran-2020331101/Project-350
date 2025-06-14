@@ -5,6 +5,7 @@ import authReducer from './authSlice';
 import tripReducer from './tripSlice';
 import blogsReducer from './blogSlice';
 import groupReducer from './groupSlice';
+import photoReducer from './photoSlice'
 
 import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer, createTransform } from 'redux-persist';
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   trips: tripReducer,
   blogs: blogsReducer,
   groups: groupReducer,
+  photos: photoReducer
 });
 
 
@@ -31,7 +33,7 @@ const authTransform = createTransform(
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth', 'blogs', 'trips', 'groups'],
+  whitelist: ['auth', 'blogs', 'trips', 'groups','photos'],
   transforms: [authTransform],
 };
 

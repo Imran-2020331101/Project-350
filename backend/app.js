@@ -20,6 +20,7 @@ const {
   updateBlog,
   addCommentToBlog,
   addReplyToComment,
+  addLikeToBlog,
 } = require("./Service/BlogService");
 const {
   handleLogin,
@@ -33,8 +34,9 @@ const {
   getAllTrips,
   deleteTrip,
 } = require("./Service/TripService");
-const { uploadImage } = require("./Service/ImageService");
+
 const { createGroup, getAllGroups, joinGroup } = require("./Service/GroupService");
+const { uploadImage, getPhotos } = require("./Service/ImageService");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -69,6 +71,7 @@ app.route("/api/blogs").get(getAllBlogs).post(createBlog).put(updateBlog);
 app.delete("/api/blogs/:id", deleteBlog); // Assumes blog ID is passed as URL param
 app.post("/api/blogs/:id/comments", addCommentToBlog);
 app.post("/api/blogs/:blogId/comments/:commentId/replies", addReplyToComment);
+app.post("/api/blogs/:id/like", addLikeToBlog);
 
 app.post("/api/auth/login", handleLogin);
 app.post("/api/auth/register", handleRegister);
@@ -82,8 +85,8 @@ app.route("/api/groups/:id/join").post(joinGroup);
 app.route("/api/groups/:id/cancel").post(joinGroup); // Reusing joinGroup for cancellation
 
 // Routes - Image Upload
-app.post('/api/upload-image', upload.array("images"), uploadImage);
-
+app.post("/api/upload-image", upload.array("images"), uploadImage);
+app.get("/api/photos/:id",getPhotos);
 
 /*
 app.post('/api/gemini-describe', upload.single("file"), async (req, res) => {
@@ -116,5 +119,5 @@ app.use((err, req, res, next) => {
 connectDB();
 
 app.listen(port, () => {
-  console.log(`✅ Server listening on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });

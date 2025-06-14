@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { nanoid } from "@reduxjs/toolkit";
 
 /* global process */
 export const fetchBlogs = createAsyncThunk("blogs/fetchPublic", async () => {
@@ -10,6 +9,40 @@ export const fetchBlogs = createAsyncThunk("blogs/fetchPublic", async () => {
   return data;
 });
 
+export const likeBlog = createAsyncThunk("blogs/likeBlog", async (likeData) => {
+  const {id:blogId, isBlogLiked} = likeData;
+  console.log("from blogSlice : ", isBlogLiked)
+  const { data } = await axios.post(
+    `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs/${blogId}/like`,
+    {blogLiked: isBlogLiked}
+  );
+  return { blogId, likes: data.likes };
+});
+
+export const addCommentToBlog = createAsyncThunk(
+  "blogs/addCommentToBlog",
+  async ({ blogId, comment }) => {
+    const { data } = await axios.post(
+      `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs/${blogId}/comments`,
+      comment
+    );
+    console.log("data. comments : ", data.comments);
+    return { blogId, comment: data.comments };
+  }
+);
+
+export const addReplyToComment = createAsyncThunk(
+  "blogs/addReplyToComment",
+  async ({ blogId, commentId, reply }) => {
+    const { data } = await axios.post(
+      `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs/${blogId}/comments/${commentId}/replies`,
+      reply
+    );
+    console.log("comments after reply : ", data.comments);
+    return { blogId, comment: data.comments };
+  }
+);
+
 const blogsSlice = createSlice({
   name: "blogs",
   initialState: {
@@ -17,57 +50,7 @@ const blogsSlice = createSlice({
     status: "idle",
     error: null,
   },
-  reducers: {
-    likeBlog: async (state, action) => {
-      console.log("Like Blog reducer called");
-
-      const blog = state.blogs.find((b) => b._id === action.payload);
-      if (blog) {
-        blog.likes = (blog.likes || 0) + 1;
-      }
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs`
-      );
-      return response.data;
-    },
-
-    addCommentToBlog: async (state, action) => {
-      const { blogId, comment } = action.payload;
-      const blog = state.blogs.find((b) => b._id === blogId);
-      if (blog) {
-        const newComment = {
-          user: comment.user,
-          text: comment.text,
-          replies: [],
-        };
-        blog.comments = blog.comments || [];
-        blog.comments.unshift(newComment);
-        const { data } = await axios.post(
-          `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs/${blogId}/comments`,
-          comment
-        );
-        console.log(data);
-        return data;
-      }
-    },
-
-    addReplyToComment: (state, action) => {
-      const { blogId, commentId, reply } = action.payload;
-      const blog = state.blogs.find((b) => b._id === blogId);
-      if (blog) {
-        const comment = blog.comments?.find((c) => c._id === commentId);
-        if (comment) {
-          const newReply = {
-            _id: nanoid(),
-            user: reply.user,
-            text: reply.text,
-          };
-          comment.replies = comment.replies || [];
-          comment.replies.push(newReply);
-        }
-      }
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchBlogs.pending, (state) => {
@@ -80,11 +63,29 @@ const blogsSlice = createSlice({
       .addCase(fetchBlogs.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+      })
+      .addCase(likeBlog.fulfilled, (state, action) => {
+        const { blogId, likes } = action.payload;
+        const blog = state.blogs.find((b) => b._id === blogId);
+        if (blog) {
+          blog.likes = likes;
+        }
+      })
+      .addCase(addCommentToBlog.fulfilled, (state, action) => {
+        const { blogId, comment } = action.payload;
+        const blog = state.blogs.find((b) => b._id === blogId);
+        if (blog) {
+          blog.comments = comment;
+        }
+      })
+      .addCase(addReplyToComment.fulfilled, (state, action) => {
+        const { blogId, comment } = action.payload;
+        const blog = state.blogs.find((b) => b._id === blogId);
+        if (blog) {
+          blog.comments = comment;
+        }
       });
   },
 });
-
-export const { likeBlog, addCommentToBlog, addReplyToComment } =
-  blogsSlice.actions;
 
 export default blogsSlice.reducer;

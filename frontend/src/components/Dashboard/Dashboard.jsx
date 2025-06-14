@@ -8,22 +8,29 @@ import ImageCard from './imageCard';
 import BlogCard from '../blogCard';
 import TripCard from '../TripCard';
 import Loader from '../Shared/Loader';
+import { fetchUserPhotos } from '../../redux/photoSlice';
 const Experiences = () => {
   const user = useSelector((state) => state.auth.user);
   const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
-  const { trips, status: tripStatus, error: tripError } = useSelector((state) => state.trips);
-  
+  const {photos, status: photoStatus, error} = useSelector((state)=>state.photos)
   const dispatch = useDispatch();
   
-useEffect(() => {
-  if (!user || !user._id) return; // ✅ Wait for user to be ready
-  console.log("dashboard useeffect : ", tripStatus);
-  if (tripStatus === 'idle' || tripStatus === 'failed') {
-    console.log("🚀 Dispatching fetchTrips");
-    dispatch(fetchTrips(user._id));
-  }
-}, [dispatch, tripStatus, user]); // ✅ safer dependency array
-
+  useEffect(()=>{
+    if(photoStatus === 'idle'){
+      dispatch(fetchUserPhotos(user._id));
+    }
+  })
+  
+  useEffect(() => {
+    // if (!user || !user._id) return; 
+    // console.log("dashboard useeffect : ", tripStatus);
+    // if (tripStatus === 'idle' || tripStatus === 'failed') {
+    //   console.log("Dispatching fetchTrips");
+      dispatch(fetchTrips(user._id));
+    // }
+  }, [dispatch, user]); 
+  
+  const { trips, status: tripStatus, error: tripError } = useSelector((state) => state.trips);
 
 useEffect(() => {
   if (blogError) toast(`Error fetching blog: ${blogError}`);
@@ -37,7 +44,7 @@ useEffect(() => {
     return <Loader/>
   }
   
-  
+  console.log(photos)
   const myBlogs = blogs?.filter((blog) => blog.owner == user._id);
 
   //user._id = 683316c96055d600aa184970
@@ -63,8 +70,10 @@ useEffect(() => {
       <section className="w-full">
         <h2 className="text-xl font-semibold text-gray-700 mb-2">Image Gallery</h2>
         <div className="w-full max-h-[420px] overflow-y-auto flex flex-wrap gap-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <ImageCard key={i} />
+          {
+            !photos.length ? <h3>No photos to display</h3> :
+            photos?.map((photo, index) => (
+            <ImageCard key={index} source={photo.url}/>
           ))}
         </div>
       </section>

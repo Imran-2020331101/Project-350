@@ -45,6 +45,22 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const fetchUserPhotos = createAsyncThunk(
+  'auth/photos',
+  async (userID, { rejectWithValue }) => {
+    try {
+      console.log(userID);
+      const {data} = await axios.get(`${process.env.REACT_APP_BACKEND_ADDRESS}/images/${userID}`);
+      console.log(data);
+      return {data};
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      }
+      return rejectWithValue('Failed to fetch Images.');
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: 'auth',
