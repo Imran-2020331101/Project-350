@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const ImageUpload = () => {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ const ImageUpload = () => {
   const [showUploadArea, setShowUploadArea] = useState(true);
   const [image, setImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+
+  const user = useSelector((state) => state.auth.user);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -32,7 +35,7 @@ const ImageUpload = () => {
     const formData = new FormData();
     formData.append("images", imageFile);
     formData.append("caption", caption);
-    formData.append("userID", localStorage.getItem("userID") || "dummyUserID123");
+    formData.append("userID", user._id || "dummyUserID123");
 
     try {
       const response = await axios.post(

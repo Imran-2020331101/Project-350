@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const groupSchema = new mongoose.Schema({
   trip: {
     type: String, //tripID
-    required: true,
+    // required: true,
   },
   groupName: {
     type: String,
@@ -11,7 +11,7 @@ const groupSchema = new mongoose.Schema({
   },
   gatheringPoint: {
     type: String,
-    required: true,
+    // required: true,
   },
   owner: {
     type: String, // user ID or email

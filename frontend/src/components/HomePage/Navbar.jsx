@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // For responsive menu icons
 import { useSelector } from "react-redux";
 import img from '../../assets/logo.png'
@@ -23,6 +23,7 @@ import defaultUser from '../../assets/defaultUser.png'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   // Extract auth state from Redux
   const { isSignedIn, user } = useSelector((state) => state.auth);
@@ -43,6 +44,13 @@ const Navbar = () => {
   const NavButtons = [{title:'Blogs',to:'/blogs'},{title:'New Trip',to:'/newtrip'},]
   isSignedIn && NavButtons.push({title:'Dashboard',to:'/dashboard'})
   
+  const isActive = (path) => {
+    if (path === '/dashboard') {
+      return location.pathname.startsWith('/dashboard');
+    }
+    return location.pathname === path;
+  };
+
   return (
     <nav className="z-50 fixed top-0 left-0 right-0 h-16 backdrop-blur-md flex items-center justify-between px-5 md:px-10">
       {/* Brand Logo */}
@@ -57,8 +65,12 @@ const Navbar = () => {
       {
         NavButtons.map((button) => (
           <Link
-            key={button.to} // Or a unique identifier from your button object
-            className="text-lg font-semibold"
+            key={button.to}
+            className={`text-lg font-semibold transition-colors duration-200 ${
+              isActive(button.to) 
+                ? 'text-blue-600 border-b-2 border-blue-600' 
+                : 'text-gray-700 hover:text-blue-600'
+            }`}
             to={button.to}
           >
             {button.title}
@@ -67,17 +79,46 @@ const Navbar = () => {
       }
       </div>
 
-      {/* Login & Signup (Desktop) */}
+      {/* Login & Signup or Profile (Desktop) */}
       <div className="hidden md:flex space-x-5">
-      {isSignedIn==false ? (
-        <>
-          <Link className="text-lg font-semibold" to="/login">Log in</Link>
-          <Link className="text-lg font-semibold" to="/register">Sign up</Link>
-        </>
-      ):(<img src={profilePhotoLink} className="h-10 w-10 rounded-full"/>)}
+        {!isSignedIn ? (
+          <>
+            <Link 
+              className={`text-lg font-semibold transition-colors duration-200 ${
+                isActive('/login') 
+                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                  : 'text-gray-700 hover:text-blue-600'
+              }`} 
+              to="/login"
+            >
+              Log in
+            </Link>
+            <Link 
+              className={`text-lg font-semibold transition-colors duration-200 ${
+                isActive('/register') 
+                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                  : 'text-gray-700 hover:text-blue-600'
+              }`} 
+              to="/register"
+            >
+              Sign up
+            </Link>
+          </>
+        ) : (
+          <Link to="/dashboard">
+            <img 
+              src={profilePhotoLink} 
+              className={`h-10 w-10 rounded-full cursor-pointer transition-all duration-200 ${
+                isActive('/dashboard') 
+                  ? 'ring-2 ring-blue-600' 
+                  : 'hover:ring-2 hover:ring-blue-500'
+              }`}
+              alt="Profile"
+            />
+          </Link>
+        )}
       </div>
       
-
       {/* Mobile Menu Button */}
       <button onClick={() => setIsOpen(!isOpen)} className="md:hidden">
         {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -85,19 +126,66 @@ const Navbar = () => {
 
       {/* Mobile Navigation Menu */}
       {isOpen && (
-      <div onClick={() => setIsOpen(!isOpen)} className="absolute top-16 left-0 w-full bg-gray-800 shadow-md flex flex-col items-center py-5 space-y-4">
-        <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/">Home</Link>
-        <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/blog">Blogs</Link>
-        <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/newTrip">Create trip</Link>
-        {isSignedIn==false ? (
+        <div onClick={() => setIsOpen(!isOpen)} className="absolute top-16 left-0 w-full bg-gray-800 shadow-md flex flex-col items-center py-5 space-y-4">
+          {NavButtons.map((button) => (
+            <Link 
+              key={button.to}
+              className={`text-lg font-semibold transition-colors duration-200 ${
+                isActive(button.to) 
+                  ? 'text-blue-400' 
+                  : 'text-white hover:text-gray-300'
+              }`}
+              to={button.to}
+            >
+              {button.title}
+            </Link>
+          ))}
+          {!isSignedIn ? (
             <>
-              <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/login">Log in</Link>
-              <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/register">Sign up</Link>
+              <Link 
+                className={`text-lg font-semibold transition-colors duration-200 ${
+                  isActive('/login') 
+                    ? 'text-blue-400' 
+                    : 'text-white hover:text-gray-300'
+                }`}
+                to="/login"
+              >
+                Log in
+              </Link>
+              <Link 
+                className={`text-lg font-semibold transition-colors duration-200 ${
+                  isActive('/register') 
+                    ? 'text-blue-400' 
+                    : 'text-white hover:text-gray-300'
+                }`}
+                to="/register"
+              >
+                Sign up
+              </Link>
             </>
-          ):<Link className="text-lg font-semibold text-white hover:text-gray-300" to="/profile">Profile</Link>}
-      </div>
-)}
-
+          ) : (
+            <Link 
+              className={`text-lg font-semibold transition-colors duration-200 ${
+                isActive('/dashboard') 
+                  ? 'text-blue-400' 
+                  : 'text-white hover:text-gray-300'
+              }`}
+              to="/dashboard"
+            >
+              <div className="flex items-center space-x-2">
+                <img 
+                  src={profilePhotoLink} 
+                  className={`h-8 w-8 rounded-full ${
+                    isActive('/dashboard') ? 'ring-2 ring-blue-400' : ''
+                  }`}
+                  alt="Profile"
+                />
+                <span>Dashboard</span>
+              </div>
+            </Link>
+          )}
+        </div>
+      )}
     </nav>
   );
 };

@@ -34,8 +34,9 @@ const {
   getAllTrips,
   deleteTrip,
 } = require("./Service/TripService");
+
+const { createGroup, getAllGroups, joinGroup } = require("./Service/GroupService");
 const { uploadImage, getPhotos } = require("./Service/ImageService");
-const { createGroup, getAllGroups } = require("./Service/GroupService");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -80,6 +81,8 @@ app.post("/api/auth/refresh", refreshToken);
 
 // Routes - Groups
 app.route("/api/groups").post(createGroup).get(getAllGroups);
+app.route("/api/groups/:id/join").post(joinGroup);
+app.route("/api/groups/:id/cancel").post(joinGroup); // Reusing joinGroup for cancellation
 
 // Routes - Image Upload
 app.post("/api/upload-image", upload.array("images"), uploadImage);
