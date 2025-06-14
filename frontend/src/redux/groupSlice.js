@@ -2,10 +2,50 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 /*global process*/
-export const fetchGroups = createAsyncThunk("groups/fetchGroups", async () => {
-  const response = await axios.get(`${process.env.REACT_APP_BACKEND_ADDRESS}/groups`);
+
+export const fetchGroups = createAsyncThunk("groups/fetchGroups", async (_, { getState }) => {
+  const state = getState();
+  const userId = state.auth.user?._id; 
+  
+  const response = await axios.get(`${process.env.REACT_APP_BACKEND_ADDRESS}/groups${userId ? `?userId=${userId}` : ''}`);
   return response.data;
 });
+
+export const bookGroup = createAsyncThunk(
+  "groups/bookGroup",
+  async ({ groupId, userId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_ADDRESS}/groups/${groupId}/join`,
+        { userId }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error in bookGroup thunk:', error);
+      console.log('Axios error response:', error.response);
+      console.log('Axios error response data:', error.response?.data);
+      return rejectWithValue(error.response?.data?.error || "Failed to book group");
+    }
+  }
+);
+
+export const cancelBooking = createAsyncThunk(
+  "groups/cancelBooking",
+  async ({ groupId, userId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_ADDRESS}/groups/${groupId}/cancel`,
+        { userId }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error in cancelBooking thunk:', error);
+      console.log('Axios error response:', error.response);
+      console.log('Axios error response data:', error.response?.data);
+      return rejectWithValue(error.response?.data?.error || "Failed to cancel booking");
+    }
+  }
+);
 
 const groupSlice = createSlice({
   name: "groups",
@@ -27,6 +67,24 @@ const groupSlice = createSlice({
       .addCase(fetchGroups.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+      })
+      .addCase(bookGroup.fulfilled, (state, action) => {
+        console.log('bookGroup.fulfilled - action.payload:', action.payload);
+        state.groups = state.groups.map(group => 
+          group._id === action.payload.group._id
+            ? { ...group, availableSpots: action.payload.group.availableSpots, isBooked: action.payload.isBooked }
+            : group
+        );
+        console.log('bookGroup.fulfilled - updated state.groups:', state.groups);
+      })
+      .addCase(cancelBooking.fulfilled, (state, action) => {
+        console.log('cancelBooking.fulfilled - action.payload:', action.payload);
+        state.groups = state.groups.map(group =>
+          group._id === action.payload.group._id
+            ? { ...group, availableSpots: action.payload.group.availableSpots, isBooked: action.payload.isBooked }
+            : group
+        );
+        console.log('cancelBooking.fulfilled - updated state.groups:', state.groups);
       });
   },
 });

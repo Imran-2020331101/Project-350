@@ -1,21 +1,80 @@
 import { CalendarDays, MapPin, DollarSign, Users, PlaneTakeoff, Info, Camera, Compass, Mountain, Sun } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { bookGroup, cancelBooking, fetchGroups } from '../redux/groupSlice';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
 
 const PackageDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   
   const { groups, status: groupStatus } = useSelector((state) => state.groups);
-  const [trip] = groups.filter((p) => p._id == id);
+  const { isSignedIn, user } = useSelector((state) => state.auth);
+  
+  const tripData = groups.find((p) => p._id === id);
 
-  // Find related trips based on shared tags
-  const relatedGroups = groups.filter(
-    (g) =>
-      g._id !== trip._id &&
-      g.tags?.some((tag) => trip.tags?.includes(tag))
-  ).slice(0, 3); 
+  // Fetch groups on component mount and after booking/cancellation, or user change
+  useEffect(() => {
+    console.log('Dispatching fetchGroups on mount/update');
+    dispatch(fetchGroups());
+  }, [dispatch, user]);
 
-  if (!trip) return <div className="text-center py-10">Trip data not available.</div>;
+  // Find related trips (can be memoized if performance is an issue)
+  const relatedTrips = groups
+    .filter((g) => g._id !== id && g.tags?.some((tag) => tripData?.tags?.includes(tag)))
+    .slice(0, 3);
+
+  const handleBooking = async () => {
+    if (!isSignedIn) {
+      toast.error('Please log in to book this trip');
+      navigate('/login');
+      return;
+    }
+
+    if (!tripData) {
+      toast.error('Trip data not available');
+      return;
+    }
+
+    try {
+      if (tripData.isBooked) {
+        const result = await dispatch(cancelBooking({ 
+          groupId: tripData._id, 
+          userId: user._id 
+        })).unwrap();
+        
+        toast.success('Booking cancelled successfully');
+        // The fetchGroups() below will update the state
+      } else {
+        const result = await dispatch(bookGroup({ 
+          groupId: tripData._id, 
+          userId: user._id 
+        })).unwrap();
+        
+        toast.success('Trip booked successfully');
+        // The fetchGroups() below will update the state
+      }
+      // Re-fetch groups after booking/cancellation to ensure data is fresh
+      dispatch(fetchGroups()); 
+    } catch (error) {
+      console.error('Booking error:', error);
+      console.log('Full error object:', JSON.stringify(error, null, 2));
+      toast.error(error.message || 'Failed to process booking');
+    }
+  };
+
+  if (groupStatus === 'loading' && !tripData) {
+    return <div className="text-center py-10 text-white">Loading trip details...</div>;
+  }
+
+  if (!tripData) {
+    return <div className="text-center py-10 text-white">Trip data not available.</div>;
+  }
+
+  console.log('Rendering Trip Data:', tripData);
+  console.log('Rendering Is Booked:', tripData.isBooked);
 
   const {
     title,
@@ -32,7 +91,8 @@ const PackageDetail = () => {
     highlights,
     itinerary,
     goodToKnow,
-  } = trip;
+    isBooked,
+  } = tripData;
 
   return (
     <div className="bg-[#111827] min-h-screen pt-12 w-full">
@@ -136,8 +196,18 @@ const PackageDetail = () => {
             </div>
           )}
 
-          <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-md shadow-md w-full mt-4 transition duration-300 ease-in-out">
-            Book Your Trip Now
+          <button 
+            onClick={handleBooking}
+            className={`w-full mt-4 py-3 px-6 rounded-md shadow-md transition duration-300 ease-in-out font-semibold ${
+              isBooked 
+                ? 'bg-red-500 hover:bg-red-600 text-white' 
+                : availableSpots === 0 
+                  ? 'bg-gray-400 cursor-not-allowed text-gray-700' 
+                  : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
+            }`}
+            disabled={availableSpots === 0 && !isBooked}
+          >
+            {isBooked ? 'Cancel Booking' : availableSpots === 0 ? 'No Spots Available' : 'Book Your Trip Now'}
           </button>
         </aside>
       </div>
@@ -146,7 +216,6 @@ const PackageDetail = () => {
       <section className="max-w-6xl mx-auto p-6 mt-12 bg-white rounded-xl shadow-md">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center"><Camera className="mr-2 text-pink-500" size={24} /> Photo Gallery</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Add more relevant image URLs here */}
           {Array.from({ length: 6 }, (_, i) => (
             <div key={i} className="overflow-hidden rounded-md shadow-sm">
               <img
@@ -159,12 +228,11 @@ const PackageDetail = () => {
         </div>
       </section>
 
-      {/* Related Trips Section (Example - you'd likely fetch this data) */}
+      {/* Related Trips Section */}
       <section className="max-w-6xl mx-auto p-6 mt-12 bg-gray-800 rounded-xl shadow-md">
         <h2 className="text-2xl font-semibold text-gray-200 mb-6 flex items-center"><Mountain className="mr-2 text-gray-200" size={24} /> You Might Also Like</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Example related trips - replace with actual data */}
-          {relatedGroups.map((group) => (
+          {relatedTrips.map((group) => (
             <div key={group._id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <img
                 src={group.image}
@@ -184,7 +252,6 @@ const PackageDetail = () => {
           ))}
         </div>
       </section>
-
     </div>
   );
 };
