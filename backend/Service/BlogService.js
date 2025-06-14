@@ -55,6 +55,7 @@ const createBlog = async (req, res) => {
       tags: trip.tripTypes,
       story: result.response.text(),
       images: images,
+      likes: 0,
       publishDate: Date.now(),
     });
 

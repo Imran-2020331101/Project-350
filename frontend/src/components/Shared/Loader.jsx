@@ -1,7 +1,10 @@
 import React from "react";
 
 const Loader = () => (
-    <div role="status">
+    <div
+        role="status"
+        className="flex items-center justify-center h-screen w-full"
+    >
         <svg
             aria-hidden="true"
             className="inline w-10 h-10 mr-2 text-gray-200 animate-spin fill-[#6469ff]"
@@ -18,6 +21,8 @@ const Loader = () => (
                 fill="currentFill"
             />
         </svg>
+        <br></br>
+        <h1 className="pl-4">Crunching the latest data, just for you. Hang tight ......</h1>
     </div>
 );
 

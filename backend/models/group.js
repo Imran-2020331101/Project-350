@@ -29,7 +29,7 @@ const groupSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  status: {
+  status: { 
     type: String,
     enum: ['public', 'private'],
     default: 'public',

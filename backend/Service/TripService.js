@@ -1,55 +1,91 @@
-const Trip = require("../models/trip")
+const Trip = require("../models/trip");
 const User = require("../models/User");
+const {
+  getWeatherForecast,
+  getHotels,
+  getFlights,
+} = require("./HelperServices");
+const { getTransport } = require("../utils/utils");
+const { getPlaces, generateResponse } = require("../utils/utils");
+
+
+// Create a new trip
+// Incoming req.body
+// {
+//     destination: "",
+//     days: "",
+//     budget: "",
+//     persons: ""
+// }
+
 
 // Create a new trip
 const createTrip = async (req, res) => {
+  const { destination, tags, owner, travelDate } = req.body;
+
+  if (!destination || !tags || !owner || !travelDate) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
   try {
     const initialTrip = {
-      owner: req.owner,
-      destination: req.destination,
-      tags: req.tags,
+      owner: owner,
+      destination: destination, 
+      tags: tags,
+      weatherForecast: null,
+      travelDate: travelDate,
+      transportOptions: {
+        trains: [],
+        flights: [],
+      },
+      placesToVisit: new Map(),
     };
 
-    //fetch: transports
+    // Fetch transport options
+    initialTrip.transportOptions.flights = await getFlights(
+      travelDate,
+      tags.days
+    );
+    initialTrip.transportOptions.trains = await getTransport(
+      "train",
+      destination,
+      travelDate,
+      tags.days
+    );
+    console.log("Transport options:", initialTrip.transportOptions);
 
-    console.log("hello");
+    // Fetch weather forecast
+    initialTrip.weatherForecast = await getWeatherForecast(destination);
+    console.log("Weather forecast:", initialTrip.weatherForecast);
 
-    //fetch: weather forecast
-    fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${req.city}&appid=${apiKey}&units=metric`
-    )
-      .then((res) => {
-        if (!res.ok) throw new Error("City not found");
-        return res.json();
-      })
-      .then((data) => {
-        const temp = data.main.temp + "°C";
-        const condition = data.weather[0].description;
-        const alerts =
-          condition.includes("rain") || condition.includes("storm")
-            ? "Weather Alert: Take precautions"
-            : "No severe alerts";
+    // Fetch hotels
+    initialTrip.hotelsToStay = await getHotels(
+      destination,
+      travelDate,
+      tags.days
+    );
+    console.log("Hotels:", initialTrip.hotelsToStay);
 
-        const suggestions = condition.includes("rain")
-          ? "Bring an umbrella and raincoat"
-          : "Light clothes are fine";
+    // Fetch places to visit
+    const places = await getPlaces(destination, "tourist", tags.budget, 5);
+    const placesPrompt = `Give me a detailed itinerary for visiting these places in ${destination} over ${
+      tags.days
+    } days, considering a budget of ${tags.budget}: ${places.join(", ")}`;
+    const itineraryResponse = await generateResponse(placesPrompt);
 
-        initialTrip.weatherForecast = {
-          temparature: temp,
-          condition: condition,
-          alerts: alerts,
-          suggestions: suggestions,
-        };
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-
-    //fetch: hotels from google travel api's
-    //refer to : https://developers.google.com/hotels/hotel-prices/api-reference#hotelviewservice
-    //Api req address: https://travelpartner.googleapis.com/v3/accounts/4200042/hotelViews
-    
-    //fetch: places to visit
+    // Parse and structure the places data
+    places.forEach((place, index) => {
+      initialTrip.placesToVisit.set(
+        `Day ${Math.floor(index / 2) + 1} - ${
+          index % 2 === 0 ? "Morning" : "Afternoon"
+        }`,
+        {
+          time: index % 2 === 0 ? "Morning" : "Afternoon",
+          name: place,
+          details: itineraryResponse,
+        }
+      );
+    });
 
     const newTrip = await Trip.create(initialTrip);
     res.status(201).json(newTrip);
@@ -62,9 +98,12 @@ const createTrip = async (req, res) => {
 // Delete a trip
 const deleteTrip = async (req, res) => {
   try {
-    const { tripId } = req.params.id;
-    const deletedTrip = Trip.findByIdAndDelete({ id: tripId });
-    res.status(200).json({ deletedTrip });
+    const { tripId } = req.params; 
+    const deletedTrip = await Trip.findByIdAndDelete(tripId); 
+    if (!deletedTrip) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+    res.status(200).json({ message: "Trip successfully deleted", deletedTrip });
   } catch (error) {
     console.log("error while deleting trip " + error);
     res.status(500).json({ error: "Failed to delete Trip" });
@@ -73,12 +112,17 @@ const deleteTrip = async (req, res) => {
 
 const getAllTrips = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId } = req.params; 
+    if (!userId) return res.status(400).json({ error: "Must send user ID" });
+
     const trips = await Trip.find({ owner: userId });
+    if (!trips.length) {
+      return res.status(404).json({ message: "No trips found for this user" });
+    }
     res.status(200).json(trips);
   } catch (error) {
     console.log("error while fetching all trips " + error);
-    res.status(500).json({ error: "failed to fetch trips" });
+    res.status(500).json({ error: "Failed to fetch trips" });
   }
 };
 

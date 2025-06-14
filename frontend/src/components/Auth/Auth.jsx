@@ -10,7 +10,9 @@ const Auth = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword,setShowPassword] = useState(false);
+
     const dispatch = useDispatch();
+    
     const currentStatus = useSelector(selectStatus); // Use the new selector name
     const currentUser = useSelector(selectCurrentUser); // Use the new selector name
     const navigate = useNavigate();
@@ -28,7 +30,7 @@ const handleSubmit = async (e) => {
     toast.success('Logged in successfully');
     console.log('Logged in user:', user);
   } catch (error) {
-    toast.error(`Login failed: ${error}`);
+    toast.error(`Login failed: ${error?.toString()}`);
     console.error('Login error:', error);
   }
 };

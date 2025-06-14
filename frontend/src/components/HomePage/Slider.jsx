@@ -45,7 +45,7 @@ export default function Category({Packages}) {
         <Slider {...settings}>
           {
             Packages.map((pack)=>
-            <Link key={pack.id} to={`/group/${pack.id}`}>
+            <Link key={pack._id} to={`/group/${pack._id}`}>
               <TripCard  trip={pack}/>
             </Link>)
           }

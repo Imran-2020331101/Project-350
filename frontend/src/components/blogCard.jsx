@@ -3,6 +3,7 @@ import React from 'react';
 const BlogCard = ({ blogData }) => {
   const {
     id,
+    title,
     owner,
     author,
     destination,
@@ -24,6 +25,7 @@ const BlogCard = ({ blogData }) => {
         </div>
       )}
       <div className="p-4">
+        <h5 className="text-lg font-semibold mb-1">{title}</h5>
         <h5 className="text-lg font-semibold mb-1">{destination}</h5>
         <p className="text-gray-300 text-xs mb-1">By {author}</p>
         <div className="flex flex-wrap gap-1 mb-2">

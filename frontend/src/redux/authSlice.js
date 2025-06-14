@@ -1,31 +1,35 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import {dummyUser} from '../DemoInfo/User'
-
 
 const initialState = {
-  user: dummyUser, 
+  user: null, 
   status: 'idle', 
   error: null,
   isSignedIn: false,
+  token: null,
+  limit: 1,
 };
 
 /* global process */
 export const postUsers = createAsyncThunk('auth/login', async (user,{dispatch, rejectWithValue}) => {
   try {
-    const res = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/auth/login`, user);
-    const {token, user:userData} = res.data;
-
-    dispatch(setUser({user:userData,token}))
+    console.log('sending login request ');
+    const res = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/auth/login`, user,{
+      withCredentials:true,
+    });
+    
+    const {accessToken, user:userData} = res.data;
+    
+    // dispatch(setUser({user:userData,token: accessToken}))
 
     console.log(userData , 'login success');
 
-    return userData; // Expecting a single user object or relevant auth data
+    return {user:userData,accessToken}; // Expecting a single user object or relevant auth data
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || error.message);
   }
 });
-
+ 
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (user, { rejectWithValue }) => {
@@ -104,6 +108,7 @@ export const selectStatus = (state) => state.auth.status;
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectIsSignedIn = (state) => state.auth.isSignedIn;
 export const selectAuthError = (state) => state.auth.error;
+export const selectAuthState = (state) => state.auth;
 
 export const { setUser, signedOut, clearError } = authSlice.actions;
 export default authSlice.reducer;

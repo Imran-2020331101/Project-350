@@ -23,22 +23,14 @@ const handleLogin = async (req, res) => {
     const accessToken = generateAccessToken(foundUser);
     const refreshToken = generateRefreshToken(foundUser);
 
-    res.cookie("refreshToken", refreshToken, {
+    res.status(200).cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-
-    res.status(200).json({
-      msg: "Login successful",
+      path: '/auth/refresh-token'
+    }).json({
+      accessToken,
       user: foundUser,
     });
   } catch (error) {
@@ -49,11 +41,12 @@ const handleLogin = async (req, res) => {
 
 const handleRegister = async (req, res) => {
   try {
-    const { name, username, email, password } = req.body;
-    if (!name || !username || !email || !password) {
+    console.log(req.body);
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
       return res
         .status(400)
-        .json({ message: "Name,Username , email, and password are required." });
+        .json({ message: "Name, email, and password are required." });
     }
     const duplicateUser = await User.findOne({ email: email });
     if (duplicateUser)
@@ -62,7 +55,6 @@ const handleRegister = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const userEntity = await User.create({
       name: name,
-      username: username,
       email: email,
       password: hashedPassword,
       role: "user",

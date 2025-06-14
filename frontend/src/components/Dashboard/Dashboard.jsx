@@ -1,13 +1,48 @@
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import {toast} from 'react-toastify'
+import { useEffect } from 'react';
+import { fetchTrips } from '../../redux/tripSlice';
+
 import ImageCard from './imageCard';
 import BlogCard from '../blogCard';
-import { Blogs } from '../../DemoInfo/BlogsData';
-
+import TripCard from '../TripCard';
+import Loader from '../Shared/Loader';
 const Experiences = () => {
   const user = useSelector((state) => state.auth.user);
-  const myBlogs = Blogs.filter((blog) => blog.owner == user.userId);
+  const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
+  const { trips, status: tripStatus, error: tripError } = useSelector((state) => state.trips);
   
+  const dispatch = useDispatch();
+  
+useEffect(() => {
+  if (!user || !user._id) return; // ✅ Wait for user to be ready
+  console.log("dashboard useeffect : ", tripStatus);
+  if (tripStatus === 'idle' || tripStatus === 'failed') {
+    console.log("🚀 Dispatching fetchTrips");
+    dispatch(fetchTrips(user._id));
+  }
+}, [dispatch, tripStatus, user]); // ✅ safer dependency array
+
+
+useEffect(() => {
+  if (blogError) toast(`Error fetching blog: ${blogError}`);
+}, [blogError]);
+
+useEffect(() => {
+  if (tripError) toast(`Error fetching trips: ${tripError}`);
+}, [tripError]);
+
+  if(!user){
+    return <Loader/>
+  }
+  
+  
+  const myBlogs = blogs?.filter((blog) => blog.owner == user._id);
+
+  //user._id = 683316c96055d600aa184970
+  console.log("trips from dashboard : " , trips);
+   
   return (
     <div className="w-full max-w-7xl px-4 sm:px-6 md:px-10 py-8 overflow-y-auto flex flex-col gap-10 bg-inherit mx-auto">
 
@@ -38,8 +73,8 @@ const Experiences = () => {
       <section className="w-full mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Your Travel Blogs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {myBlogs.map((blog) => (
-            <Link key={blog.id} to={`/blogs/${blog.id}`}>
+          {myBlogs?.map((blog) => (
+            <Link key={blog._id} to={`/blogs/${blog._id}`}>
               <BlogCard blogData={blog} />
             </Link>
           ))}
@@ -50,9 +85,9 @@ const Experiences = () => {
       <section className="w-full mb-10">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Your Trip plans</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {myBlogs.map((blog) => (
-            <Link key={blog.id} to={`/blogs/${blog.id}`}>
-              <BlogCard blogData={blog} />
+          {trips?.map((trip) => (
+            <Link key={trip._id} to={`/trips/${trip._id}`}>
+              <TripCard trip={trip} />
             </Link>
           ))}
         </div>

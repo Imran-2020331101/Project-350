@@ -7,7 +7,7 @@ const connectDB=async ()=>{
             useNewUrlParser: true,
             useUnifiedTopology: true,
             serverSelectionTimeoutMS: 30000 })
-        console.log("Successfuly connected to database");
+        console.log("✅ Successfully connected to database");
     } catch (error) {
         console.log('Unable to connect to database : '+error);
     }

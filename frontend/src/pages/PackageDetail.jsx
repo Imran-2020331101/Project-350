@@ -1,17 +1,17 @@
-import React from 'react';
 import { CalendarDays, MapPin, DollarSign, Users, PlaneTakeoff, Info, Camera, Compass, Mountain, Sun } from 'lucide-react';
-import { Groups } from '../DemoInfo/Groups';
 import { Link, useParams } from 'react-router-dom';
-import Footer from '../components/HomePage/Footer';
+import { useSelector } from 'react-redux';
 
 const PackageDetail = () => {
   const { id } = useParams();
-  const [trip] = Groups.filter((p) => p.id == id);
+  
+  const { groups, status: groupStatus } = useSelector((state) => state.groups);
+  const [trip] = groups.filter((p) => p._id == id);
 
   // Find related trips based on shared tags
-  const relatedGroups = Groups.filter(
+  const relatedGroups = groups.filter(
     (g) =>
-      g.id !== trip.id &&
+      g._id !== trip._id &&
       g.tags?.some((tag) => trip.tags?.includes(tag))
   ).slice(0, 3); 
 
@@ -165,17 +165,17 @@ const PackageDetail = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Example related trips - replace with actual data */}
           {relatedGroups.map((group) => (
-            <div key={group.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div key={group._id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <img
-                src={`https://source.unsplash.com/random/400x250?landscape&sig=`}
-                alt={`Related Trip ${group.id}`}
+                src={group.image}
+                alt={`Related group ${group._id}`}
                 className="w-full h-32 object-cover"
               />
               <div className="p-4 bg-gray-900 text-gray-50">
                 <h3 className="font-semibold text-lg mb-2">{group.title}</h3>
                 <p className="text-sm">{group.days} | {group.place}</p>
                 <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mt-2 text-sm">
-                  <Link to={`/group/${group.id}`}>
+                  <Link to={`/group/${group._id}`}>
                     View Details
                   </Link>
                 </button>

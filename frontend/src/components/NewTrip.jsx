@@ -6,11 +6,12 @@ import { SelectTravelList, SelectBudgetOptions } from "../DemoInfo/options";
 import { toast } from "react-toastify";
 
 const NewTrip = () => {
-  const isSignedIn = useSelector((state) => state.auth.isSignedIn);
+  const {isSignedIn, limit, user} = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [tripDetails, setTripDetails] = useState({
+    owner: user._id,
     destination: "",
     days: "",
     budget: "",
@@ -19,7 +20,7 @@ const NewTrip = () => {
 
   const handleChange = (name, value) => {
     setTripDetails((prev) => ({ ...prev, [name]: value }));
-  };
+  }; 
 
   const handleSubmit = useCallback(() => {
     
@@ -27,10 +28,15 @@ const NewTrip = () => {
       toast.error('You need to Sign In to create a Trip');
       return navigate('/login');
     }
+    if(!limit){
+      toast.error('Reached free limit. Upgrade plan to use more');
+      return navigate('/upgrade');
+    }
 
-    const { destination, days, budget, persons } = tripDetails;
-    dispatch(postTrip({ destination, days, budget, persons }));
-    navigate("/dashboard"); // or wherever you want to go after submission
+    const { destination, days, budget, persons, owner } = tripDetails;
+    dispatch(postTrip({ destination, days, budget, persons, owner }));
+
+    navigate("/dashboard"); 
     toast.success("Trip created successfully");
   }, [tripDetails, dispatch, navigate]);
 

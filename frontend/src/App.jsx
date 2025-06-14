@@ -15,6 +15,8 @@ import AllBlogs from './pages/AllBlogs'
 import PackageDetail from './pages/PackageDetail'
 import CreateGroup from './pages/CreateGroup'
 import { ToastContainer } from 'react-toastify'
+import SubscriptionPlans from './pages/SubscriptionPlans'
+import NotFound from './pages/NotFound'
 
 function App() {
 
@@ -26,18 +28,20 @@ function App() {
         <Route path='login' element={<Login/>}/>
         <Route path='register' element={<Register/>}/>
         <Route path='newtrip' element={<NewTrip/>}/>
+        <Route path='upgrade' element={<SubscriptionPlans/>}/>
         <Route path='uploadimage' element={<ImageUpload/>}/>
         <Route path='logout' element={<Logout/>}/>
         <Route path='group/new' element={<CreateGroup/>}/>
         <Route path='group/:id' element={<PackageDetail/>}/>
         <Route path='blogs/new' element={<CreateBlog/>}/>
         <Route path='blogs' element={<AllBlogs/>}/>
-        <Route path='blogs/:id' element={<Blog/>}/>
+        <Route path='blogs/:_id' element={<Blog/>}/>
         <Route path='dashboard' element={<DashBoardLayout/>}>
           <Route index element={<Dashboard/>}/> 
           <Route path='itinerary/:id' element={<Itinerary/>}/>
           <Route path='experience' element={<Dashboard/>}/> 
         </Route>
+        <Route path="*" element={<NotFound/>} />
       </Route>
     </Routes>
     <ToastContainer/>
