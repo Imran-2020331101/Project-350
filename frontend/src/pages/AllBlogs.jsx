@@ -7,16 +7,30 @@ import { useState, useMemo } from 'react';
 const AllBlogs = () => {
   const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [showAllTags, setShowAllTags] = useState(false);
 
   const isLoading = blogStatus === 'loading';
 
-  // Get unique tags from all blogs
+  // Get unique tags from all blogs and add additional travel-related tags
   const allTags = useMemo(() => {
     const tags = new Set();
     blogs.forEach(blog => {
       blog.tags?.forEach(tag => tags.add(tag));
     });
-    return Array.from(tags);
+    
+    // Add additional travel-related tags
+    const additionalTags = [
+      'Adventure', 'Cultural', 'Foodie', 'Nature', 'Historical',
+      'Beach', 'Mountain', 'City', 'Rural', 'Wildlife',
+      'Photography', 'Backpacking', 'Luxury', 'Budget', 'Family',
+      'Solo', 'Couple', 'Group', 'Road Trip', 'Hiking',
+      'Camping', 'Safari', 'Cruise', 'Island', 'Desert',
+      'Tropical', 'Arctic', 'Urban', 'Religious', 'Art',
+      'Architecture', 'Shopping', 'Nightlife', 'Festival', 'Seasonal'
+    ];
+    
+    additionalTags.forEach(tag => tags.add(tag));
+    return Array.from(tags).sort();
   }, [blogs]);
 
   // Filter blogs based on selected tags
@@ -35,6 +49,10 @@ const AllBlogs = () => {
     );
   };
 
+  // Split tags into initial and additional
+  const initialTags = allTags.slice(0, 10);
+  const additionalTags = allTags.slice(10);
+
   return (
     <div className="min-h-screen bg-[#111827] py-8 px-4 md:px-12">
       <h1 className="text-3xl font-bold text-center mb-10 py-5 text-gray-200">All Travel Blogs</h1>
@@ -43,7 +61,8 @@ const AllBlogs = () => {
       <div className="max-w-4xl mx-auto mb-8">
         <h2 className="text-xl font-semibold text-gray-200 mb-4">Filter by Tags</h2>
         <div className="flex flex-wrap gap-2">
-          {allTags.map((tag) => (
+          {/* All Tags */}
+          {allTags.slice(0, showAllTags ? allTags.length : 10).map((tag) => (
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
@@ -56,6 +75,16 @@ const AllBlogs = () => {
               #{tag}
             </button>
           ))}
+
+          {/* More/Less Button */}
+          {additionalTags.length > 0 && (
+            <button
+              onClick={() => setShowAllTags(!showAllTags)}
+              className="px-4 py-2 rounded-full text-sm font-medium bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
+            >
+              {showAllTags ? '- Less' : '+ More'}
+            </button>
+          )}
         </div>
       </div>
 
