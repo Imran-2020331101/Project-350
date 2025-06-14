@@ -14,7 +14,7 @@ const BlogCard = ({ blogData }) => {
   } = blogData;
 
   return (
-    <div className="bg-black text-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-gray-800 text-white rounded-lg shadow-md overflow-hidden">
       {images && images.length > 0 && (
         <div className="w-full h-32">
           <img

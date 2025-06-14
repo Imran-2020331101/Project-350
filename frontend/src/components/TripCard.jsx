@@ -2,7 +2,7 @@ import React from "react";
 
 const TripCard = ({ trip }) => {
   return (
-    <div className="bg-black m-4 rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition">
+    <div className="bg-gray-800 m-4 rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition">
       <img
         src={trip.image}
         alt={trip.title}

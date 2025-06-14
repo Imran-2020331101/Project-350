@@ -1,4 +1,3 @@
-const axios = require("axios");
 const { getJson } = require("serpapi");
 
 const serpApiKey = process.env.SERP_API_KEY;
@@ -34,23 +33,18 @@ const getWeatherForecast = async (city) => {
 
 const getHotels = async (destination, check_in, days) => {
   try {
-    // Convert check_in to proper date format if it's not already
-    const checkInDate = new Date(check_in);
-    const checkOutDate = new Date(checkInDate);
-    checkOutDate.setDate(checkOutDate.getDate() + parseInt(days));
-
     const params = {
       engine: "google_hotels",
       q: destination,
       hl: "en",
       gl: "bd",
-      check_in_date: checkInDate.toISOString().split('T')[0],
-      check_out_date: checkOutDate.toISOString().split('T')[0],
+      check_in_date: check_in,
+      check_out_date: check_in + days,
       currency: "BDT",
       api_key: serpApiKey,
     };
 
-    const res = await axios.get("https://serpapi.com/search", { params });
+    const res = await getJson(params);
     if (!res.data) throw new Error("No hotel data received");
     
     return res.data.hotels || [];
@@ -60,12 +54,13 @@ const getHotels = async (destination, check_in, days) => {
   }
 };
 
+
+
+
 const getFlights = async (travelDate, days, from = "DAC") => {
   try {
-    // Convert travelDate to proper date format if it's not already
-    const departureDate = new Date(travelDate);
-    const returnDate = new Date(departureDate);
-    returnDate.setDate(returnDate.getDate() + parseInt(days));
+
+    //TODO: 
 
     const params = {
       api_key: serpApiKey,
@@ -73,9 +68,8 @@ const getFlights = async (travelDate, days, from = "DAC") => {
       hl: "en",
       gl: "bd",
       departure_id: from,
-      arrival_id: "AUS", // This should ideally come from a mapping of the destination
-      outbound_date: departureDate.toISOString().split('T')[0],
-      return_date: returnDate.toISOString().split('T')[0],
+      arrival_id: "AUS",
+      outbound_date: travelDate,
       currency: "BDT",
     };
 

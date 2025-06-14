@@ -11,6 +11,7 @@ const replySchema = new mongoose.Schema({
 
 const commentSchema = new mongoose.Schema({
   user: {
+    _id: String,
     name: String,
     profilePic: String,
   },

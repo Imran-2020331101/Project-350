@@ -1,43 +1,53 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { nanoid } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { nanoid } from "@reduxjs/toolkit";
 
 /* global process */
-export const fetchBlogs = createAsyncThunk(
-  'blogs/fetchPublic',
-  async () => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_ADDRESS}/blogs`);
-    return response.data;
-  }
-);
+export const fetchBlogs = createAsyncThunk("blogs/fetchPublic", async () => {
+  const { data } = await axios.get(
+    `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs`
+  );
+  return data;
+});
 
 const blogsSlice = createSlice({
-  name: 'blogs',
+  name: "blogs",
   initialState: {
     blogs: [],
-    status: 'idle',
+    status: "idle",
     error: null,
   },
   reducers: {
-    likeBlog: (state, action) => {
+    likeBlog: async (state, action) => {
+      console.log("Like Blog reducer called");
+
       const blog = state.blogs.find((b) => b._id === action.payload);
       if (blog) {
         blog.likes = (blog.likes || 0) + 1;
       }
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs`
+      );
+      return response.data;
     },
 
-    addCommentToBlog: (state, action) => {
+    addCommentToBlog: async (state, action) => {
       const { blogId, comment } = action.payload;
       const blog = state.blogs.find((b) => b._id === blogId);
       if (blog) {
         const newComment = {
-          _id: nanoid(),
           user: comment.user,
           text: comment.text,
           replies: [],
         };
         blog.comments = blog.comments || [];
         blog.comments.unshift(newComment);
+        const { data } = await axios.post(
+          `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs/${blogId}/comments`,
+          comment
+        );
+        console.log(data);
+        return data;
       }
     },
 
@@ -61,23 +71,20 @@ const blogsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchBlogs.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchBlogs.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = "succeeded";
         state.blogs = action.payload.blogs;
       })
       .addCase(fetchBlogs.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.error.message;
       });
   },
 });
 
-export const {
-  likeBlog,
-  addCommentToBlog,
-  addReplyToComment,
-} = blogsSlice.actions;
+export const { likeBlog, addCommentToBlog, addReplyToComment } =
+  blogsSlice.actions;
 
 export default blogsSlice.reducer;

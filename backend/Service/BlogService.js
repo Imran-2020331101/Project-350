@@ -152,9 +152,59 @@ const updateBlog = async (req, res) => {
   }
 };
 
+// POST /api/blogs/:id/comments
+const addCommentToBlog = async (req, res) => {
+  try {
+
+    console.log('blog service : ', req.body)
+
+    const { id } = req.params;
+    const { user, text } = req.body;
+
+    const blog = await Blog.findById(id);
+    if (!blog) return res.status(404).json({ success: false, msg: "Blog not found" });
+
+    const newComment = { user, text };
+    blog.comments.push(newComment);
+    await blog.save();
+
+    res.status(200).json({ success: true, msg: "Comment added", comments: blog.comments });
+  } catch (err) {
+    console.error("Add comment error:", err);
+    res.status(500).json({ success: false, msg: "Internal server error" });
+  }
+};
+
+
+// POST /api/blogs/:blogId/comments/:commentId/replies
+const addReplyToComment = async (req, res) => {
+  try {
+    const { blogId, commentId } = req.params;
+    const { user, text } = req.body;
+
+    const blog = await Blog.findById(blogId);
+    if (!blog) return res.status(404).json({ success: false, msg: "Blog not found" });
+
+    const comment = blog.comments.id(commentId);
+    if (!comment) return res.status(404).json({ success: false, msg: "Comment not found" });
+
+    comment.replies.push({ user, text });
+    await blog.save();
+
+    res.status(200).json({ success: true, msg: "Reply added", comments: blog.comments });
+  } catch (err) {
+    console.error("Add reply error:", err);
+    res.status(500).json({ success: false, msg: "Internal server error" });
+  }
+};
+
+
+
 module.exports = {
   getAllBlogs,
   createBlog,
   deleteBlog,
   updateBlog,
+  addCommentToBlog,
+  addReplyToComment
 };

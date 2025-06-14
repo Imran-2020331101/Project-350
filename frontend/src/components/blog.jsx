@@ -2,15 +2,13 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Mountain } from 'lucide-react';
 import {useSelector, useDispatch} from 'react-redux'
+import { addCommentToBlog, addReplyToComment, likeBlog } from '../redux/blogSlice';
+import {toast} from 'react-toastify'
 
-const mockUser = {
-  name: "John Doe",
-  profilePic: "https://i.pravatar.cc/40?img=3", // You can replace this with actual user data
-};
 
 const Blog = () => {
   const Blogs = useSelector((state) => state.blogs.blogs); // Adjust path based on your slice
-
+  const {_id:userId} =  useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
 
   const { _id } = useParams();
@@ -28,8 +26,7 @@ const Blog = () => {
   const coverImage = blog.images?.[0];
 
   const [comment, setComment] = React.useState('');
-  const [comments, setComments] = React.useState([]);
-  const [likes, setLikes] = React.useState(0);
+
   const [commentLikes, setCommentLikes] = React.useState({});
   const [replyingTo, setReplyingTo] = React.useState(null);
   const [replyText, setReplyText] = React.useState('');
@@ -40,7 +37,7 @@ const handleCommentSubmit = () => {
     dispatch(addCommentToBlog({
       blogId: _id,
       comment: {
-        user: mockUser,
+        user: userId,
         text: comment,
       },
     }));
@@ -56,7 +53,7 @@ const handleReplySubmit = (idx) => {
       blogId: _id,
       commentId,
       reply: {
-        user: mockUser,
+        user: userId,
         text: replyText,
       },
     }));
@@ -75,13 +72,15 @@ const handleReplySubmit = (idx) => {
   const handleBlogLike = () => {
     dispatch(likeBlog(blog._id))
   };
+  
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Blog link copied to clipboard!');
+    toast.success('Blog link copied to clipboard!');
   };
 
   if (!blog) {
+    toast.error("No Blogs Found");
     return <div className="text-center text-red-500 pt-20">Blog not found</div>;
   }
 
@@ -204,10 +203,10 @@ const handleReplySubmit = (idx) => {
         {/* Display Comments */}
         <div className="mt-6">
           <h4 className="text-xl font-semibold text-white mb-3">Comments</h4>
-          {comments.length === 0 ? (
+          {blog.comments.length === 0 ? (
             <p className="text-sm text-gray-400">No comments yet. Be the first to share your thoughts!</p>
           ) : (
-            comments.map((cmt, idx) => (
+            blog.comments.map((cmt, idx) => (
               <div key={idx} className="border-t border-blue-800 pt-3 mt-3 text-gray-200 text-sm">
                 <div className="flex items-start gap-3">
                   <img

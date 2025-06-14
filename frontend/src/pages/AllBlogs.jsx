@@ -23,7 +23,7 @@ const AllBlogs = () => {
       ) : (
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {blogs.map((blog) => (
-            <Link to={`/blogs/${blog.id}`} key={blog.id}>
+            <Link to={`/blogs/${blog._id}`} key={blog._id}>
               <BlogCard blogData={blog} />
             </Link>
           ))}

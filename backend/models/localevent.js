@@ -1,7 +1,6 @@
 const localEventSchema = new mongoose.Schema({
-    eventID: { type: String, required: true, unique: true },
-    locationID: { type: String, required: true, ref: 'Map' },
-    eventName: String,
+    location: { type: String, required: true },
+    eventName:{type: String, required: true},
     eventDate: Date,
     eventType: String,
     description: String,

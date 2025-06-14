@@ -1,8 +1,9 @@
 // import React, { useEffect, useState } from "react";
 
-import { GoogleMap, LoadScript, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { MapContainer, TileLayer, useMap, Marker, Popup } from 'react-leaflet'
 
 const MapComponent = ({ places, type }) => {
+    
     console.log(places);
 
     // const { isLoaded } = useJsApiLoader({
@@ -10,55 +11,31 @@ const MapComponent = ({ places, type }) => {
     //     googleMapsApiKey: 'YOUR_API_KEY',
     //   })
 
-    const defaultCenter = {
-        lat: places[0].location.lat,
-        lng: places[0].location.lng,
-    };
-    const mapStyles = {
-        height: "70vh",
-        width: "100%",
-    };
+    // const defaultCenter = {
+    //     lat: places[0].location.lat,
+    //     lng: places[0].location.lng,
+    // };
+    // const mapStyles = {
+    //     height: "70vh",
+    //     width: "100%",
+    // };
+
     const handleMarkerClick = (place) => {
-        // alert(`Hotel: ${place.name}`);
-        // window.open(`https://www.google.com/search?q=${encodeURIComponent(place.name)}`, '_blank');
-        if (type === "hotels") {
-            window.open(
-                `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(
-                    place.name + " bangladesh"
-                )}`,
-                "_blank"
-            );
-        } else {
-            window.open(
-                `https://www.google.com/search?q=${encodeURIComponent(
-                    place.name
-                )}`,
-                "_blank"
-            );
-        }
+       //TODO: complete this method
     };
+
     return (
-        <LoadScript googleMapsApiKey={import.meta.env.VITE_TEST}>
-            <GoogleMap
-                mapContainerStyle={mapStyles}
-                zoom={14}
-                center={defaultCenter}
-            >
-                {places.map((place, index) => {
-                    console.log(place);
-                    return (
-                        <Marker
-                            key={index}
-                            position={{
-                                lat: place.location.lat,
-                                lng: place.location.lng,
-                            }}
-                            onClick={() => handleMarkerClick(place)}
-                        />
-                    );
-                })}
-            </GoogleMap>
-        </LoadScript>
+        <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false}>
+            <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={[51.505, -0.09]}>
+                <Popup>
+                A pretty CSS3 popup. <br /> Easily customizable.
+                </Popup>
+            </Marker>
+        </MapContainer>
     );
 };
 
