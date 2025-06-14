@@ -79,44 +79,44 @@ const Navbar = () => {
       }
       </div>
 
-      {/* Login & Signup (Desktop) */}
+      {/* Login & Signup or Profile (Desktop) */}
       <div className="hidden md:flex space-x-5">
-      {isSignedIn==false ? (
-        <>
-          <Link 
-            className={`text-lg font-semibold transition-colors duration-200 ${
-              isActive('/login') 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-700 hover:text-blue-600'
-            }`} 
-            to="/login"
-          >
-            Log in
+        {!isSignedIn ? (
+          <>
+            <Link 
+              className={`text-lg font-semibold transition-colors duration-200 ${
+                isActive('/login') 
+                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                  : 'text-gray-700 hover:text-blue-600'
+              }`} 
+              to="/login"
+            >
+              Log in
+            </Link>
+            <Link 
+              className={`text-lg font-semibold transition-colors duration-200 ${
+                isActive('/register') 
+                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                  : 'text-gray-700 hover:text-blue-600'
+              }`} 
+              to="/register"
+            >
+              Sign up
+            </Link>
+          </>
+        ) : (
+          <Link to="/dashboard">
+            <img 
+              src={profilePhotoLink} 
+              className={`h-10 w-10 rounded-full cursor-pointer transition-all duration-200 ${
+                isActive('/dashboard') 
+                  ? 'ring-2 ring-blue-600' 
+                  : 'hover:ring-2 hover:ring-blue-500'
+              }`}
+              alt="Profile"
+            />
           </Link>
-          <Link 
-            className={`text-lg font-semibold transition-colors duration-200 ${
-              isActive('/register') 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-700 hover:text-blue-600'
-            }`} 
-            to="/register"
-          >
-            Sign up
-          </Link>
-        </>
-      ):(
-        <Link to="/dashboard">
-          <img 
-            src={profilePhotoLink} 
-            className={`h-10 w-10 rounded-full cursor-pointer transition-all duration-200 ${
-              isActive('/dashboard') 
-                ? 'ring-2 ring-blue-600' 
-                : 'hover:ring-2 hover:ring-blue-500'
-            }`}
-            alt="Profile"
-          />
-        </Link>
-      )}
+        )}
       </div>
       
       {/* Mobile Menu Button */}
@@ -126,21 +126,21 @@ const Navbar = () => {
 
       {/* Mobile Navigation Menu */}
       {isOpen && (
-      <div onClick={() => setIsOpen(!isOpen)} className="absolute top-16 left-0 w-full bg-gray-800 shadow-md flex flex-col items-center py-5 space-y-4">
-        {NavButtons.map((button) => (
-          <Link 
-            key={button.to}
-            className={`text-lg font-semibold transition-colors duration-200 ${
-              isActive(button.to) 
-                ? 'text-blue-400' 
-                : 'text-white hover:text-gray-300'
-            }`}
-            to={button.to}
-          >
-            {button.title}
-          </Link>
-        ))}
-        {isSignedIn==false ? (
+        <div onClick={() => setIsOpen(!isOpen)} className="absolute top-16 left-0 w-full bg-gray-800 shadow-md flex flex-col items-center py-5 space-y-4">
+          {NavButtons.map((button) => (
+            <Link 
+              key={button.to}
+              className={`text-lg font-semibold transition-colors duration-200 ${
+                isActive(button.to) 
+                  ? 'text-blue-400' 
+                  : 'text-white hover:text-gray-300'
+              }`}
+              to={button.to}
+            >
+              {button.title}
+            </Link>
+          ))}
+          {!isSignedIn ? (
             <>
               <Link 
                 className={`text-lg font-semibold transition-colors duration-200 ${
@@ -163,7 +163,7 @@ const Navbar = () => {
                 Sign up
               </Link>
             </>
-          ):(
+          ) : (
             <Link 
               className={`text-lg font-semibold transition-colors duration-200 ${
                 isActive('/dashboard') 
@@ -184,8 +184,8 @@ const Navbar = () => {
               </div>
             </Link>
           )}
-      </div>
-)}
+        </div>
+      )}
     </nav>
   );
 };
