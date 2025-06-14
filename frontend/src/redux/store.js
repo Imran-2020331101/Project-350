@@ -21,7 +21,7 @@ const rootReducer = combineReducers({
 const authTransform = createTransform(
   (inboundState) => ({
     user: inboundState.user,
-    isAuthenticated: inboundState.isAuthenticated,
+    isSignedIn: inboundState.isSignedIn,
   }),
   (outboundState) => outboundState,
   { whitelist: ['auth'] }

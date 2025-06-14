@@ -8,7 +8,7 @@ import {toast} from 'react-toastify'
 
 const Blog = () => {
   const Blogs = useSelector((state) => state.blogs.blogs); // Adjust path based on your slice
-  const {_id:userId} =  useSelector((state) => state.auth.user);
+  const {_id:userId, name, profilePicture} =  useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
 
   const { _id } = useParams();
@@ -26,18 +26,22 @@ const Blog = () => {
   const coverImage = blog.images?.[0];
 
   const [comment, setComment] = React.useState('');
+  const [blogLiked, setBlogLiked] = React.useState(false);
 
   const [commentLikes, setCommentLikes] = React.useState({});
   const [replyingTo, setReplyingTo] = React.useState(null);
   const [replyText, setReplyText] = React.useState('');
 
-// Submit comment
+
 const handleCommentSubmit = () => {
   if (comment.trim()) {
     dispatch(addCommentToBlog({
       blogId: _id,
       comment: {
-        user: userId,
+        user: {
+          profilePic: profilePicture,
+          name,
+        },
         text: comment,
       },
     }));
@@ -45,7 +49,6 @@ const handleCommentSubmit = () => {
   }
 };
 
-// Submit reply
 const handleReplySubmit = (idx) => {
   if (replyText.trim()) {
     const commentId = blog.comments[idx]._id;
@@ -53,7 +56,10 @@ const handleReplySubmit = (idx) => {
       blogId: _id,
       commentId,
       reply: {
-        user: userId,
+        user: {
+          profilePic: profilePicture,
+          name,
+        },
         text: replyText,
       },
     }));
@@ -69,8 +75,14 @@ const handleReplySubmit = (idx) => {
     }));
   };
 
+  console.log("comments of this blog : ",blog.comments)
+  
   const handleBlogLike = () => {
-    dispatch(likeBlog(blog._id))
+    dispatch(likeBlog({
+      id: blog._id,
+      isBlogLiked : blogLiked
+    }));
+    setBlogLiked((prev)=> !prev);
   };
   
 
@@ -203,14 +215,14 @@ const handleReplySubmit = (idx) => {
         {/* Display Comments */}
         <div className="mt-6">
           <h4 className="text-xl font-semibold text-white mb-3">Comments</h4>
-          {blog.comments.length === 0 ? (
+          {blog?.comments.length === 0 ? (
             <p className="text-sm text-gray-400">No comments yet. Be the first to share your thoughts!</p>
           ) : (
-            blog.comments.map((cmt, idx) => (
+            blog?.comments.map((cmt, idx) => (
               <div key={idx} className="border-t border-blue-800 pt-3 mt-3 text-gray-200 text-sm">
                 <div className="flex items-start gap-3">
                   <img
-                    src={cmt.user.profilePic}
+                    src={cmt?.user?.profilePic}
                     alt="profile"
                     className="w-10 h-10 rounded-full object-cover"
                   />

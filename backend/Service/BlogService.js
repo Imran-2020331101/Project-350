@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
 const Trip = require("../models/trip");
 const { generateResponse } = require("../utils/utils");
-// const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const getAllBlogs = async (req, res) => {
   try {
@@ -20,7 +19,6 @@ const getAllBlogs = async (req, res) => {
   }
 };
 
-// Function to create a new blog
 const createBlog = async (req, res) => {
   try {
     const { tripId, images, blogInfo } = req.body;
@@ -70,18 +68,15 @@ const deleteBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
 
-    // 1. Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(blogId)) {
       return res.status(400).json({ success: false, msg: "Invalid blog ID" });
     }
 
-    // 2. Find blog
     const blog = await Blog.findById(blogId);
     if (!blog) {
       return res.status(404).json({ success: false, msg: "Blog not found" });
     }
 
-    // 3. Ownership check (assumes req.user is set by auth middleware)
     if (blog.authorEmail !== req.user.email) {
       return res
         .status(403)
@@ -101,25 +96,21 @@ const updateBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
 
-    // 1. Validate ID
     if (!mongoose.Types.ObjectId.isValid(blogId)) {
       return res.status(400).json({ success: false, msg: "Invalid blog ID" });
     }
 
-    // 2. Find the blog
     const blog = await Blog.findById(blogId);
     if (!blog) {
       return res.status(404).json({ success: false, msg: "Blog not found" });
     }
 
-    // 3. Check if the current user owns the blog
     if (blog.owner !== req.user.id) {
       return res
         .status(403)
         .json({ success: false, msg: "Forbidden: Not the blog owner" });
     }
 
-    // 4. Update allowed fields only
     const allowedFields = [
       "author",
       "destination",
@@ -136,7 +127,6 @@ const updateBlog = async (req, res) => {
       }
     });
 
-    // 5. Save the updated blog
     const updatedBlog = await blog.save();
 
     return res.status(200).json({
@@ -198,6 +188,25 @@ const addReplyToComment = async (req, res) => {
   }
 };
 
+// POST /api/blogs/:id/like
+const addLikeToBlog = async (req,res)=>{
+  try {
+    const { id } = req.params;
+    const {blogLiked}  = req.body;
+
+    const blog = await Blog.findById(id);
+    if (!blog) return res.status(404).json({ success: false, msg: "Blog not found" });
+
+    blog.likes = !blogLiked ? blog.likes + 1: blog.likes - 1;
+    await blog.save();
+
+    return res.status(200).json({ success: true, likes: blog.likes });
+  } catch (error) {
+    console.error("like blog error:", err);
+    res.status(500).json({ success: false, msg: "Internal server error" });
+  }
+}
+
 
 
 module.exports = {
@@ -206,5 +215,6 @@ module.exports = {
   deleteBlog,
   updateBlog,
   addCommentToBlog,
-  addReplyToComment
+  addReplyToComment,
+  addLikeToBlog
 };

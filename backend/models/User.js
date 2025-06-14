@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
   password: {type: String,required: true},
   bio: { type: String, default:'Add a bio' },
   location: { type: String },
-  profilePicture: { type: String },
+  profilePicture: { type: String , default:"https://unsplash.com/photos/man-wearing-henley-top-portrait-7YVZYZeITc8"},
   coverPhoto: { type: String },
   followers: { type: Number, default: 0 },
   following: { type: Number, default: 0 },

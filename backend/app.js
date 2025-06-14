@@ -20,6 +20,7 @@ const {
   updateBlog,
   addCommentToBlog,
   addReplyToComment,
+  addLikeToBlog
 } = require("./Service/BlogService");
 const {
   handleLogin,
@@ -69,6 +70,8 @@ app.route("/api/blogs").get(getAllBlogs).post(createBlog).put(updateBlog);
 app.delete("/api/blogs/:id", deleteBlog); // Assumes blog ID is passed as URL param
 app.post("/api/blogs/:id/comments", addCommentToBlog);
 app.post("/api/blogs/:blogId/comments/:commentId/replies", addReplyToComment);
+app.post("/api/blogs/:id/like", addLikeToBlog);
+
 
 app.post("/api/auth/login", handleLogin);
 app.post("/api/auth/register", handleRegister);
