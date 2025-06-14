@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // For responsive menu icons
 import { useSelector } from "react-redux";
@@ -27,6 +27,18 @@ const Navbar = () => {
   // Extract auth state from Redux
   const { isSignedIn, user } = useSelector((state) => state.auth);
   const profilePhotoLink = user?.profilePhoto || defaultUser;
+
+  // Close mobile menu when window is resized to desktop size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) { // 768px is the md breakpoint in Tailwind
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const NavButtons = [{title:'Blogs',to:'/blogs'},{title:'New Trip',to:'/newtrip'},]
   isSignedIn && NavButtons.push({title:'Dashboard',to:'/dashboard'})
@@ -73,16 +85,16 @@ const Navbar = () => {
 
       {/* Mobile Navigation Menu */}
       {isOpen && (
-      <div onClick={() => setIsOpen(!isOpen)} className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center py-5 space-y-4">
-        <Link className="text-lg font-semibold text-gray-800" to="/">Home</Link>
-        <Link className="text-lg font-semibold text-gray-800" to="/blog">Blogs</Link>
-        <Link className="text-lg font-semibold text-gray-800" to="/newTrip">Create trip</Link>
+      <div onClick={() => setIsOpen(!isOpen)} className="absolute top-16 left-0 w-full bg-gray-800 shadow-md flex flex-col items-center py-5 space-y-4">
+        <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/">Home</Link>
+        <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/blog">Blogs</Link>
+        <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/newTrip">Create trip</Link>
         {isSignedIn==false ? (
             <>
-              <Link className="text-lg font-semibold text-gray-900" to="/login">Log in</Link>
-              <Link className="text-lg font-semibold text-gray-900" to="/register">Sign up</Link>
+              <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/login">Log in</Link>
+              <Link className="text-lg font-semibold text-white hover:text-gray-300" to="/register">Sign up</Link>
             </>
-          ):<Link className="text-lg font-semibold text-gray-900" to="/profile">Profile</Link>}
+          ):<Link className="text-lg font-semibold text-white hover:text-gray-300" to="/profile">Profile</Link>}
       </div>
 )}
 
