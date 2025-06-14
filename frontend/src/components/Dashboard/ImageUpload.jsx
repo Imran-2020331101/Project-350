@@ -4,58 +4,56 @@ import axios from "axios";
 
 const ImageUpload = () => {
   const navigate = useNavigate();
-  const [description, setDescription] = useState("");
+  const [caption, setCaption] = useState("");
   const [uploading, setUploading] = useState(false);
   const [showUploadArea, setShowUploadArea] = useState(true);
-  const [images, setImages] = useState([]);
-  const [imgData, setImgData] = useState([]);
+  const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   const handleImageChange = (event) => {
-    const files = Array.from(event.target.files);
-    if (files.length === 0) return;
+    const file = event.target.files[0];
+    if (!file) return;
 
-    setImgData(files);
+    setImageFile(file);
 
-    const newImagePreviews = [];
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        newImagePreviews.push(reader.result);
-        if (newImagePreviews.length === files.length) {
-          setImages(newImagePreviews);
-          setShowUploadArea(false);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImage(reader.result);
+      setShowUploadArea(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleUpload = async () => {
-    if (imgData.length === 0) return alert("Please select at least one image!");
+    if (!imageFile) return alert("Please select an image!");
+    if (!caption.trim()) return alert("Please add a caption!");
 
     setUploading(true);
     const formData = new FormData();
-    imgData.forEach((file) => {
-      formData.append("images", file);
-    });
-    formData.append("description", description);
-    formData.append("userID", "dummyUserID123");
+    formData.append("images", imageFile);
+    formData.append("caption", caption);
+    formData.append("userID", localStorage.getItem("userID") || "dummyUserID123");
 
     try {
       const response = await axios.post(
         `http://localhost:3000/api/upload-image`,
-        formData
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
       );
 
-      if (response.status === 200) {
+      if (response.data.success) {
         alert("Upload successful!");
         navigate(-1);
       } else {
-        alert("Upload failed. Try again.");
+        alert(response.data.error || "Upload failed. Try again.");
       }
     } catch (error) {
-      alert("Network error. Try again.");
-      console.error(error);
+      console.error("Upload error:", error);
+      alert(error.response?.data?.error || "Network error. Try again.");
     } finally {
       setUploading(false);
     }
@@ -80,7 +78,7 @@ const ImageUpload = () => {
             <span className="text-blue-700">Save</span> your experiences
           </h1>
           <p className="text-gray-600 font-medium">
-            Upload images you took during your trip
+            Upload an image from your trip
           </p>
         </div>
 
@@ -116,41 +114,37 @@ const ImageUpload = () => {
                 accept="image/png, image/jpg, image/jpeg"
                 className="hidden"
                 onChange={handleImageChange}
-                multiple
               />
             </label>
           </div>
         ) : (
           <div className="flex flex-col items-center mb-4">
-            <div className="flex flex-wrap justify-center gap-4">
-              {images.map((imgSrc, index) => (
-                <img
-                  key={index}
-                  src={imgSrc}
-                  alt={`Uploaded Preview ${index}`}
-                  className="w-64 h-64 object-cover rounded-lg border shadow-md mb-2"
-                />
-              ))}
+            <div className="flex justify-center">
+              <img
+                src={image}
+                alt="Uploaded Preview"
+                className="w-64 h-64 object-cover rounded-lg border shadow-md mb-2"
+              />
             </div>
             <button
               className="text-sm text-blue-600 mt-2 underline"
               onClick={() => {
                 setShowUploadArea(true);
-                setImages([]);
-                setImgData([]);
+                setImage(null);
+                setImageFile(null);
               }}
             >
-              Change image(s)
+              Change image
             </button>
           </div>
         )}
 
-        {/* Description Input */}
+        {/* Caption Input */}
         <textarea
           className="w-full border rounded-md p-3 text-sm text-gray-800 h-24 resize-none mb-4"
-          placeholder="Write about your experience..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Write a caption for your image..."
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
         />
 
         {/* Upload Button */}
