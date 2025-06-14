@@ -22,7 +22,7 @@ const PackageDetail = () => {
   }, [dispatch, user]);
 
   // Find related trips (can be memoized if performance is an issue)
-  const relatedTrips = groups
+  const relatedGroups = groups
     .filter((g) => g._id !== id && g.tags?.some((tag) => tripData?.tags?.includes(tag)))
     .slice(0, 3);
 
@@ -232,7 +232,7 @@ const PackageDetail = () => {
       <section className="max-w-6xl mx-auto p-6 mt-12 bg-gray-800 rounded-xl shadow-md">
         <h2 className="text-2xl font-semibold text-gray-200 mb-6 flex items-center"><Mountain className="mr-2 text-gray-200" size={24} /> You Might Also Like</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {relatedTrips.map((group) => (
+          {relatedGroups.map((group) => (
             <div key={group._id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <img
                 src={group.image}
