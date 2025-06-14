@@ -13,7 +13,7 @@ const { getPlaces, generateResponse } = require("../utils/utils");
 // Incoming req.body
 // {
 //     destination: "",
-//     days: "",
+//     days: "", 
 //     budget: "",
 //     persons: ""
 // }
@@ -110,16 +110,21 @@ const deleteTrip = async (req, res) => {
   }
 };
 
+//GET /api/trips/:id
 const getAllTrips = async (req, res) => {
   try {
-    const { userId } = req.params; 
-    if (!userId) return res.status(400).json({ error: "Must send user ID" });
+    const { id } = req.params; 
+    if (!id) return res.status(400).json({ error: "Must send user ID" });
 
-    const trips = await Trip.find({ owner: userId });
+    const trips = await Trip.find({ owner: id });
     if (!trips.length) {
       return res.status(404).json({ message: "No trips found for this user" });
     }
-    res.status(200).json(trips);
+    res.status(200).json({
+      success: true,
+      count: trips.length,
+      trips,
+    });
   } catch (error) {
     console.log("error while fetching all trips " + error);
     res.status(500).json({ error: "Failed to fetch trips" });
