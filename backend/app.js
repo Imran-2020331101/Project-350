@@ -80,7 +80,8 @@ app.post("/api/auth/refresh", refreshToken);
 app.route("/api/groups").post(createGroup).get(getAllGroups);
 
 // Routes - Image Upload
-app.post("/api/upload-image", upload.single("file"), uploadImage);
+app.post('/api/upload-image', upload.array("images"), uploadImage);
+
 
 /*
 app.post('/api/gemini-describe', upload.single("file"), async (req, res) => {

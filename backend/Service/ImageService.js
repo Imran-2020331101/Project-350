@@ -1,56 +1,95 @@
-const Trip = require('../models/trip');
-// const { getStorage, ref, uploadBytes, getDownloadURL } = require('firebase/storage');
-const firebaseApp = require('../config/firebase');
+const cloudinary = require('../config/cloudinary');
 const multer = require('multer');
 const upload = multer();
+const Photo = require('../models/photo');
 
 const uploadImage = async (req, res) => {
+    try {
+        const files = req.files;
+        const { caption, userID } = req.body;
 
-    // const file = req.file;
+        // Validate request
+        if (!files || files.length === 0) {
+            return res.status(400).json({ 
+                success: false,
+                error: 'No files uploaded' 
+            });
+        }
 
-    // const { tripId, caption,email,name } = req.body;
-    // console.log(caption)
+        if (!caption || !userID) {
+            return res.status(400).json({ 
+                success: false,
+                error: 'Caption and User ID are required.' 
+            });
+        }
 
-    // if (!file || !details) {
-    //     return res.status(400).json({ error: 'No file or details uploaded from user' });
-    // }
+        // Validate file type
+        const file = files[0];
+        if (!file.mimetype.startsWith('image/')) {
+            return res.status(400).json({
+                success: false,
+                error: 'Only image files are allowed'
+            });
+        }
 
-    // const storage = getStorage(firebaseApp);
-    // const storageRef = ref(storage, `images/${req.file.originalname}`);
-    
-    // try {
-    //     const snapshot = await uploadBytes(storageRef, req.file.buffer);
-    //     const downloadURL = await getDownloadURL(snapshot.ref);
+        // Convert to base64
+        const b64 = Buffer.from(file.buffer).toString('base64');
+        const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
 
-    //     //Update the trip with the new image address        
-    //     const trip = await Trip.find({email:email,name:name}); 
-    //     if (!trip) {
-    //         trip = await Trip.create({ email, name, Images: [] });
-    //     }
-    //     trip.Images.push({ downloadURL,getImageDescription(downloadURL), caption });
-    //     const updatedTrip = await trip.save();
-    //     res.status(200).json(updatedTrip);
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(dataURI, {
+            folder: 'trip-images',
+            resource_type: 'auto',
+            timeout: 60000 // Increase timeout to 60 seconds
+        });
 
-    // } catch (error) {
-    //     res.status(500).json({ error: 'Failed to upload image' });
-    // }
+        if (!result || !result.secure_url) {
+            throw new Error('Failed to upload to Cloudinary');
+        }
+
+        // Create photo document
+        const newPhoto = new Photo({
+            photoID: result.public_id,
+            userID: userID,
+            url: result.secure_url,
+            caption: caption
+        });
+
+        // Save to database
+        await newPhoto.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Photo uploaded successfully',
+            data: newPhoto
+        });
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        
+        // Handle specific error types
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                error: 'Validation error',
+                details: error.message
+            });
+        }
+
+        if (error.name === 'MongoError') {
+            return res.status(500).json({
+                success: false,
+                error: 'Database error',
+                details: error.message
+            });
+        }
+
+        res.status(500).json({ 
+            success: false,
+            error: 'Failed to upload image',
+            details: error.message 
+        });
+    }
 };
 
-const searchImages = async (req, res) => {
-    // const { searchTerm } = req.body;
-
-    // if (!searchTerm) {
-    //     return res.status(400).json({ error: 'Search term is required' });
-    // }
-
-    // try {
-    //     const regex = new RegExp(searchTerm, 'i');
-    //     const trips = await Trip.find({ 'Images.imageDetails': regex });
-    //     const images = trips.flatMap(trip => trip.Images.filter(image => regex.test(image.imageDetails)));
-    //     res.status(200).json({ images });
-    // } catch (error) {
-    //     res.status(500).json({ error: 'Failed to search images' });
-    // }
-};
-
-module.exports = { uploadImage, searchImages };
+module.exports = { uploadImage };
