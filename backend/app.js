@@ -20,7 +20,7 @@ const {
   updateBlog,
   addCommentToBlog,
   addReplyToComment,
-  addLikeToBlog
+  addLikeToBlog,
 } = require("./Service/BlogService");
 const {
   handleLogin,
@@ -34,7 +34,7 @@ const {
   getAllTrips,
   deleteTrip,
 } = require("./Service/TripService");
-const { uploadImage } = require("./Service/ImageService");
+const { uploadImage, getPhotos } = require("./Service/ImageService");
 const { createGroup, getAllGroups } = require("./Service/GroupService");
 
 const app = express();
@@ -72,7 +72,6 @@ app.post("/api/blogs/:id/comments", addCommentToBlog);
 app.post("/api/blogs/:blogId/comments/:commentId/replies", addReplyToComment);
 app.post("/api/blogs/:id/like", addLikeToBlog);
 
-
 app.post("/api/auth/login", handleLogin);
 app.post("/api/auth/register", handleRegister);
 app.post("/api/auth/logout", handleLogout);
@@ -83,8 +82,8 @@ app.post("/api/auth/refresh", refreshToken);
 app.route("/api/groups").post(createGroup).get(getAllGroups);
 
 // Routes - Image Upload
-app.post('/api/upload-image', upload.array("images"), uploadImage);
-
+app.post("/api/upload-image", upload.array("images"), uploadImage);
+app.get("/api/photos/:id",getPhotos);
 
 /*
 app.post('/api/gemini-describe', upload.single("file"), async (req, res) => {
@@ -117,5 +116,5 @@ app.use((err, req, res, next) => {
 connectDB();
 
 app.listen(port, () => {
-  console.log(`✅ Server listening on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });

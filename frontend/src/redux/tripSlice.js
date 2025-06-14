@@ -8,18 +8,15 @@ export const fetchTrips = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const url = `${process.env.REACT_APP_BACKEND_ADDRESS}/trips/${userId}`;
-      console.log('👉 Requesting:', url);
-      const response = await axios.get(url,{
-        withCredentials:true,
-      });
+      console.log('Requesting:', url);
+      const response = await axios.get(url);
       return response.data;
     } catch (err) {
-      console.error('❌ Error fetching trips:', err.response?.data || err.message);
+      console.error('Error fetching trips:', err.response?.data || err.message);
       return rejectWithValue(err.response?.data || 'Unknown error');
     }
   }
 );
-
 
 
 
@@ -54,7 +51,7 @@ const tripsSlice = createSlice({
         state.error = action.error.message;
       })
       .addCase(postTrip.fulfilled, (state, action) => {
-        state.trips.push(action.payload); // Add the new trip to the list
+        state.trips.push(action.payload); 
       });
   },
 });

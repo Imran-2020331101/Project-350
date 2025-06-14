@@ -92,4 +92,23 @@ const uploadImage = async (req, res) => {
     }
 };
 
-module.exports = { uploadImage };
+//GET /api/photos/:id
+const getPhotos= async (req,res)=>{
+  try {
+    const {id} = req.params;
+
+    const photos = await Photo.find({userID: id}).sort({ createdAt: -1 }); // sort latest first
+
+    res.status(200).json({
+      success: true,
+      count: photos.length,
+      photos,
+    });
+
+  } catch (error) {
+    console.error("Error fetching photos:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+}
+
+module.exports = { uploadImage, getPhotos };
