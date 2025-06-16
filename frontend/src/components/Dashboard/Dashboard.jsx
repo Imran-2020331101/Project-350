@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {toast} from 'react-toastify'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchTrips } from '../../redux/tripSlice';
 
 import ImageCard from './imageCard';
+import ImageModal from './ImageModal';
 import BlogCard from '../blogCard';
 import TripCard from '../TripCard';
 import Loader from '../Shared/Loader';
@@ -14,8 +15,21 @@ const Experiences = () => {
   const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
   const {photos, status: photoStatus, error} = useSelector((state)=>state.photos);
   const {trips, status: tripStatus, error:tripError} = useSelector((state)=>state.trips);
-
   const dispatch = useDispatch();
+  
+  // Modal state for image popup
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleImageClick = (photo) => {
+    setSelectedPhoto(photo);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPhoto(null);
+  };
   
   useEffect(()=>{
     if(photoStatus === 'idle'){
@@ -63,11 +77,10 @@ useEffect(() => {
       {/* Image Gallery Section */}
       <section className="w-full">
         <h2 className="text-xl font-semibold text-gray-700 mb-2">Image Gallery</h2>
-        <div className="w-full max-h-[420px] overflow-y-auto flex flex-wrap gap-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          {
+        <div className="w-full max-h-[420px] overflow-y-auto flex flex-wrap gap-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">          {
             !photos.length ? <h3>No photos to display</h3> :
             photos?.map((photo, index) => (
-            <ImageCard key={index} source={photo.url}/>
+            <ImageCard key={index} photo={photo} onClick={handleImageClick}/>
           ))}
         </div>
       </section>
@@ -93,8 +106,14 @@ useEffect(() => {
               <TripCard trip={trip} />
             </Link>
           ))}
-        </div>
-      </section>
+        </div>      </section>
+
+      {/* Image Modal */}
+      <ImageModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        photo={selectedPhoto}
+      />
     </div>
   );
 };

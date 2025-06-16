@@ -1,13 +1,22 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
 
-const ImageCard = ({source}) => {
-  const navigate = useNavigate();
-
+const ImageCard = ({ photo, onClick }) => {
   return (
-    <div className='w-[170px] h-[200px] rounded-2xl bg-white  flex flex-col justify-start items-center relative'>
-      <img className='  w-full h-full object-cover rounded-2xl ' src={source} alt="An image from the gallery" />
-      {/* <button onClick={()=>navigate('/blog')} className='w-[100px] h-[30px] mt-3 bg-white shadow-lg shadow-gray-500 font-semibold text-black rounded-lg flex justify-center '>view blog</button> */}
+    <div 
+      className='w-[170px] h-[200px] rounded-2xl bg-white flex flex-col justify-start items-center relative cursor-pointer hover:shadow-lg transition-shadow duration-200'
+      onClick={() => onClick(photo)}
+    >
+      <img 
+        className='w-full h-full object-cover rounded-2xl' 
+        src={photo.url} 
+        alt={photo.caption || "Gallery image"} 
+      />
+      {/* Optional: Add a small overlay indicator */}
+      <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 rounded-2xl flex items-center justify-center">
+        <span className="text-white opacity-0 hover:opacity-100 transition-opacity duration-200 text-xs">
+          Click to view
+        </span>
+      </div>
     </div>
   )
 }
