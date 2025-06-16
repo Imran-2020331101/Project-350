@@ -1,12 +1,13 @@
-import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Trips } from '../../DemoInfo/Trips';
 import { CalendarDays, Plane, TrainFront, Hotel, Sun } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 const Itinerary = () => {
   const { id } = useParams();
-  const myTrip = Trips.find((t) => t.id === id);
+  const Trips = useSelector((state) => state.trips.trips);
 
+  const myTrip = Trips?.find((t)=> t._id == id);
+ 
   if (!myTrip) {
     return <div className="text-center text-white mt-10">Trip not found.</div>;
   }
@@ -76,21 +77,23 @@ const Itinerary = () => {
           </section>
 
           {/* Itinerary */}
-          <section className="w-full max-w-4xl flex flex-col items-center gap-5">
-            <h3 className="text-2xl font-semibold text-white flex items-center gap-2">
-              <CalendarDays /> Trip Plan
-            </h3>
-            {Object.entries(myTrip.placesToVisit).map(([day, places], idx) => (
-              <div key={idx} className="w-full bg-white rounded-xl p-4 shadow-md text-gray-800">
-                <h4 className="font-semibold mb-2">{day}</h4>
-                <ul className="list-disc pl-6">
-                  {places.map((p, index) => (
-                    <li key={index}>{p.time} - {p.place}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </section>
+          {myTrip.placesToVisit && (
+            <section className="w-full max-w-4xl flex flex-col items-center gap-5">
+              <h3 className="text-2xl font-semibold text-white flex items-center gap-2">
+                <CalendarDays /> Trip Plan
+              </h3>
+              {Object.entries(myTrip.placesToVisit).map(([day, places], idx) => (
+                <div key={idx} className="w-full bg-white rounded-xl p-4 shadow-md text-gray-800">
+                  <h4 className="font-semibold mb-2">{day}</h4>
+                  <ul className="list-disc pl-6">
+                    {places.map((p, index) => (
+                      <li key={index}>{p.time} - {p.place}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </section>
+          )}
 
           {/* Hotels */}
           <section className="w-full max-w-4xl bg-white text-gray-800 rounded-xl shadow-md p-6">

@@ -2,7 +2,7 @@ import React from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import TripCard from '../TripCard';
+import GroupCard from '../GroupCard';
 import { Link } from 'react-router-dom';
 
 export default function Category({Packages}) {
@@ -46,7 +46,7 @@ export default function Category({Packages}) {
           {
             Packages.map((pack)=>
             <Link key={pack._id} to={`/group/${pack._id}`}>
-              <TripCard  trip={pack}/>
+              <GroupCard  group={pack}/>
             </Link>)
           }
         </Slider>

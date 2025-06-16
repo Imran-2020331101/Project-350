@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CalendarDays, Sun, MapPin, Tag, Info, ImagePlus, Users, DollarSign, Flag, Camera } from 'lucide-react';
 import {toast} from 'react-toastify';
-import axios from 'axios'
+import {useDispatch,useSelector} from 'react-redux'
+import { createGroup } from '../redux/groupSlice';
+
 
 const CreateGroup = () => {
-
+  const dispatch = useDispatch();
   const location = useLocation();
   const tripFromState = location.state?.trip;
+  const {_id} = useSelector((state)=> state.auth.user);
 
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -25,6 +28,8 @@ const CreateGroup = () => {
     expectedCost: '',
     startingPointOfGroup: '',
     image: '',
+    tripId: '',
+    owner: _id
   });
 
   useEffect(() => {
@@ -32,6 +37,7 @@ const CreateGroup = () => {
       
       setGroupData((prev) => ({
         ...prev,
+        tripId: tripFromState._id,
         title: `Trip to ${tripFromState.destination}`,
         place: tripFromState.destination,
         days: Object.keys(tripFromState.placesToVisit).length,
@@ -51,21 +57,18 @@ const CreateGroup = () => {
   };
 
 
-  /* global process */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Send to backend here
-    const res = await axios({
-      method:'post',
-      url:`${process.env.REACT_APP_BACKEND_ADDRESS}/groups`,
-      data: groupData,
-      headers:{
-        
-      }
-    });
-    if(res.status == 200){
+
+    const res = await dispatch(createGroup(groupData)).unwrap();
+
+    console.log(res)
+
+    if(res.status == 'success'){
       toast.success("Group Created Successfully");
-      navigate('/group/2');
+      console.log("newly created group id : ", res.createdGroup._id)
+      navigate(`/group/${res.createdGroup._id}`);
     }else{
       toast.error("Failed to create group");
     }

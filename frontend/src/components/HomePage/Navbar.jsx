@@ -25,14 +25,12 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  // Extract auth state from Redux
   const { isSignedIn, user } = useSelector((state) => state.auth);
   const profilePhotoLink = user?.profilePhoto || defaultUser;
 
-  // Close mobile menu when window is resized to desktop size
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) { // 768px is the md breakpoint in Tailwind
+      if (window.innerWidth >= 768) { 
         setIsOpen(false);
       }
     };
@@ -87,7 +85,7 @@ const Navbar = () => {
               className={`text-lg font-semibold transition-colors duration-200 ${
                 isActive('/login') 
                   ? 'text-blue-600 border-b-2 border-blue-600' 
-                  : 'text-gray-700 hover:text-blue-600'
+                  : 'text-gray-200 hover:text-blue-600'
               }`} 
               to="/login"
             >
@@ -97,7 +95,7 @@ const Navbar = () => {
               className={`text-lg font-semibold transition-colors duration-200 ${
                 isActive('/register') 
                   ? 'text-blue-600 border-b-2 border-blue-600' 
-                  : 'text-gray-700 hover:text-blue-600'
+                  : 'text-gray-200 hover:text-blue-600'
               }`} 
               to="/register"
             >
