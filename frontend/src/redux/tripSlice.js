@@ -23,9 +23,14 @@ export const fetchTrips = createAsyncThunk(
 
 export const postTrip = createAsyncThunk(
   'trips/postTrip',
-  async (newTrip) => {
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/trips`, newTrip);
-    return response.data;
+  async (newTrip, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_ADDRESS}/trips`, newTrip);
+      return response.data;
+    } catch (err) {
+      console.error('Error creating trip:', err.response?.data || err.message);
+      return rejectWithValue(err.response?.data || 'Failed to create trip');
+    }
   }
 );
 
@@ -46,13 +51,20 @@ const tripsSlice = createSlice({
       .addCase(fetchTrips.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.trips = action.payload;
-      })
-      .addCase(fetchTrips.rejected, (state, action) => {
+      })      .addCase(fetchTrips.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       })
+      .addCase(postTrip.pending, (state) => {
+        state.status = 'loading';
+      })
       .addCase(postTrip.fulfilled, (state, action) => {
-        state.trips.push(action.payload); 
+        state.status = 'succeeded';
+        state.trips.push(action.payload.trip); 
+      })
+      .addCase(postTrip.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || action.error.message;
       });
   },
 });
