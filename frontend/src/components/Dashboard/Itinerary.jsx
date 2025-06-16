@@ -163,13 +163,23 @@ const Itinerary = () => {
       </section>
 
       {/* Join Group Button */}
-      <Link
-        to="/group/new"
-        state={{ trip: myTrip }}
-        className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-md transition"
-      >
-        Create Travel Group
-      </Link>
+      <div className="my-10 pt-10 flex flex-wrap gap-6 justify-center items-center">
+
+        <Link
+          to="/blogs/new"
+          state={{ trip: myTrip }}
+          className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-md transition"
+          >
+          Create A Blog
+        </Link>
+        <Link
+          to="/group/new"
+          state={{ trip: myTrip }}
+          className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-md transition"
+          >
+          Create Travel Group
+        </Link>
+      </div>
     </div>
   );
 };

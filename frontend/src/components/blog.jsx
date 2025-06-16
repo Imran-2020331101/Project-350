@@ -7,22 +7,21 @@ import {toast} from 'react-toastify'
 
 
 const Blog = () => {
-  const Blogs = useSelector((state) => state.blogs.blogs); // Adjust path based on your slice
-  const {_id:userId, name, profilePicture} =  useSelector((state) => state.auth.user);
+  const Blogs = useSelector((state) => state.blogs.blogs); 
+  const {name, profilePicture} =  useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
 
   const { _id } = useParams();
   const blog = Blogs?.find((b) => b._id === _id);
   console.log("blog :" + blog)
 
-  // Find related blogs based on shared tags
+
   const relatedBlogs = Blogs.filter(
     (b) =>
       b._id !== blog._id &&
       b.tags?.some((tag) => blog.tags?.includes(tag))
   ).slice(0, 3); 
 
-  console.log(relatedBlogs);
   const coverImage = blog.images?.[0];
 
   const [comment, setComment] = React.useState('');

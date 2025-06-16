@@ -98,7 +98,7 @@ const PackageDetail = () => {
     availableSpots,
     expectedCost,
     startingPointOfGroup,
-    image,
+    images,
     highlights,
     itinerary,
     goodToKnow,
@@ -109,7 +109,7 @@ const PackageDetail = () => {
     <div className="bg-[#111827] min-h-screen pt-12 text-white w-full">
       {/* Hero Section */}
       <div className="relative mx-[12%] h-96 overflow-hidden rounded-xl shadow-lg mb-8">
-        <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-500 transform scale-100 hover:scale-105" />
+        <img src={images[0]} alt={title} className="w-full h-full object-cover transition-transform duration-500 transform scale-100 hover:scale-105" />
         <div className="absolute inset-0 bg-black opacity-40"></div>
         <div className="absolute bottom-6 left-6 text-white">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">{title}</h1>
@@ -226,11 +226,11 @@ const PackageDetail = () => {
       <section className="max-w-6xl mx-auto p-6 mt-12 bg-gray-800 rounded-xl shadow-md">
         <h2 className="text-2xl font-semibold mb-6 flex items-center"><Camera className="mr-2 text-pink-500" size={24} /> Photo Gallery</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }, (_, i) => (
+          {images.map((i)=>(
             <div key={i} className="overflow-hidden rounded-md shadow-sm">
               <img
-                src={`https://source.unsplash.com/random/400x300?nature,travel&sig=${i}`}
-                alt={`Trip Photo ${i + 1}`}
+                src={i}
+                alt={`Trip Photo`}
                 className="w-full h-48 object-cover transform hover:scale-105 transition-transform duration-300"
               />
             </div>
@@ -245,7 +245,7 @@ const PackageDetail = () => {
           {relatedGroups.map((group) => (
             <div key={group._id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden">
               <img
-                src={group.image}
+                src={group.images[0]}
                 alt={`Related group ${group._id}`}
                 className="w-full h-32 object-cover"
               />

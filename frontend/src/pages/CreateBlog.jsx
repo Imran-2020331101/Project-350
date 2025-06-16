@@ -16,46 +16,9 @@ const steps = [
 
 const CreateBlog = () => {
   const user = useSelector((state) => state.auth.user);
-  const { status } = useSelector((state) => state.blogs);
-  const uploadedImages = user?.images || [];
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const uploadedImages = useSelector((state)=>state.photos.photos);
 
-  // Check if user is logged in
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-6 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Please Log In</h1>
-          <p className="mb-4">You need to be logged in to create a blog.</p>
-          <button 
-            onClick={() => navigate('/login')}
-            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-xl transition"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Check if user has uploaded images
-  if (!uploadedImages.length) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-6 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">No Images Found</h1>
-          <p className="mb-4">You need to upload some images before creating a blog.</p>
-          <button 
-            onClick={() => navigate('/uploadimage')}
-            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-xl transition"
-          >
-            Upload Images
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const navigate =useNavigate();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [blogInfo, setBlogInfo] = useState({
