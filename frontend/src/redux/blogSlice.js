@@ -9,6 +9,21 @@ export const fetchBlogs = createAsyncThunk("blogs/fetchPublic", async () => {
   return data;
 });
 
+export const createBlog = createAsyncThunk(
+  "blogs/createBlog", 
+  async (blogData, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs`,
+        blogData
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { error: "Failed to create blog" });
+    }
+  }
+);
+
 export const likeBlog = createAsyncThunk("blogs/likeBlog", async (likeData) => {
   const {id:blogId, isBlogLiked} = likeData;
   console.log("from blogSlice : ", isBlogLiked)
@@ -69,7 +84,17 @@ const blogsSlice = createSlice({
         const blog = state.blogs.find((b) => b._id === blogId);
         if (blog) {
           blog.likes = likes;
-        }
+        }      })
+      .addCase(createBlog.pending, (state) => {
+        state.status = "creating";
+      })
+      .addCase(createBlog.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.blogs.unshift(action.payload.blog); // Add new blog to the beginning
+      })
+      .addCase(createBlog.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload?.error || "Failed to create blog";
       })
       .addCase(addCommentToBlog.fulfilled, (state, action) => {
         const { blogId, comment } = action.payload;

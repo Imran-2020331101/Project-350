@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
+const Photo = require("../models/photo");
 const Trip = require("../models/trip");
 const { generateResponse } = require("../utils/utils");
 
@@ -21,46 +22,204 @@ const getAllBlogs = async (req, res) => {
 
 const createBlog = async (req, res) => {
   try {
-    const { tripId, images, blogInfo } = req.body;
-    const trip = await Trip.findOne({ _id: tripId });
+    console.log('Create blog request:', req.body);
+    
+    const { blogInfo, user, selectedImages } = req.body;
+    
+    if (!blogInfo) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Blog information is required" 
+      });
+    }
 
+    if (!user || !user.id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "User information is required" 
+      });
+    }
+
+    const { selectedImageIds, howWhy, journey, experiences, insights, conclusion } = blogInfo;
+    
+    if (!selectedImageIds || selectedImageIds.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "At least one image must be selected" 
+      });
+    }
+
+    // Generate blog content using OpenAI
     const prompt = `
-    I want you to generate a detailed, engaging, and well-structured travel blog post based on the following fields. The content should feel personal and immersive, as if written by a real traveler reflecting on their journey. Use a storytelling tone and vivid descriptions.
-    Blog Details:
-    - Destination: ${trip.destination},
-    - Tags: ${trip.tripTypes},
-    - Story: 
-      - beginning: ${blogInfo.howWhy}
-      - Journe: ${blogInfo.journey}
-      - Highlights: ${blogInfo.experiences}
-      - Insights: ${blogInfo.insights}
-      - conclusion: ${blogInfo.conclusion}
-    - Image Captions: 
-    Additional Instructions:
-    - Keep the blog between 800–1500 words.
-    - Break it into sections with meaningful headings.
-    - Include a short summary paragraph at the beginning.
-    - Maintain an informal yet insightful tone.
-    - You may invent plausible details to fill the story if not all are given, as long as they feel authentic.
+    Create a detailed, engaging travel blog post based on the following information:
+    
+    How and Why the trip happened: ${howWhy}
+    Journey and first impressions: ${journey}
+    Key experiences: ${experiences}
+    Cultural insights and personal thoughts: ${insights}
+    Conclusion and reflections: ${conclusion}
+    
+    Please write a compelling travel blog post that:
+    - Has an engaging title (extract destination if mentioned)
+    - Is well-structured with clear sections
+    - Maintains a personal, storytelling tone
+    - Is between 800-1200 words
+    - Includes vivid descriptions and emotions
+    - Flows naturally from one section to the next
+    
+    Return the response in the following JSON format:
+    {
+      "title": "Generated blog title",
+      "story": "Complete blog story content",
+      "destination": "Extracted destination name from content"
+    }
+    
+    If no specific destination is mentioned, use a generic title and destination.
     `;
-    const result = generateResponse(prompt);
 
+    console.log('Generating blog content with OpenAI...');
+    let blogContent;
+    
+    try {
+      const aiResponse = await generateResponse(prompt);
+      console.log('AI Response received:', aiResponse.substring(0, 200) + '...');
+      
+      // Try to parse as JSON first
+      try {
+        blogContent = JSON.parse(aiResponse);
+      } catch (parseError) {
+        console.log('AI response not in JSON format, creating structured content');
+        
+        // Extract potential title from first line or create one
+        const lines = aiResponse.split('\n').filter(line => line.trim());
+        let extractedTitle = "My Travel Experience";
+        
+        if (lines.length > 0) {
+          // Look for a title-like first line
+          const firstLine = lines[0].replace(/^#+\s*/, '').trim();
+          if (firstLine.length < 100) {
+            extractedTitle = firstLine;
+          }
+        }
+        
+        // Extract destination from content
+        let extractedDestination = "Travel Destination";
+        const destinationMatch = aiResponse.match(/(?:to|in|at|visiting|from)\s+([A-Z][a-zA-Z\s,]+?)(?:\s|,|\.|\n)/g);
+        if (destinationMatch && destinationMatch.length > 0) {
+          const places = destinationMatch.map(match => 
+            match.replace(/(?:to|in|at|visiting|from)\s+/i, '').replace(/[,\.].*/,'').trim()
+          ).filter(place => place.length > 2 && place.length < 30);
+          
+          if (places.length > 0) {
+            extractedDestination = places[0];
+          }
+        }
+        
+        blogContent = {
+          title: extractedTitle,
+          story: aiResponse,
+          destination: extractedDestination
+        };
+      }
+    } catch (aiError) {
+      console.error('OpenAI generation failed:', aiError);
+      
+      // Fallback content if AI fails
+      blogContent = {
+        title: "My Travel Experience",
+        story: `
+        <h2>How It All Started</h2>
+        <p>${howWhy || 'An exciting journey began...'}</p>
+        
+        <h2>The Journey Begins</h2>
+        <p>${journey || 'The adventure unfolded beautifully...'}</p>
+        
+        <h2>Unforgettable Experiences</h2>
+        <p>${experiences || 'Amazing moments were captured...'}</p>
+        
+        <h2>Insights and Reflections</h2>
+        <p>${insights || 'This journey taught me so much...'}</p>
+        
+        <h2>Final Thoughts</h2>
+        <p>${conclusion || 'A truly memorable experience that I will cherish forever.'}</p>
+        `,
+        destination: "Travel Destination"
+      };
+    }    // Handle images - either from frontend selectedImages or fetch from database
+    let blogImages = [];
+    
+    if (selectedImages && selectedImages.length > 0) {
+      // Use images provided by frontend
+      blogImages = selectedImages.map(img => ({
+        url: img.url,
+        description: img.caption || `Travel image`
+      }));
+    } else {
+      // Fallback: try to fetch images from database using selectedImageIds
+      try {
+        const userPhotos = await Photo.find({ 
+          photoID: { $in: selectedImageIds },
+          userID: user.id 
+        });
+        
+        if (userPhotos.length > 0) {
+          blogImages = userPhotos.map(photo => ({
+            url: photo.url,
+            description: photo.caption || `Travel image`
+          }));
+        } else {
+          // Final fallback to placeholder images
+          blogImages = selectedImageIds.map((imageId, index) => ({
+            url: `https://source.unsplash.com/800x600/?travel,${index}`,
+            description: `Travel image ${index + 1}`
+          }));
+        }
+      } catch (fetchError) {
+        console.error('Error fetching user photos:', fetchError);
+        // Use placeholder images as last resort
+        blogImages = selectedImageIds.map((imageId, index) => ({
+          url: `https://source.unsplash.com/800x600/?travel,${index}`,
+          description: `Travel image ${index + 1}`
+        }));
+      }
+    }
+
+    // Generate tags based on content
+    const tags = ["travel", "adventure", "blog"];
+    if (blogContent.destination && blogContent.destination !== "Travel Destination") {
+      tags.push(blogContent.destination.toLowerCase());
+    }
+
+    // Create the blog
     const newBlog = await Blog.create({
-      owner: trip.owner,
-      author: owner,
-      destination: trip.destination,
-      title: "",
-      tags: trip.tripTypes,
-      story: result.response.text(),
-      images: images,
+      owner: user.id,
+      author: user.name || "Anonymous Traveler",
+      destination: blogContent.destination,
+      title: blogContent.title,
+      tags: tags,
+      story: blogContent.story,
+      images: blogImages,
       likes: 0,
-      publishDate: Date.now(),
+      publishDate: new Date(),
+      comments: []
     });
 
-    res.status(201).json(newBlog);
+    console.log('Blog created successfully:', newBlog._id);
+
+    res.status(201).json({
+      success: true,
+      message: "Blog created successfully",
+      blog: newBlog,
+      body: { id: newBlog._id } // For frontend compatibility
+    });
+
   } catch (error) {
-    console.log("Error generating Blog : " + error);
-    res.status(500).json({ error: "Failed to create Blog" });
+    console.error("Error creating blog:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Failed to create blog",
+      details: error.message 
+    });
   }
 };
 

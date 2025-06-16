@@ -9,9 +9,7 @@ async function generateResponse(prompt) {
     if (!openai) {
       console.log("No OpenAI API key found, using fallback response");
       return "AI response generation unavailable. Using fallback information.";
-    }
-
-    const completion = await openai.chat.completions.create({
+    }    const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
@@ -19,7 +17,7 @@ async function generateResponse(prompt) {
           content: prompt
         }
       ],
-      max_tokens: 500,
+      max_tokens: 1500, // Increased for longer blog content
       temperature: 0.7
     });
 

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import {useNavigate} from 'react-router-dom'
-import axios from 'axios'
-import {toast} from 'react-toastify';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom'
+import { createBlog } from '../redux/blogSlice';
+import { toast } from 'react-toastify';
 
 const steps = [
   'images',
@@ -16,9 +16,46 @@ const steps = [
 
 const CreateBlog = () => {
   const user = useSelector((state) => state.auth.user);
-  const uploadedImages = user.images;
+  const { status } = useSelector((state) => state.blogs);
+  const uploadedImages = user?.images || [];
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const navigate =useNavigate();
+  // Check if user is logged in
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-6 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">Please Log In</h1>
+          <p className="mb-4">You need to be logged in to create a blog.</p>
+          <button 
+            onClick={() => navigate('/login')}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-xl transition"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has uploaded images
+  if (!uploadedImages.length) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-6 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">No Images Found</h1>
+          <p className="mb-4">You need to upload some images before creating a blog.</p>
+          <button 
+            onClick={() => navigate('/uploadimage')}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-xl transition"
+          >
+            Upload Images
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const [currentStep, setCurrentStep] = useState(0);
   const [blogInfo, setBlogInfo] = useState({
@@ -44,21 +81,42 @@ const CreateBlog = () => {
 
   const handleChange = (field, value) => {
     setBlogInfo((prev) => ({ ...prev, [field]: value }));
-  };
+  };  const publishBlog = async () => {
+    try {
+      console.log('Publishing blog with data:', blogInfo);
+      
+      // Validate that all required fields are filled
+      if (!blogInfo.selectedImageIds.length || !blogInfo.howWhy || !blogInfo.journey || 
+          !blogInfo.experiences || !blogInfo.insights || !blogInfo.conclusion) {
+        toast.error("Please fill in all required fields and select at least one image");
+        return;
+      }
 
-  /* global process */
-  const publishBlog = async ()=>{
-    const res = await axios.post(`${process.env.REACT_APP_BASE_ADDRESS}/blogs`,{ blogInfo })
-    const {status,body} = res;
-    if(status==201){
-      toast("Blog created successfully");
-      /* TODO:
-      * 1. check what is returned & add the returned blog to the user's state
-      * 2. Test it
-      */
-      navigate(`/blogs/${body.id}`)
+      // Include user information in the request
+      const requestData = {
+        blogInfo,
+        user: {
+          id: user._id,
+          name: user.name || user.username,
+          email: user.email
+        },
+        selectedImages: uploadedImages.filter(img => 
+          blogInfo.selectedImageIds.includes(img._id)
+        )
+      };
+
+      // Use Redux action instead of direct axios call
+      const result = await dispatch(createBlog(requestData)).unwrap();
+      console.log('Blog creation successful:', result);
+      
+      toast.success("Blog created successfully");
+      navigate(`/blogs/${result.blog._id}`);
+      
+    } catch (error) {
+      console.error('Error creating blog:', error);
+      toast.error(error.error || "Failed to create blog");
     }
-  }
+  };
 
   const stepComponent = () => {
     switch (steps[currentStep]) {
@@ -137,12 +195,16 @@ const CreateBlog = () => {
             <p><strong>Journey:</strong> {blogInfo.journey}</p>
             <p><strong>Experiences:</strong> {blogInfo.experiences}</p>
             <p><strong>Insights:</strong> {blogInfo.insights}</p>
-            <p><strong>Conclusion:</strong> {blogInfo.conclusion}</p>
-            <button
+            <p><strong>Conclusion:</strong> {blogInfo.conclusion}</p>            <button
               onClick={() => publishBlog()}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-xl transition"
+              disabled={status === 'creating'}
+              className={`font-semibold px-6 py-2 rounded-xl transition ${
+                status === 'creating'
+                  ? 'bg-gray-400 cursor-not-allowed text-gray-700'
+                  : 'bg-yellow-500 hover:bg-yellow-600 text-black'
+              }`}
             >
-              Publish Blog
+              {status === 'creating' ? 'Publishing...' : 'Publish Blog'}
             </button>
           </div>
         );
