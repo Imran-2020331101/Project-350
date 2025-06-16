@@ -48,6 +48,33 @@ export const postPhoto = createAsyncThunk(
     }
   }
 );
+export const updateProfilePicture = createAsyncThunk(
+  "photo/profilePicture",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const {data} = await axios.post(
+        `${process.env.REACT_APP_BACKEND_ADDRESS}/upload-image/profile`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(data)
+      return data;
+    } catch (err) {
+      console.error(
+        "Error uploading photo :",
+        err.response?.data || err.message
+      );
+      return rejectWithValue(err.response?.data || "Unknown error");
+    }
+  }
+);
+
+
+
 
 const photoSlice = createSlice({
   name: "photos",
