@@ -1,6 +1,8 @@
 const axios = require("axios");
 
-async function translateText(text, targetLang = "es") {
+//POST /api/translate
+const translateText = async (req, res) => {
+  const { text, targetLang } = req.body;
   try {
     const response = await axios.post("https://libretranslate.de/translate", {
       q: text,
@@ -8,10 +10,17 @@ async function translateText(text, targetLang = "es") {
       target: targetLang,
       format: "text",
     });
-    return response.data.translatedText;
+    const data = response.data.translatedText;
+    res.status(200).json({
+      status: success,
+      data: data,
+    });
   } catch (err) {
     console.error("Translation error:", err);
-    throw err;
+    res.status(400).json({
+      status: failed,
+      message:"Internal Server Error"
+    })
   }
 }
 

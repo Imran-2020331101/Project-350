@@ -37,6 +37,7 @@ const {
 
 const { createGroup, getAllGroups, joinGroup } = require("./Service/GroupService");
 const { uploadImage, getPhotos } = require("./Service/ImageService");
+const {translateText} = require("./Service/TranslateService");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -79,42 +80,23 @@ app.post("/api/auth/logout", handleLogout);
 app.post("/api/auth/profile/update", handleProfileUpdate);
 app.post("/api/auth/refresh", refreshToken);
 
-// Routes - Groups
+
 app.route("/api/groups").post(createGroup).get(getAllGroups);
 app.route("/api/groups/:id/join").post(joinGroup);
 app.route("/api/groups/:id/cancel").post(joinGroup); // Reusing joinGroup for cancellation
 
-// Routes - Image Upload
+
 app.post("/api/upload-image", upload.array("images"), uploadImage);
 app.get("/api/photos/:id",getPhotos);
 
-/*
-app.post('/api/gemini-describe', upload.single("file"), async (req, res) => {
-    try {
-        const imageFile = req.file;
-        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-        const image = [fileToGenerativePart(imageFile.buffer, imageFile.mimetype)];
-        const result = await model.generateContent(["Describe the image", ...image]);
-        const response = await result.response;
-        const text = response.text();
+app.post("/api/translate",translateText);
 
-        console.log('Generated text:', text);
-        res.json({ result: text });
-    } catch (error) {
-        console.error("Gemini Error:", error);
-        res.status(500).json({ error: "Failed to generate description." });
-    }
-});
-*/
 
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error("Unhandled Error:", err.stack);
   res.status(500).json({ error: "Something went wrong!" });
 });
-
-// Server Start
 
 connectDB();
 
