@@ -1,6 +1,6 @@
 import axios from 'axios';
 import store from '../redux/store';
-import { setAuth, logout } from '../redux/authSlice';
+import { setUser, signedOut } from '../redux/authSlice';
 
 /* global process */
 const api = axios.create({
@@ -23,11 +23,11 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const res = await api.post('/auth/refresh-token');
-        store.dispatch(setAuth({ token: res.data.accessToken }));
+        store.dispatch(setUser({ user: res.data.user, token: res.data.accessToken }));
         originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
         return api(originalRequest);
       } catch (refreshErr) {
-        store.dispatch(logout());
+        store.dispatch(signedOut());
         return Promise.reject(refreshErr);
       }
     }

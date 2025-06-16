@@ -1,13 +1,20 @@
 import BlogCard from '../components/blogCard'; 
 import Loader from '../components/Shared/Loader';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { useState, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useState, useMemo, useEffect } from 'react';
+import { fetchBlogs } from '../redux/blogSlice';
 
 const AllBlogs = () => {
   const { blogs, status: blogStatus, error: blogError } = useSelector((state) => state.blogs);
   const [selectedTags, setSelectedTags] = useState([]);
   const [showAllTags, setShowAllTags] = useState(false);
+  const dispatch = useDispatch();
+
+  // Fetch blogs when component mounts
+  useEffect(() => {
+    dispatch(fetchBlogs());
+  }, [dispatch]);
 
   const isLoading = blogStatus === 'loading';
 

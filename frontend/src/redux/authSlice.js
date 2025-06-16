@@ -46,7 +46,7 @@ export const fetchUserPhotos = createAsyncThunk(
   async (userID, { rejectWithValue }) => {
     try {
       console.log(userID);
-      const {data} = await axios.get(`${process.env.REACT_APP_BACKEND_ADDRESS}/images/${userID}`);
+      const {data} = await axios.get(`${process.env.REACT_APP_BACKEND_ADDRESS}/photos/${userID}`);
       console.log(data);
       return {data};
     } catch (error) {

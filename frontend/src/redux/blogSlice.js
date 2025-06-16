@@ -3,29 +3,39 @@ import axios from "axios";
 
 /* global process */
 
-export const createBlog = createAsyncThunk(
-  "groups/createBlog",
-  async (blogData, { rejectWithValue }) => {
+// Create axios instance for blogs
+const blogApi = axios.create({
+  baseURL: process.env.REACT_APP_BACKEND_ADDRESS,
+  withCredentials: true,
+});
+
+// Add request interceptor to include auth token
+blogApi.interceptors.request.use((config) => {
+  // Try to get token from localStorage/sessionStorage first, then from Redux
+  let token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  
+  // If not found in storage, try to get from Redux store
+  if (!token) {
     try {
-      console.log('Blog Data in thunk : ', blogData);
-      const { data } = await axios.post(
-        `${process.env.REACT_APP_BACKEND_ADDRESS}/groups`,
-        blogData
-      );
-      return data;
+      const persistedState = localStorage.getItem('persist:root');
+      if (persistedState) {
+        const parsedState = JSON.parse(persistedState);
+        const authState = JSON.parse(parsedState.auth || '{}');
+        token = authState.token;
+      }
     } catch (error) {
-      console.log("Error creating Group:", error);
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to cancel booking"
-      );
+      console.log('Could not retrieve token from persisted state');
     }
   }
-);
+  
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const fetchBlogs = createAsyncThunk("blogs/fetchPublic", async () => {
-  const { data } = await axios.get(
-    `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs`
-  );
+  const { data } = await blogApi.get("/blogs");
   return data;
 });
 
@@ -33,10 +43,7 @@ export const createBlog = createAsyncThunk(
   "blogs/createBlog", 
   async (blogData, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(
-        `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs`,
-        blogData
-      );
+      const { data } = await blogApi.post("/blogs", blogData);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { error: "Failed to create blog" });
@@ -47,8 +54,8 @@ export const createBlog = createAsyncThunk(
 export const likeBlog = createAsyncThunk("blogs/likeBlog", async (likeData) => {
   const {id:blogId, isBlogLiked} = likeData;
   console.log("from blogSlice : ", isBlogLiked)
-  const { data } = await axios.post(
-    `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs/${blogId}/like`,
+  const { data } = await blogApi.post(
+    `/blogs/${blogId}/like`,
     {blogLiked: isBlogLiked}
   );
   return { blogId, likes: data.likes };
@@ -57,8 +64,8 @@ export const likeBlog = createAsyncThunk("blogs/likeBlog", async (likeData) => {
 export const addCommentToBlog = createAsyncThunk(
   "blogs/addCommentToBlog",
   async ({ blogId, comment }) => {
-    const { data } = await axios.post(
-      `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs/${blogId}/comments`,
+    const { data } = await blogApi.post(
+      `/blogs/${blogId}/comments`,
       comment
     );
     console.log("data. comments : ", data.comments);
@@ -69,8 +76,8 @@ export const addCommentToBlog = createAsyncThunk(
 export const addReplyToComment = createAsyncThunk(
   "blogs/addReplyToComment",
   async ({ blogId, commentId, reply }) => {
-    const { data } = await axios.post(
-      `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs/${blogId}/comments/${commentId}/replies`,
+    const { data } = await blogApi.post(
+      `/blogs/${blogId}/comments/${commentId}/replies`,
       reply
     );
     console.log("comments after reply : ", data.comments);

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
-import { createBlog } from '../redux/blogSlice';
+import { createBlog, fetchBlogs } from '../redux/blogSlice';
 import { toast } from 'react-toastify';
 
 const steps = [
@@ -17,8 +17,10 @@ const steps = [
 const CreateBlog = () => {
   const user = useSelector((state) => state.auth.user);
   const uploadedImages = useSelector((state)=>state.photos.photos);
+  const { status, error } = useSelector((state) => state.blogs);
 
-  const navigate =useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [blogInfo, setBlogInfo] = useState({
@@ -55,6 +57,12 @@ const CreateBlog = () => {
         return;
       }
 
+      // Validate user is logged in
+      if (!user || !user._id) {
+        toast.error("You must be logged in to create a blog");
+        return;
+      }
+
       // Include user information in the request
       const requestData = {
         blogInfo,
@@ -68,16 +76,19 @@ const CreateBlog = () => {
         )
       };
 
-      // Use Redux action instead of direct axios call
+      console.log('Sending blog data to backend:', requestData);      // Use Redux action instead of direct axios call
       const result = await dispatch(createBlog(requestData)).unwrap();
       console.log('Blog creation successful:', result);
       
-      toast.success("Blog created successfully");
-      navigate(`/blogs/${result.blog._id}`);
+      // Refresh the blogs list to include the new blog
+      await dispatch(fetchBlogs());
+      
+      toast.success("Blog created successfully!");
+      navigate('/blogs'); // Navigate to blogs list page
       
     } catch (error) {
       console.error('Error creating blog:', error);
-      toast.error(error.error || "Failed to create blog");
+      toast.error(error.error || error.message || "Failed to create blog");
     }
   };
 
@@ -180,9 +191,7 @@ const CreateBlog = () => {
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Create Your Bagan Blog</h1>
 
-      <div className="mb-6">{stepComponent()}</div>
-
-      <div className="flex justify-between mt-10">
+      <div className="mb-6">{stepComponent()}</div>      <div className="flex justify-between mt-10">
         <button
           onClick={prevStep}
           disabled={currentStep === 0}
@@ -190,13 +199,14 @@ const CreateBlog = () => {
         >
           Back
         </button>
-        <button
-          onClick={nextStep}
-          disabled={currentStep === steps.length - 1}
-          className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-xl transition"
-        >
-          {currentStep === steps.length - 2 ? 'Review' : 'Next'}
-        </button>
+        {currentStep < steps.length - 1 && (
+          <button
+            onClick={nextStep}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-xl transition"
+          >
+            {currentStep === steps.length - 2 ? 'Review' : 'Next'}
+          </button>
+        )}
       </div>
     </div>
   );

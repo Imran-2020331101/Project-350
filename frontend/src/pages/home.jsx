@@ -60,10 +60,8 @@ const Home = () => {
             <BlogCard blogData={blog} />
           </Link>
         ))}
-      </div>
-
-      <Link
-        to="/Blogs"
+      </div>      <Link
+        to="/blogs"
         className="text-blue-500 hover:underline mb-16"
       >
         See all Stories
