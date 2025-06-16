@@ -15,14 +15,22 @@ const createGroup = async (req, res) => {
       title,
       startingPointOfGroup,
       availableSpots,
+      days,
     } = req.body;
 
+    // Basic validation for required fields
     if (
       !owner ||
       !tripId ||
       !title ||
       !startingPointOfGroup ||
-      !availableSpots
+      !availableSpots ||
+      !place ||
+      !about ||
+      !startDate ||
+      !endDate ||
+      !expectedCost ||
+      !image
     ) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -34,21 +42,22 @@ const createGroup = async (req, res) => {
     }
 
     const newGroup = {
-      expectedCost,
-      status: "public",
-      place,
-      groupName: `Group_${tripId}`,
       trip: tripId,
+      groupName: `Group_${tripId}`,
       title,
+      place,
       about,
-      startingPointOfGroup: startingPointOfGroup,
-      owner,
-      availableSpots,
-      startDate,
-      endDate,
-      activities: activities.split(","),
-      participants: [owner],
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      days: parseInt(days) || 0,
+      activities: activities ? activities.split(",").map(activity => activity.trim()) : [],
+      expectedCost: parseFloat(expectedCost),
+      startingPointOfGroup,
       image,
+      owner,
+      participants: [owner],
+      availableSpots: parseInt(availableSpots),
+      status: "public",
     };
 
     const createdGroup = await Group.create(newGroup);

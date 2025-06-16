@@ -37,9 +37,7 @@ const Navbar = () => {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const NavButtons = [{title:'Blogs',to:'/blogs'},{title:'New Trip',to:'/newtrip'},]
+  }, []);  const NavButtons = [{title:'Blogs',to:'/blogs'},{title:'New Trip',to:'/newtrip'},{title:'Translator',to:'/translate'}]
   isSignedIn && NavButtons.push({title:'Dashboard',to:'/dashboard'})
   
   const isActive = (path) => {

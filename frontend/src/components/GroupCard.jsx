@@ -1,6 +1,17 @@
 import React from "react";
 
 const GroupCard = ({ group }) => {
+  // Helper function to format dates
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div className="bg-gray-800 m-4 rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition">
       <img
@@ -20,10 +31,8 @@ const GroupCard = ({ group }) => {
           📍 {group.place}
         </div>
 
-        <p className="text-sm text-gray-600">{group.about}</p>
-
-        <div className="text-sm text-gray-600">
-          📅 {group.startDate} – {group.endDate}
+        <p className="text-sm text-gray-600">{group.about}</p>        <div className="text-sm text-gray-600">
+          📅 {formatDate(group.startDate)} – {formatDate(group.endDate)}
         </div>
 
         <div className="text-sm">

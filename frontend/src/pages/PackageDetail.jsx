@@ -21,6 +21,17 @@ const PackageDetail = () => {
     dispatch(fetchGroups());
   }, [dispatch, user]);
 
+  // Helper function to format dates
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   // Find related trips (can be memoized if performance is an issue)
   const relatedGroups = groups
     .filter((g) => g._id !== id && g.tags?.some((tag) => tripData?.tags?.includes(tag)))
@@ -156,10 +167,9 @@ const PackageDetail = () => {
               <div className="flex items-center gap-2">
                 <MapPin className="text-red-500" size={16} />
                 <span><strong>Location:</strong> {place}</span>
-              </div>
-              <div className="flex items-center gap-2">
+              </div>              <div className="flex items-center gap-2">
                 <CalendarDays className="text-green-500" size={16} />
-                <span><strong>Dates:</strong> {startDate} → {endDate}</span>
+                <span><strong>Dates:</strong> {formatDate(startDate)} → {formatDate(endDate)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Users className="text-purple-500" size={16} />
