@@ -9,6 +9,44 @@ const groupSchema = new mongoose.Schema({
     type: String,
     default: 'Group : '+Date.now,
   },
+  title: {
+    type: String,
+    required: true,
+  },
+  place: {
+    type: String,
+    required: true,
+  },
+  about: {
+    type: String,
+    required: true,
+  },
+  startDate: {
+    type: Date,
+    required: true,
+  },
+  endDate: {
+    type: Date,
+    required: true,
+  },
+  days: {
+    type: Number,
+  },
+  activities: [{
+    type: String,
+  }],
+  expectedCost: {
+    type: Number,
+    required: true,
+  },
+  startingPointOfGroup: {
+    type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+    required: true,
+  },
   gatheringPoint: {
     type: String,
     // required: true,

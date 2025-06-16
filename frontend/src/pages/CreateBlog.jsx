@@ -69,16 +69,16 @@ const CreateBlog = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {uploadedImages.map((img) => (
                 <div
-                  key={img.id}
-                  onClick={() => toggleImageSelection(img.id)}
+                  key={img._id}
+                  onClick={() => toggleImageSelection(img._id)}
                   className={`cursor-pointer border-2 rounded-xl p-1 transition ${
-                    blogInfo.selectedImageIds.includes(img.id)
+                    blogInfo.selectedImageIds.includes(img._id)
                       ? 'border-yellow-400'
                       : 'border-gray-700'
                   }`}
                 >
                   <img
-                    src={img.source}
+                    src={img.url}
                     alt={img.caption}
                     className="rounded-lg w-full h-32 object-cover"
                   />

@@ -51,9 +51,28 @@ const CreateGroup = () => {
   
   
   if (isLoading) return <div>Loading...</div>; 
-  
-  const handleChange = (e) => {
-    setGroupData({ ...groupData, [e.target.name]: e.target.value });
+    const handleChange = (e) => {
+    const { name, value } = e.target;
+    let updatedData = { ...groupData, [name]: value };
+    
+    // Auto-calculate duration when start or end date changes
+    if (name === 'startDate' || name === 'endDate') {
+      const startDate = name === 'startDate' ? value : groupData.startDate;
+      const endDate = name === 'endDate' ? value : groupData.endDate;
+      
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const timeDiff = end.getTime() - start.getTime();
+        const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // +1 to include both start and end days
+        
+        if (dayDiff > 0) {
+          updatedData.days = dayDiff.toString();
+        }
+      }
+    }
+    
+    setGroupData(updatedData);
   };
 
 
@@ -116,13 +135,13 @@ const CreateGroup = () => {
             <div>
               <label htmlFor="startDate" className="block text-gray-200 text-sm font-bold mb-2">
                 <CalendarDays className="inline-block mr-1 text-green-500" size={16} /> Start Date
-              </label>
-              <input
+              </label>              <input
                 type="date"
                 id="startDate"
                 name="startDate"
                 value={groupData.startDate}
                 onChange={handleChange}
+                min={new Date().toISOString().split('T')[0]}
                 required
                 className="w-full p-3 border rounded-lg focus:ring-green-500 focus:border-green-500"
               />
@@ -130,13 +149,13 @@ const CreateGroup = () => {
             <div>
               <label htmlFor="endDate" className="block text-gray-200 text-sm font-bold mb-2">
                 <CalendarDays className="inline-block mr-1 text-orange-500" size={16} /> End Date
-              </label>
-              <input
+              </label>              <input
                 type="date"
                 id="endDate"
                 name="endDate"
                 value={groupData.endDate}
                 onChange={handleChange}
+                min={groupData.startDate || new Date().toISOString().split('T')[0]}
                 required
                 className="w-full p-3 border rounded-lg focus:ring-orange-500 focus:border-orange-500"
               />
@@ -145,17 +164,15 @@ const CreateGroup = () => {
           <div>
             <label htmlFor="days" className="block text-gray-200 text-sm font-bold mb-2">
               <Sun className="inline-block mr-1 text-yellow-500" size={16} /> Duration (Days)
-            </label>
-            <input
-              type="number"
+            </label>            <input
+              type="text"
               id="days"
               name="days"
-              placeholder="e.g., 7"
+              placeholder="Auto-calculated from dates"
               value={groupData.days}
-              onChange={handleChange}
-              min={1}
+              readOnly
               required
-              className="w-full p-3 border rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
+              className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-yellow-500 focus:border-yellow-500"
             />
           </div>
           <div>

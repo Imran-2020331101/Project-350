@@ -18,6 +18,7 @@ import { ToastContainer } from 'react-toastify'
 import SubscriptionPlans from './pages/SubscriptionPlans'
 import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/Auth/ProtectedRoute'
+import Translator from './pages/Translator'
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
         <Route path='logout' element={<Logout/>}/>
         <Route path='group/new' element={<CreateGroup/>}/>
         <Route path='group/:id' element={<PackageDetail/>}/>
+        <Route path='translate' element={<Translator/>}/>
         <Route path='blogs/new' element={<CreateBlog/>}/>
         <Route path='blogs' element={<AllBlogs/>}/>
         <Route path='blogs/:_id' element={<Blog/>}/>

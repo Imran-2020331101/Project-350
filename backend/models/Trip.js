@@ -43,14 +43,13 @@ const tripSchema = new mongoose.Schema({
     alerts: String,
     suggestions: String
   },
-  description: String,
-  placesToVisit: {
+  description: String,  placesToVisit: {
     type: Map,
-    of: [{
+    of: {
       time: String,
       name: String,
       details: String
-    }]
+    }
   },
   hotelsToStay: [{
     name: String,

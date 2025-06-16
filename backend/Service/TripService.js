@@ -23,6 +23,8 @@ const { getPlaces, generateResponse } = require("../utils/utils");
 const createTrip = async (req, res) => {
   const { destination, tags, owner, travelDate } = req.body;
 
+  console.log("Create trip request:", { destination, tags, owner, travelDate });
+
   if (!destination || !tags || !owner || !travelDate) {
     return res.status(400).json({ message: "Missing required fields" });
   }
@@ -37,61 +39,126 @@ const createTrip = async (req, res) => {
       transportOptions: {
         trains: [],
         flights: [],
+        buses: []
       },
-      placesToVisit: new Map(),
+      placesToVisit: {},
+      hotelsToStay: []
     };
 
-    // Fetch transport options
-    initialTrip.transportOptions.flights = await getFlights(
-      travelDate,
-      tags.days
-    );
-    initialTrip.transportOptions.trains = await getTransport(
-      "train",
-      destination,
-      travelDate,
-      tags.days
-    );
+    console.log("Fetching transport options...");
+    // Fetch transport options with error handling
+    try {
+      initialTrip.transportOptions.flights = await getFlights(
+        travelDate,
+        tags.days
+      );
+    } catch (error) {
+      console.log("Flights fetch error:", error.message);
+      initialTrip.transportOptions.flights = [];
+    }
+
+    try {
+      initialTrip.transportOptions.trains = await getTransport(
+        "train",
+        destination,
+        travelDate,
+        tags.days
+      );
+    } catch (error) {
+      console.log("Transport fetch error:", error.message);
+      initialTrip.transportOptions.trains = [];
+    }
+
     console.log("Transport options:", initialTrip.transportOptions);
 
-    // Fetch weather forecast
-    initialTrip.weatherForecast = await getWeatherForecast(destination);
+    console.log("Fetching weather forecast...");
+    // Fetch weather forecast with error handling
+    try {
+      initialTrip.weatherForecast = await getWeatherForecast(destination);
+    } catch (error) {
+      console.log("Weather fetch error:", error.message);
+      initialTrip.weatherForecast = {
+        temperature: "N/A",
+        condition: "Unknown",
+        alerts: "No alerts available",
+        suggestions: "Check local weather"
+      };
+    }
+
     console.log("Weather forecast:", initialTrip.weatherForecast);
 
-    // Fetch hotels
-    initialTrip.hotelsToStay = await getHotels(
-      destination,
-      travelDate,
-      tags.days
-    );
+    console.log("Fetching hotels...");
+    // Fetch hotels with error handling
+    try {
+      initialTrip.hotelsToStay = await getHotels(
+        destination,
+        travelDate,
+        tags.days
+      );
+    } catch (error) {
+      console.log("Hotels fetch error:", error.message);
+      initialTrip.hotelsToStay = [];
+    }
+
     console.log("Hotels:", initialTrip.hotelsToStay);
 
-    // Fetch places to visit
-    const places = await getPlaces(destination, "tourist", tags.budget, 5);
-    const placesPrompt = `Give me a detailed itinerary for visiting these places in ${destination} over ${
-      tags.days
-    } days, considering a budget of ${tags.budget}: ${places.join(", ")}`;
-    const itineraryResponse = await generateResponse(placesPrompt);
+    console.log("Fetching places to visit...");
+    // Fetch places to visit with error handling
+    try {
+      const places = await getPlaces(destination, "tourist", tags.budget, 5);
+      console.log("Places fetched:", places);
+      
+      const placesPrompt = `Give me a detailed itinerary for visiting these places in ${destination} over ${
+        tags.days
+      } days, considering a budget of ${tags.budget}: ${places.join(", ")}`;
+      
+      let itineraryResponse;
+      try {
+        itineraryResponse = await generateResponse(placesPrompt);
+      } catch (error) {
+        console.log("AI response error:", error.message);
+        itineraryResponse = `Visit ${places.join(", ")} in ${destination} over ${tags.days} days.`;
+      }
 
-    // Parse and structure the places data
-    places.forEach((place, index) => {
-      initialTrip.placesToVisit.set(
-        `Day ${Math.floor(index / 2) + 1} - ${
+      // Structure the places data as a regular object instead of Map
+      const placesToVisitObj = {};
+      places.forEach((place, index) => {
+        const dayKey = `Day ${Math.floor(index / 2) + 1} - ${
           index % 2 === 0 ? "Morning" : "Afternoon"
-        }`,
-        {
+        }`;
+        placesToVisitObj[dayKey] = {
           time: index % 2 === 0 ? "Morning" : "Afternoon",
           name: place,
           details: itineraryResponse,
+        };
+      });
+      
+      initialTrip.placesToVisit = placesToVisitObj;
+    } catch (error) {
+      console.log("Places fetch error:", error.message);
+      initialTrip.placesToVisit = {
+        "Day 1 - Morning": {
+          time: "Morning",
+          name: `${destination} City Tour`,
+          details: `Explore the main attractions of ${destination}`
         }
-      );
-    });
+      };
+    }
 
+    console.log("Creating trip in database...");
     const newTrip = await Trip.create(initialTrip);
-    res.status(201).json(newTrip);
+    console.log("Trip created successfully:", newTrip._id);
+    
+    res.status(201).json({
+      success: true,
+      trip: newTrip
+    });
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ message: "Internal Server Error" });
+    console.error("Trip creation error:", error);
+    res.status(500).json({ 
+      message: "Internal Server Error", 
+      error: error.message 
+    });
   }
 };
 
