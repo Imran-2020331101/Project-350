@@ -4,19 +4,19 @@ import travel_bg from '/travel_bg2.mp4'
 
 const Welcome = () => {
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center py-12 overflow-hidden">
+    <div className="relative w-screen min-h-screen flex items-center justify-center  overflow-hidden">
       
       {/* Background Video */}
-<video
-  src={travel_bg}
-  autoPlay
-  loop
-  muted
-  playsInline
-  className="absolute top-0 left-0 w-full h-full object-cover z-9"
->
-  Your browser does not support the video tag.
-</video>
+      <video
+        src={travel_bg}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover z-9"
+      >
+        Your browser does not support the video tag.
+      </video>
 
 
       {/* Overlay content */}

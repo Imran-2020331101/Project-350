@@ -2,6 +2,26 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 /* global process */
+
+export const createBlog = createAsyncThunk(
+  "groups/createBlog",
+  async (blogData, { rejectWithValue }) => {
+    try {
+      console.log('Blog Data in thunk : ', blogData);
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_BACKEND_ADDRESS}/groups`,
+        blogData
+      );
+      return data;
+    } catch (error) {
+      console.log("Error creating Group:", error);
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to cancel booking"
+      );
+    }
+  }
+);
+
 export const fetchBlogs = createAsyncThunk("blogs/fetchPublic", async () => {
   const { data } = await axios.get(
     `${process.env.REACT_APP_BACKEND_ADDRESS}/blogs`

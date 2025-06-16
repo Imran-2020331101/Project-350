@@ -39,7 +39,6 @@ const Home = () => {
   } 
   if (blogStatus === 'failed') return <div className="text-red-500">{blogError}</div>;
 
-  console.log(groups)
 
   const getRandomBlogs = (blogs, count = 5) => {
     const shuffled = [...blogs].sort(() => 0.5 - Math.random());

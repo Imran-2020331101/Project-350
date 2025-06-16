@@ -62,7 +62,6 @@ export const createGroup = createAsyncThunk(
   "groups/createGroup",
   async (groupData, { rejectWithValue }) => {
     try {
-      console.log('Group Data in thunk : ', groupData);
       const { data } = await axios.post(
         `${process.env.REACT_APP_BACKEND_ADDRESS}/groups`,
         groupData
