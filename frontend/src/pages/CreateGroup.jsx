@@ -27,7 +27,7 @@ const CreateGroup = () => {
     availableSpots: '',
     expectedCost: '',
     startingPointOfGroup: '',
-    image: '',
+    images: [],
     tripId: '',
     owner: _id
   });
@@ -42,7 +42,7 @@ const CreateGroup = () => {
         place: tripFromState.destination,
         days: Object.keys(tripFromState.placesToVisit).length,
         about: tripFromState.description,
-        image: `https://source.unsplash.com/featured/?${tripFromState.destination}`,
+        images: [`https://source.unsplash.com/featured/?${tripFromState.destination}`],
       }));
       setIsLoading(false);
 
@@ -261,7 +261,7 @@ const CreateGroup = () => {
               id="image"
               name="image"
               placeholder="Paste image URL here"
-              value={groupData.image}
+              value={groupData.images[0]}
               onChange={handleChange}
               required
               className="w-full p-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"

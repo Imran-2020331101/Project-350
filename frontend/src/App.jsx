@@ -19,6 +19,7 @@ import SubscriptionPlans from './pages/SubscriptionPlans'
 import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/Auth/ProtectedRoute'
 import Translator from './pages/Translator'
+import EmergencyAssistance from './components/EmergencyAssistance'
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
         <Route path='group/new' element={<CreateGroup/>}/>
         <Route path='group/:id' element={<PackageDetail/>}/>
         <Route path='translate' element={<Translator/>}/>
+        <Route path='emergency' element={<EmergencyAssistance/>}/>
         <Route path='blogs/new' element={<CreateBlog/>}/>
         <Route path='blogs' element={<AllBlogs/>}/>
         <Route path='blogs/:_id' element={<Blog/>}/>

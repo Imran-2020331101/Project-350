@@ -109,7 +109,7 @@ const PackageDetail = () => {
     <div className="bg-[#111827] min-h-screen pt-12 text-white w-full">
       {/* Hero Section */}
       <div className="relative mx-[12%] h-96 overflow-hidden rounded-xl shadow-lg mb-8">
-        <img src={images[0]} alt={title} className="w-full h-full object-cover transition-transform duration-500 transform scale-100 hover:scale-105" />
+        <img src={images && images[0]} alt={title} className="w-full h-full object-cover transition-transform duration-500 transform scale-100 hover:scale-105" />
         <div className="absolute inset-0 bg-black opacity-40"></div>
         <div className="absolute bottom-6 left-6 text-white">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">{title}</h1>

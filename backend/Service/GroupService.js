@@ -5,7 +5,7 @@ const createGroup = async (req, res) => {
     const {
       expectedCost,
       place,
-      image,
+      images,
       startDate,
       endDate,
       activities,
@@ -30,7 +30,7 @@ const createGroup = async (req, res) => {
       !startDate ||
       !endDate ||
       !expectedCost ||
-      !image
+      !images
     ) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -53,7 +53,7 @@ const createGroup = async (req, res) => {
       activities: activities ? activities.split(",").map(activity => activity.trim()) : [],
       expectedCost: parseFloat(expectedCost),
       startingPointOfGroup,
-      image,
+      images,
       owner,
       participants: [owner],
       availableSpots: parseInt(availableSpots),

@@ -35,9 +35,25 @@ const {
   deleteTrip,
 } = require("./Service/TripService");
 
-const { createGroup, getAllGroups, joinGroup } = require("./Service/GroupService");
-const { uploadImage, getPhotos } = require("./Service/ImageService");
-const {translateText} = require("./Service/TranslateService");
+const {
+  createGroup,
+  getAllGroups,
+  joinGroup,
+} = require("./Service/GroupService");
+const {
+  uploadImage,
+  getPhotos,
+  uploadProfilePicture,
+} = require("./Service/ImageService");
+const { translateText } = require("./Service/TranslateService");
+const {
+  getEmergencyContacts,
+  getContactTypes,
+  addEmergencyContact,
+  searchEmergencyContacts,
+  updateEmergencyContact,
+  deleteEmergencyContact,
+} = require("./Service/EmergencyService");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -80,17 +96,27 @@ app.post("/api/auth/logout", handleLogout);
 app.post("/api/auth/profile/update", handleProfileUpdate);
 app.post("/api/auth/refresh", refreshToken);
 
-
 app.route("/api/groups").post(createGroup).get(getAllGroups);
 app.route("/api/groups/:id/join").post(joinGroup);
 app.route("/api/groups/:id/cancel").post(joinGroup); // Reusing joinGroup for cancellation
 
-
 app.post("/api/upload-image", upload.array("images"), uploadImage);
-app.get("/api/photos/:id",getPhotos);
+app.post(
+  "/api/upload-image/profile",
+  upload.array("images"),
+  uploadProfilePicture
+);
+app.get("/api/photos/:id", getPhotos);
 
-app.post("/api/translate",translateText);
+app.post("/api/translate", translateText);
 
+// Emergency assistance routes
+app.get("/api/emergency/types", getContactTypes);
+app.get("/api/emergency/search", searchEmergencyContacts);
+app.get("/api/emergency/:location", getEmergencyContacts);
+app.post("/api/emergency", addEmergencyContact);
+app.put("/api/emergency/:id", updateEmergencyContact);
+app.delete("/api/emergency/:id", deleteEmergencyContact);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
