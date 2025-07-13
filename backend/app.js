@@ -55,6 +55,8 @@ const {
   deleteEmergencyContact,
 } = require("./Service/EmergencyService");
 
+const ExpenseService = require("./Service/ExpenseService");
+
 const app = express();
 const port = process.env.PORT || 3000;
 const upload = multer();
@@ -117,6 +119,122 @@ app.get("/api/emergency/:location", getEmergencyContacts);
 app.post("/api/emergency", addEmergencyContact);
 app.put("/api/emergency/:id", updateEmergencyContact);
 app.delete("/api/emergency/:id", deleteEmergencyContact);
+
+// Expense tracking routes
+app.get("/api/expenses/categories", async (req, res) => {
+  const result = await ExpenseService.getExpenseCategories();
+  res.status(200).json(result);
+});
+
+app.get("/api/expenses/summary", verifyJWT, async (req, res) => {
+  const { userID } = req.user;
+  const { startDate, endDate, tripID } = req.query;
+
+  const result = await ExpenseService.getExpenseSummary(userID, {
+    startDate,
+    endDate,
+    tripID,
+  });
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+app.get("/api/expenses/search", verifyJWT, async (req, res) => {
+  const { userID } = req.user;
+  const { q: searchTerm, page, limit } = req.query;
+
+  if (!searchTerm) {
+    return res.status(400).json({
+      success: false,
+      message: "Search term is required",
+    });
+  }
+
+  const result = await ExpenseService.searchExpenses(userID, searchTerm, {
+    page,
+    limit,
+  });
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+app.get("/api/expenses", verifyJWT, async (req, res) => {
+  const { userID } = req.user;
+  const filters = req.query;
+
+  const result = await ExpenseService.getUserExpenses(userID, filters);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+app.get("/api/expenses/:expenseID", verifyJWT, async (req, res) => {
+  const { userID } = req.user;
+  const { expenseID } = req.params;
+
+  const result = await ExpenseService.getExpenseById(expenseID, userID);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(404).json(result);
+  }
+});
+
+app.post("/api/expenses", verifyJWT, async (req, res) => {
+  const { userID } = req.user;
+  const expenseData = req.body;
+
+  const result = await ExpenseService.addExpense(userID, expenseData);
+
+  if (result.success) {
+    res.status(201).json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+app.put("/api/expenses/:expenseID", verifyJWT, async (req, res) => {
+  const { userID } = req.user;
+  const { expenseID } = req.params;
+  const updateData = req.body;
+
+  const result = await ExpenseService.updateExpense(
+    expenseID,
+    userID,
+    updateData
+  );
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+app.delete("/api/expenses/:expenseID", verifyJWT, async (req, res) => {
+  const { userID } = req.user;
+  const { expenseID } = req.params;
+
+  const result = await ExpenseService.deleteExpense(expenseID, userID);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
 
 // Global Error Handler
 app.use((err, req, res, next) => {
