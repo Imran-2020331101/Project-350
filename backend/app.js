@@ -126,7 +126,7 @@ app.get("/api/expenses/categories", async (req, res) => {
   res.status(200).json(result);
 });
 
-app.get("/api/expenses/summary", verifyJWT, async (req, res) => {
+app.get("/api/expenses/summary", async (req, res) => {
   const { userID } = req.user;
   const { startDate, endDate, tripID } = req.query;
 
@@ -143,7 +143,7 @@ app.get("/api/expenses/summary", verifyJWT, async (req, res) => {
   }
 });
 
-app.get("/api/expenses/search", verifyJWT, async (req, res) => {
+app.get("/api/expenses/search", async (req, res) => {
   const { userID } = req.user;
   const { q: searchTerm, page, limit } = req.query;
 
@@ -166,7 +166,7 @@ app.get("/api/expenses/search", verifyJWT, async (req, res) => {
   }
 });
 
-app.get("/api/expenses", verifyJWT, async (req, res) => {
+app.get("/api/expenses", async (req, res) => {
   const { userID } = req.user;
   const filters = req.query;
 
@@ -179,7 +179,7 @@ app.get("/api/expenses", verifyJWT, async (req, res) => {
   }
 });
 
-app.get("/api/expenses/:expenseID", verifyJWT, async (req, res) => {
+app.get("/api/expenses/:expenseID", async (req, res) => {
   const { userID } = req.user;
   const { expenseID } = req.params;
 
@@ -192,7 +192,7 @@ app.get("/api/expenses/:expenseID", verifyJWT, async (req, res) => {
   }
 });
 
-app.post("/api/expenses", verifyJWT, async (req, res) => {
+app.post("/api/expenses", async (req, res) => {
   const { userID } = req.user;
   const expenseData = req.body;
 
@@ -205,7 +205,7 @@ app.post("/api/expenses", verifyJWT, async (req, res) => {
   }
 });
 
-app.put("/api/expenses/:expenseID", verifyJWT, async (req, res) => {
+app.put("/api/expenses/:expenseID", async (req, res) => {
   const { userID } = req.user;
   const { expenseID } = req.params;
   const updateData = req.body;
@@ -223,7 +223,7 @@ app.put("/api/expenses/:expenseID", verifyJWT, async (req, res) => {
   }
 });
 
-app.delete("/api/expenses/:expenseID", verifyJWT, async (req, res) => {
+app.delete("/api/expenses/:expenseID", async (req, res) => {
   const { userID } = req.user;
   const { expenseID } = req.params;
 

@@ -1,95 +1,206 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "My API",
-    "description": "Auto-generated docs",
-    "version": "1.0.0"
+    "title": "Project-350 Travel Assistant API",
+    "description": "Comprehensive API documentation for the AI-powered travel assistant platform",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Project-350 Team",
+      "email": "support@project350.com"
+    }
   },
   "host": "localhost:3000",
   "basePath": "/",
   "schemes": [
     "http"
   ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT Bearer token. Format: Bearer {token}"
+    }
+  },
   "paths": {
+    "/api/trips": {
+      "post": {
+        "tags": ["Trips"],
+        "summary": "Create a new trip",
+        "description": "Create a new travel itinerary with AI-generated suggestions",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["destination", "duration", "budget"],
+              "properties": {
+                "destination": {
+                  "type": "string",
+                  "example": "Cox's Bazar, Bangladesh"
+                },
+                "duration": {
+                  "type": "integer",
+                  "example": 3,
+                  "description": "Duration in days"
+                },
+                "budget": {
+                  "type": "number",
+                  "example": 500,
+                  "description": "Budget in USD"
+                },
+                "preferences": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "example": ["beach", "adventure", "culture"]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Trip created successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "trip": {"$ref": "#/definitions/Trip"}
+              }
+            }
+          },
+          "400": {"description": "Bad Request - Invalid input"},
+          "401": {"description": "Unauthorized"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
     "/api/trips/{id}": {
       "get": {
         "tags": ["Trips"],
-        "description": "",
-                "parameters": [
+        "summary": "Get trip by ID",
+        "description": "Retrieve a specific trip with all details",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string",
+            "description": "Trip ID"
           }
-        ],  
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
-      "post": {
-        "tags": ["Trips"],
-        "description": "",
+        ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Trip retrieved successfully",
+            "schema": {"$ref": "#/definitions/Trip"}
           },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "404": {"description": "Trip not found"},
+          "401": {"description": "Unauthorized"}
         }
-      }
-    },
+      },
       "delete": {
-      "tags": ["Trips"],
-      "summary": "Delete a trip",
-      "description": "Deletes a specific trip based on the provided ID",
-      "parameters": [
-        {
-          "name": "tripId",
-          "in": "query",
-          "required": true,
-          "description": "The ID of the trip to delete",
-          "schema": {
-            "type": "string"
+        "tags": ["Trips"],
+        "summary": "Delete a trip",
+        "description": "Delete a specific trip by ID",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Trip ID to delete"
           }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Trip deleted successfully"
-        },
-        "400": {
-          "description": "Bad Request - Missing or invalid trip ID"
-        },
-        "404": {
-          "description": "Trip not found"
-        },
-        "500": {
-          "description": "Internal Server Error"
+        ],
+        "responses": {
+          "200": {"description": "Trip deleted successfully"},
+          "404": {"description": "Trip not found"},
+          "401": {"description": "Unauthorized"},
+          "500": {"description": "Internal Server Error"}
         }
       }
     },
     "/api/blogs": {
       "get": {
         "tags": ["Blogs"],
-        "description": "",
+        "summary": "Get all blogs",
+        "description": "Retrieve all travel blogs with pagination",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of blogs per page"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Blogs retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "blogs": {
+                  "type": "array",
+                  "items": {"$ref": "#/definitions/Blog"}
+                },
+                "pagination": {"$ref": "#/definitions/Pagination"}
+              }
+            }
           }
         }
       },
       "post": {
         "tags": ["Blogs"],
-        "description": "",
+        "summary": "Create a blog",
+        "description": "Create a new travel blog from trip experience",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["tripId"],
+              "properties": {
+                "tripId": {
+                  "type": "string",
+                  "example": "trip_123456"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "Amazing Adventure in Cox's Bazar"
+                },
+                "content": {
+                  "type": "string",
+                  "example": "Custom content for the blog..."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {"description": "Blog created successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "500": {"description": "Internal Server Error"}
+        }
+      },
+      "put": {
+        "tags": ["Blogs"],
+        "summary": "Update a blog",
+        "description": "Update an existing blog",
+        "security": [{"bearerAuth": []}],
         "parameters": [
           {
             "name": "body",
@@ -97,91 +208,168 @@
             "schema": {
               "type": "object",
               "properties": {
-                "tripId": {
-                  "example": "any"
-                }
+                "blogId": {"type": "string"},
+                "title": {"type": "string"},
+                "content": {"type": "string"}
               }
             }
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "put": {
-        "tags": ["Blogs"],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "200": {"description": "Blog updated successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "403": {"description": "Forbidden"},
+          "404": {"description": "Blog not found"}
         }
       }
     },
     "/api/blogs/{id}": {
       "delete": {
         "tags": ["Blogs"],
-        "description": "",
+        "summary": "Delete a blog",
+        "description": "Delete a specific blog by ID",
+        "security": [{"bearerAuth": []}],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Blog ID"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "200": {"description": "Blog deleted successfully"},
+          "401": {"description": "Unauthorized"},
+          "403": {"description": "Forbidden"},
+          "404": {"description": "Blog not found"}
+        }
+      }
+    },
+    "/api/blogs/{id}/comments": {
+      "post": {
+        "tags": ["Blogs"],
+        "summary": "Add comment to blog",
+        "description": "Add a comment to a specific blog",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Blog ID"
           },
-          "400": {
-            "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": ["comment"],
+              "properties": {
+                "comment": {
+                  "type": "string",
+                  "example": "Great travel experience!"
+                }
+              }
+            }
           }
+        ],
+        "responses": {
+          "201": {"description": "Comment added successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Blog not found"}
+        }
+      }
+    },
+    "/api/blogs/{blogId}/comments/{commentId}/replies": {
+      "post": {
+        "tags": ["Blogs"],
+        "summary": "Reply to comment",
+        "description": "Add a reply to a specific comment",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": ["reply"],
+              "properties": {
+                "reply": {
+                  "type": "string",
+                  "example": "Thank you for sharing!"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {"description": "Reply added successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"}
+        }
+      }
+    },
+    "/api/blogs/{id}/like": {
+      "post": {
+        "tags": ["Blogs"],
+        "summary": "Like a blog",
+        "description": "Like or unlike a blog post",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Blog ID"
+          }
+        ],
+        "responses": {
+          "200": {"description": "Like status updated"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Blog not found"}
         }
       }
     },
     "/api/auth/login": {
       "post": {
-        "tags": ["Auth"],
-        "description": "",
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Authenticate user and return JWT token",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
+              "required": ["email", "password"],
               "properties": {
                 "email": {
-                  "example": "imranbinazad777@gmail.com"
+                  "type": "string",
+                  "format": "email",
+                  "example": "user@example.com"
                 },
                 "password": {
-                  "example": "password"
+                  "type": "string",
+                  "format": "password",
+                  "example": "securepassword123"
                 }
               }
             }
@@ -189,24 +377,80 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "token": {"type": "string"},
+                "user": {"$ref": "#/definitions/User"}
+              }
+            }
           },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "400": {"description": "Bad Request - Missing credentials"},
+          "401": {"description": "Invalid credentials"},
+          "500": {"description": "Internal Server Error"}
         }
       }
     },
     "/api/auth/register": {
       "post": {
-        "tags": ["Auth"],
-        "description": "",
+        "tags": ["Authentication"],
+        "summary": "User registration",
+        "description": "Register a new user account",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["name", "email", "password"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "John Doe"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "example": "john@example.com"
+                },
+                "password": {
+                  "type": "string",
+                  "format": "password",
+                  "example": "securepassword123",
+                  "minLength": 6
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {"description": "User registered successfully"},
+          "400": {"description": "Bad Request - Invalid input"},
+          "409": {"description": "User already exists"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User logout",
+        "description": "Logout user and invalidate token",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {"description": "Logout successful"}
+        }
+      }
+    },
+    "/api/auth/profile/update": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Update user profile",
+        "description": "Update user profile information",
+        "security": [{"bearerAuth": []}],
         "parameters": [
           {
             "name": "body",
@@ -214,154 +458,910 @@
             "schema": {
               "type": "object",
               "properties": {
-                "name": {
-                  "example": "any"
+                "name": {"type": "string", "example": "John Doe"},
+                "username": {"type": "string", "example": "johndoe"},
+                "bio": {"type": "string", "example": "Travel enthusiast"},
+                "location": {"type": "string", "example": "New York, USA"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {"description": "Profile updated successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "User not found"}
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh JWT token",
+        "description": "Get a new access token using refresh token",
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "accessToken": {"type": "string"}
+              }
+            }
+          },
+          "401": {"description": "Invalid refresh token"}
+        }
+      }
+    },
+    "/api/groups": {
+      "get": {
+        "tags": ["Groups"],
+        "summary": "Get all travel groups",
+        "description": "Retrieve all available travel groups",
+        "responses": {
+          "200": {
+            "description": "Groups retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/Group"}
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Groups"],
+        "summary": "Create a travel group",
+        "description": "Create a new travel group for an existing trip",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["tripId", "groupName", "gatheringPoint", "availableSpots"],
+              "properties": {
+                "tripId": {
+                  "type": "string",
+                  "example": "6659c97b3f3a123456789012"
                 },
-                "email": {
-                  "example": "any"
+                "groupName": {
+                  "type": "string",
+                  "example": "Adventure Seekers"
                 },
-                "password": {
-                  "example": "any"
+                "gatheringPoint": {
+                  "type": "string",
+                  "example": "Dhaka Airport Terminal 1"
+                },
+                "availableSpots": {
+                  "type": "integer",
+                  "example": 5,
+                  "minimum": 1
                 }
               }
             }
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "409": {
-            "description": "Conflict"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "201": {"description": "Group created successfully"},
+          "400": {"description": "Bad Request - Invalid input"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Trip not found"},
+          "500": {"description": "Internal Server Error"}
         }
       }
     },
-    "/api/auth/logout": {
+    "/api/groups/{id}/join": {
       "post": {
-        "tags": ["Auth"],
-        "description": "",
+        "tags": ["Groups"],
+        "summary": "Join a travel group",
+        "description": "Join an existing travel group",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Group ID"
+          }
+        ],
+        "responses": {
+          "200": {"description": "Successfully joined group"},
+          "400": {"description": "Group is full or user already joined"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Group not found"}
+        }
+      }
+    },
+    "/api/groups/{id}/cancel": {
+      "post": {
+        "tags": ["Groups"],
+        "summary": "Cancel group membership",
+        "description": "Leave a travel group",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Group ID"
+          }
+        ],
+        "responses": {
+          "200": {"description": "Successfully left group"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Group not found"}
+        }
+      }
+    },
+    "/api/upload-image": {
+      "post": {
+        "tags": ["Media"],
+        "summary": "Upload images",
+        "description": "Upload multiple images to cloud storage",
+        "security": [{"bearerAuth": []}],
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "images",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Image files to upload"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Images uploaded successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "urls": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                }
+              }
+            }
+          },
+          "400": {"description": "Bad Request - No files uploaded"},
+          "401": {"description": "Unauthorized"}
+        }
+      }
+    },
+    "/api/upload-profile-picture": {
+      "post": {
+        "tags": ["Media"],
+        "summary": "Upload profile picture",
+        "description": "Upload user profile picture",
+        "security": [{"bearerAuth": []}],
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "profilePicture",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Profile picture file"
+          }
+        ],
+        "responses": {
+          "200": {"description": "Profile picture updated successfully"},
+          "401": {"description": "Unauthorized"}
+        }
+      }
+    },
+    "/api/photos/{id}": {
+      "get": {
+        "tags": ["Media"],
+        "summary": "Get trip photos",
+        "description": "Retrieve photos for a specific trip",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Trip ID"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK"
-          }
+            "description": "Photos retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "photos": {
+                  "type": "array",
+                  "items": {"$ref": "#/definitions/Photo"}
+                }
+              }
+            }
+          },
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Trip not found"}
         }
       }
     },
-    "/api/auth/profile/update": {
+    "/api/translate": {
       "post": {
-        "tags": ["Auth"],
-        "description": "",
+        "tags": ["Translation"],
+        "summary": "Translate text",
+        "description": "Translate text between languages using MyMemory API",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "example": {
-                "name": "Imran Bin Azad",
-                "username": "imran_travels",
-                "bio": "Travel lover"
+              "required": ["text", "sourceLang", "targetLang"],
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "example": "Hello, how are you?"
+                },
+                "sourceLang": {
+                  "type": "string",
+                  "example": "en",
+                  "description": "Source language code (ISO 639-1)"
+                },
+                "targetLang": {
+                  "type": "string",
+                  "example": "bn",
+                  "description": "Target language code (ISO 639-1)"
+                }
               }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Translation successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "translatedText": {"type": "string"},
+                "sourceLang": {"type": "string"},
+                "targetLang": {"type": "string"}
+              }
+            }
           },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
+          "400": {"description": "Bad Request - Missing parameters"},
+          "500": {"description": "Translation service error"}
         }
       }
     },
-    "/api/groups": {
+    "/api/emergency/types": {
       "get": {
-        "tags":["Group"],
-        "description": "",
+        "tags": ["Emergency"],
+        "summary": "Get emergency contact types",
+        "description": "Retrieve all available emergency contact types",
         "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
-  "post": {
-    "tags": ["Group"],
-    "description": "Creates a new travel group for an existing trip.",
-    "parameters": [
-      {
-        "name": "body",
-        "in": "body",
-        "schema": {
-          "type": "object",
-          "required": ["tripId", "groupName", "gatheringPoint", "availableSpots"],
-          "properties": {
-            "tripId": {
-              "type": "string",
-              "example": "6659c97b3f3a123456789012"
-            },
-            "groupName": {
-              "type": "string",
-              "example": "Adventurers from Yangon"
-            },
-            "gatheringPoint": {
-              "type": "string",
-              "example": "Yangon Central Station"
-            },
-            "availableSpots": {
-              "type": "integer",
-              "example": 4
+          "200": {
+            "description": "Contact types retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "types": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "example": ["police", "fire", "medical", "coast_guard", "embassy", "tourist_helpline"]
+                }
+              }
             }
           }
         }
       }
-    ],
-    "responses": {
-      "201": {
-        "description": "Group created successfully"
-      },
-      "400": {
-        "description": "Bad Request - Missing or invalid fields"
-      },
-      "404": {
-        "description": "Trip not found"
-      },
-      "500": {
-        "description": "Internal Server Error"
-      }
-    }
-  }
     },
-    "/api/upload-image": {
-      "post": {
-        "description": "",
+    "/api/emergency/search": {
+      "get": {
+        "tags": ["Emergency"],
+        "summary": "Search emergency contacts",
+        "description": "Search emergency contacts with filters",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "type": "string",
+            "description": "Location to search"
+          },
+          {
+            "name": "contactType",
+            "in": "query",
+            "type": "string",
+            "description": "Type of emergency contact"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "type": "string",
+            "description": "Search by contact name"
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Search results",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "contacts": {
+                  "type": "array",
+                  "items": {"$ref": "#/definitions/EmergencyContact"}
+                }
+              }
+            }
           }
         }
+      }
+    },
+    "/api/emergency/{location}": {
+      "get": {
+        "tags": ["Emergency"],
+        "summary": "Get emergency contacts by location",
+        "description": "Retrieve emergency contacts for a specific location",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Location name (city or country)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Emergency contacts retrieved",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "contacts": {
+                  "type": "array",
+                  "items": {"$ref": "#/definitions/EmergencyContact"}
+                }
+              }
+            }
+          },
+          "404": {"description": "No contacts found for location"}
+        }
+      }
+    },
+    "/api/emergency": {
+      "post": {
+        "tags": ["Emergency"],
+        "summary": "Add emergency contact",
+        "description": "Add a new emergency contact (Admin only)",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["location", "contactType", "name", "phoneNumber"],
+              "properties": {
+                "location": {"type": "string", "example": "Dhaka, Bangladesh"},
+                "contactType": {"type": "string", "example": "police"},
+                "name": {"type": "string", "example": "Dhaka Metropolitan Police"},
+                "phoneNumber": {"type": "string", "example": "999"},
+                "address": {"type": "string", "example": "Police Headquarters, Ramna"},
+                "description": {"type": "string", "example": "Emergency police services"},
+                "priority": {"type": "integer", "example": 1, "minimum": 1, "maximum": 3}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {"description": "Emergency contact added successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "403": {"description": "Admin access required"}
+        }
+      }
+    },
+    "/api/emergency/{id}": {
+      "put": {
+        "tags": ["Emergency"],
+        "summary": "Update emergency contact",
+        "description": "Update an existing emergency contact (Admin only)",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Emergency contact ID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "phoneNumber": {"type": "string"},
+                "address": {"type": "string"},
+                "description": {"type": "string"},
+                "priority": {"type": "integer"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {"description": "Emergency contact updated successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "403": {"description": "Admin access required"},
+          "404": {"description": "Contact not found"}
+        }
+      },
+      "delete": {
+        "tags": ["Emergency"],
+        "summary": "Delete emergency contact",
+        "description": "Delete an emergency contact (Admin only)",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Emergency contact ID"
+          }
+        ],
+        "responses": {
+          "200": {"description": "Emergency contact deleted successfully"},
+          "401": {"description": "Unauthorized"},
+          "403": {"description": "Admin access required"},
+          "404": {"description": "Contact not found"}
+        }
+      }
+    },
+    "/api/expenses/categories": {
+      "get": {
+        "tags": ["Expenses"],
+        "summary": "Get expense categories",
+        "description": "Retrieve all available expense categories",
+        "responses": {
+          "200": {
+            "description": "Categories retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "categories": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "example": ["accommodation", "transportation", "food", "entertainment", "shopping"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/summary": {
+      "get": {
+        "tags": ["Expenses"],
+        "summary": "Get expense summary",
+        "description": "Get expense analytics and summary for user",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "type": "string",
+            "format": "date",
+            "description": "Start date for summary (YYYY-MM-DD)"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "type": "string",
+            "format": "date",
+            "description": "End date for summary (YYYY-MM-DD)"
+          },
+          {
+            "name": "tripID",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by specific trip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Summary retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "summary": {"$ref": "#/definitions/ExpenseSummary"}
+              }
+            }
+          },
+          "401": {"description": "Unauthorized"}
+        }
+      }
+    },
+    "/api/expenses/search": {
+      "get": {
+        "tags": ["Expenses"],
+        "summary": "Search expenses",
+        "description": "Search expenses by description, tags, or location",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Search term"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Results per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "expenses": {
+                  "type": "array",
+                  "items": {"$ref": "#/definitions/Expense"}
+                },
+                "totalResults": {"type": "integer"}
+              }
+            }
+          },
+          "400": {"description": "Search term required"},
+          "401": {"description": "Unauthorized"}
+        }
+      }
+    },
+    "/api/expenses": {
+      "get": {
+        "tags": ["Expenses"],
+        "summary": "Get user expenses",
+        "description": "Get user expenses with filtering and pagination",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by category"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "type": "string",
+            "format": "date",
+            "description": "Start date filter"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "type": "string",
+            "format": "date",
+            "description": "End date filter"
+          },
+          {
+            "name": "minAmount",
+            "in": "query",
+            "type": "number",
+            "description": "Minimum amount filter"
+          },
+          {
+            "name": "maxAmount",
+            "in": "query",
+            "type": "number",
+            "description": "Maximum amount filter"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Results per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expenses retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "expenses": {
+                  "type": "array",
+                  "items": {"$ref": "#/definitions/Expense"}
+                },
+                "pagination": {"$ref": "#/definitions/Pagination"}
+              }
+            }
+          },
+          "401": {"description": "Unauthorized"}
+        }
+      },
+      "post": {
+        "tags": ["Expenses"],
+        "summary": "Add expense",
+        "description": "Add a new expense entry",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["category", "amount", "description"],
+              "properties": {
+                "category": {"type": "string", "example": "food"},
+                "subcategory": {"type": "string", "example": "restaurant"},
+                "amount": {"type": "number", "example": 25.50},
+                "currency": {"type": "string", "example": "USD"},
+                "date": {"type": "string", "format": "date", "example": "2024-01-15"},
+                "description": {"type": "string", "example": "Lunch at local restaurant"},
+                "location": {"type": "string", "example": "Bangkok, Thailand"},
+                "paymentMethod": {"type": "string", "example": "card"},
+                "tags": {"type": "array", "items": {"type": "string"}},
+                "notes": {"type": "string", "example": "Great food!"},
+                "tripID": {"type": "string", "example": "trip_123"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {"description": "Expense added successfully"},
+          "400": {"description": "Bad Request - Invalid input"},
+          "401": {"description": "Unauthorized"}
+        }
+      }
+    },
+    "/api/expenses/{expenseID}": {
+      "get": {
+        "tags": ["Expenses"],
+        "summary": "Get expense by ID",
+        "description": "Retrieve a specific expense",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "expenseID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Expense ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expense retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "expense": {"$ref": "#/definitions/Expense"}
+              }
+            }
+          },
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Expense not found"}
+        }
+      },
+      "put": {
+        "tags": ["Expenses"],
+        "summary": "Update expense",
+        "description": "Update an existing expense",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "expenseID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Expense ID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "category": {"type": "string"},
+                "amount": {"type": "number"},
+                "description": {"type": "string"},
+                "location": {"type": "string"},
+                "notes": {"type": "string"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {"description": "Expense updated successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Expense not found"}
+        }
+      },
+      "delete": {
+        "tags": ["Expenses"],
+        "summary": "Delete expense",
+        "description": "Delete an expense entry",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "expenseID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Expense ID"
+          }
+        ],
+        "responses": {
+          "200": {"description": "Expense deleted successfully"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Expense not found"}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "userID": {"type": "string"},
+        "name": {"type": "string"},
+        "email": {"type": "string"},
+        "username": {"type": "string"},
+        "bio": {"type": "string"},
+        "profilePhoto": {"type": "string"},
+        "createdAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "Trip": {
+      "type": "object",
+      "properties": {
+        "tripID": {"type": "string"},
+        "userID": {"type": "string"},
+        "destination": {"type": "string"},
+        "duration": {"type": "integer"},
+        "budget": {"type": "number"},
+        "itinerary": {"type": "object"},
+        "preferences": {"type": "array", "items": {"type": "string"}},
+        "createdAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "Blog": {
+      "type": "object",
+      "properties": {
+        "blogID": {"type": "string"},
+        "userID": {"type": "string"},
+        "tripID": {"type": "string"},
+        "title": {"type": "string"},
+        "content": {"type": "string"},
+        "images": {"type": "array", "items": {"type": "string"}},
+        "likes": {"type": "integer"},
+        "comments": {"type": "array"},
+        "createdAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "Group": {
+      "type": "object",
+      "properties": {
+        "groupID": {"type": "string"},
+        "tripID": {"type": "string"},
+        "groupName": {"type": "string"},
+        "creatorID": {"type": "string"},
+        "gatheringPoint": {"type": "string"},
+        "availableSpots": {"type": "integer"},
+        "members": {"type": "array", "items": {"type": "string"}},
+        "createdAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "EmergencyContact": {
+      "type": "object",
+      "properties": {
+        "contactID": {"type": "string"},
+        "location": {"type": "string"},
+        "contactType": {"type": "string"},
+        "name": {"type": "string"},
+        "phoneNumber": {"type": "string"},
+        "address": {"type": "string"},
+        "description": {"type": "string"},
+        "priority": {"type": "integer"},
+        "isActive": {"type": "boolean"}
+      }
+    },
+    "Expense": {
+      "type": "object",
+      "properties": {
+        "expenseID": {"type": "string"},
+        "userID": {"type": "string"},
+        "tripID": {"type": "string"},
+        "category": {"type": "string"},
+        "subcategory": {"type": "string"},
+        "amount": {"type": "number"},
+        "currency": {"type": "string"},
+        "date": {"type": "string", "format": "date"},
+        "description": {"type": "string"},
+        "location": {"type": "string"},
+        "paymentMethod": {"type": "string"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "notes": {"type": "string"},
+        "createdAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "ExpenseSummary": {
+      "type": "object",
+      "properties": {
+        "overview": {
+          "type": "object",
+          "properties": {
+            "totalAmount": {"type": "number"},
+            "totalExpenses": {"type": "integer"},
+            "avgExpense": {"type": "number"},
+            "maxExpense": {"type": "number"}
+          }
+        },
+        "categoryBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {"type": "string"},
+              "totalAmount": {"type": "number"},
+              "count": {"type": "integer"}
+            }
+          }
+        }
+      }
+    },
+    "Photo": {
+      "type": "object",
+      "properties": {
+        "photoID": {"type": "string"},
+        "tripID": {"type": "string"},
+        "url": {"type": "string"},
+        "caption": {"type": "string"},
+        "uploadedAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "Pagination": {
+      "type": "object",
+      "properties": {
+        "currentPage": {"type": "integer"},
+        "totalPages": {"type": "integer"},
+        "totalItems": {"type": "integer"},
+        "hasNextPage": {"type": "boolean"},
+        "hasPrevPage": {"type": "boolean"}
       }
     }
   }
