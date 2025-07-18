@@ -493,6 +493,176 @@
         }
       }
     },
+    "/api/auth/send-verification-otp": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Send email verification OTP",
+        "description": "Send a verification OTP to user's email address",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["email"],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "example": "user@example.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "messageId": {"type": "string"}
+              }
+            }
+          },
+          "400": {"description": "Bad Request - Email required or already verified"},
+          "404": {"description": "User not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/auth/verify-email": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify email with OTP",
+        "description": "Verify user's email address using the OTP code",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["email", "otp"],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "example": "user@example.com"
+                },
+                "otp": {
+                  "type": "string",
+                  "pattern": "^[0-9]{6}$",
+                  "example": "123456",
+                  "description": "6-digit verification code"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email verified successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "user": {"$ref": "#/definitions/User"}
+              }
+            }
+          },
+          "400": {"description": "Bad Request - Invalid or expired OTP"},
+          "404": {"description": "User not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/auth/resend-verification-otp": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Resend verification OTP",
+        "description": "Resend verification OTP to user's email (with cooldown protection)",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["email"],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "example": "user@example.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP resent successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"}
+              }
+            }
+          },
+          "400": {"description": "Bad Request - Email already verified or cooldown active"},
+          "404": {"description": "User not found"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
+    "/api/auth/otp-status": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Check OTP status",
+        "description": "Check if user has a pending OTP and get status information",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "format": "email",
+            "description": "User's email address"
+          },
+          {
+            "name": "purpose",
+            "in": "query",
+            "type": "string",
+            "default": "registration",
+            "enum": ["registration", "password_reset", "email_verification", "login_verification"],
+            "description": "Purpose of the OTP"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP status retrieved",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {"type": "boolean"},
+                "hasPendingOTP": {"type": "boolean"},
+                "timeLeft": {"type": "integer", "description": "Minutes remaining before expiry"},
+                "attempts": {"type": "integer"},
+                "maxAttempts": {"type": "integer"}
+              }
+            }
+          },
+          "400": {"description": "Bad Request - Email required"},
+          "500": {"description": "Internal Server Error"}
+        }
+      }
+    },
     "/api/groups": {
       "get": {
         "tags": ["Groups"],

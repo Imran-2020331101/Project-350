@@ -26,10 +26,23 @@ const Auth = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    const user = await dispatch(postUsers({ email, password })).unwrap();
+    await dispatch(postUsers({ email, password })).unwrap();
     toast.success('Logged in successfully! Redirecting to dashboard...');
   } catch (error) {
-    toast.error(`Login failed: ${error?.toString()}`);
+    // Check if error is related to email verification
+    if (error.toString().includes('Email not verified') || 
+        (typeof error === 'object' && error.emailVerificationRequired)) {
+      toast.warning('Please verify your email before logging in.');
+      // Redirect to email verification page
+      navigate('/verify-email', { 
+        state: { 
+          email: email,
+          message: 'Please verify your email to continue logging in.'
+        } 
+      });
+    } else {
+      toast.error(`Login failed: ${error?.toString()}`);
+    }
     console.error('Login error:', error);
   }
 };
@@ -98,7 +111,7 @@ const handleSubmit = async (e) => {
                                 Sign in
                             </button>
                             <p className="text-sm font-light text-gray-600">
-                                Don't have an account yet?{" "}
+                                Don&apos;t have an account yet?{" "}
                                 <p className="font-medium hover:underline cursor-pointer" onClick={() => navigate('/register')}>
                                     Sign up
                                 </p>

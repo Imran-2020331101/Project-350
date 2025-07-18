@@ -5,7 +5,16 @@ import axios from '../config/axiosConfig';
 const EmergencyAssistance = () => {
   const [location, setLocation] = useState('');
   const [emergencyContacts, setEmergencyContacts] = useState([]);
-  const [contactTypes, setContactTypes] = useState([]);
+  const [contactTypes, setContactTypes] = useState([
+    // Fallback contact types in case API fails
+    'police',
+    'fire', 
+    'medical',
+    'embassy',
+    'tourist_helpline',
+    'coast_guard',
+    'rescue'
+  ]);
   const [selectedType, setSelectedType] = useState('all');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -15,10 +24,24 @@ const EmergencyAssistance = () => {
   useEffect(() => {
     const fetchContactTypes = async () => {
       try {
+        console.log('Fetching contact types...');
         const response = await axios.get('/api/emergency/types');
-        setContactTypes(response.data.types);
-      } catch {
-        console.error('Error fetching contact types');
+        console.log('Contact types response:', response.data);
+        
+        if (response.data.success && response.data.types) {
+          // Extract just the values from the types array
+          const typeValues = response.data.types.map(type => 
+            typeof type === 'object' ? type.value : type
+          );
+          setContactTypes(typeValues);
+          console.log('Contact types updated from API:', typeValues);
+        } else {
+          console.warn('API response missing types, using fallback');
+        }
+      } catch (error) {
+        console.error('Error fetching contact types:', error);
+        console.log('Using fallback contact types due to API error');
+        // Keep the fallback contact types that were set in initial state
       }
     };
     fetchContactTypes();
@@ -126,20 +149,20 @@ const EmergencyAssistance = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white">
+    <div className="max-w-6xl mx-auto p-6 bg-gray-900">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center mb-4">
           <Shield className="h-12 w-12 text-red-600 mr-3" />
-          <h1 className="text-4xl font-bold text-gray-800">Emergency Assistance</h1>
+          <h1 className="text-4xl font-bold text-gray-200">Emergency Assistance</h1>
         </div>
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-200 text-lg">
           Get instant access to emergency contacts for your location
         </p>
       </div>
 
       {/* Search Form */}
-      <div className="bg-gray-50 rounded-lg p-6 mb-8">
+      <div className="bg-gray-900 rounded-lg p-6 mb-8">
         <form onSubmit={handleSearch} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Location Input */}
@@ -150,7 +173,7 @@ const EmergencyAssistance = () => {
                 placeholder="Enter city or country"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -159,7 +182,7 @@ const EmergencyAssistance = () => {
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Emergency Types</option>
                 {contactTypes.map((type) => (
@@ -178,7 +201,7 @@ const EmergencyAssistance = () => {
                 placeholder="Search by name"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -221,7 +244,7 @@ const EmergencyAssistance = () => {
       {/* Emergency Contacts Grid */}
       {emergencyContacts.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          <h2 className="text-2xl font-bold text-gray-200 mb-6">
             Emergency Contacts ({emergencyContacts.length} found)
           </h2>
           
@@ -229,7 +252,7 @@ const EmergencyAssistance = () => {
             {emergencyContacts.map((contact) => (
               <div
                 key={contact.contactID}
-                className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
+                className="bg-gray-900 border border-gray-600 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
               >
                 {/* Contact Header */}
                 <div className="flex items-start justify-between mb-4">
@@ -238,7 +261,7 @@ const EmergencyAssistance = () => {
                       {getContactIcon(contact.contactType)}
                     </span>
                     <div>
-                      <h3 className="font-bold text-lg text-gray-800">
+                      <h3 className="font-bold text-lg text-gray-200">
                         {contact.name}
                       </h3>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(contact.priority)}`}>
@@ -257,7 +280,7 @@ const EmergencyAssistance = () => {
 
                 {/* Phone Number */}
                 <div className="mb-3">
-                  <div className="flex items-center text-gray-700">
+                  <div className="flex items-center text-gray-200">
                     <Phone className="h-4 w-4 mr-2 text-green-600" />
                     <a
                       href={`tel:${contact.phoneNumber}`}
@@ -270,7 +293,7 @@ const EmergencyAssistance = () => {
 
                 {/* Location */}
                 <div className="mb-3">
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-gray-200">
                     <MapPin className="h-4 w-4 mr-2" />
                     <span className="text-sm">{contact.location}</span>
                   </div>
@@ -279,14 +302,14 @@ const EmergencyAssistance = () => {
                 {/* Address */}
                 {contact.address && (
                   <div className="mb-3">
-                    <p className="text-sm text-gray-600">{contact.address}</p>
+                    <p className="text-sm text-gray-200">{contact.address}</p>
                   </div>
                 )}
 
                 {/* Description */}
                 {contact.description && (
                   <div className="mb-4">
-                    <p className="text-sm text-gray-700">{contact.description}</p>
+                    <p className="text-sm text-gray-200">{contact.description}</p>
                   </div>
                 )}
 
@@ -319,22 +342,22 @@ const EmergencyAssistance = () => {
       {!loading && emergencyContacts.length === 0 && location && (
         <div className="text-center py-12">
           <AlertTriangle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">
+          <h3 className="text-xl font-semibold text-gray-200 mb-2">
             No Emergency Contacts Found
           </h3>
-          <p className="text-gray-500">
+          <p className="text-gray-200">
             Try searching for a different location or contact type.
           </p>
         </div>
       )}
 
       {/* Emergency Tips */}
-      <div className="mt-12 bg-blue-50 rounded-lg p-6">
-        <h3 className="text-xl font-bold text-blue-800 mb-4 flex items-center">
+      <div className="mt-12 bg-gray-900 rounded-lg p-6">
+        <h3 className="text-xl font-bold text-blue-400 mb-4 flex items-center">
           <Clock className="h-6 w-6 mr-2" />
           Emergency Tips
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-blue-700">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-200">
           <div>
             <h4 className="font-semibold mb-2">Before You Travel:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm">

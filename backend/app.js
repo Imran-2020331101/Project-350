@@ -11,6 +11,7 @@ const multer = require("multer");
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./config/swagger-output.json");
+const verifyJwt = require("./middleware/verifyJwt");
 
 // const { GoogleGenerativeAI } = require("@google/generative-ai"); // Uncomment and configure if using Gemini API
 const {
@@ -28,6 +29,10 @@ const {
   handleLogout,
   handleProfileUpdate,
   refreshToken,
+  sendVerificationOTP,
+  verifyEmailOTP,
+  resendVerificationOTP,
+  checkOTPStatus,
 } = require("./Service/AuthService");
 const {
   createTrip,
@@ -39,6 +44,23 @@ const {
   createGroup,
   getAllGroups,
   joinGroup,
+  // New group travel management functions
+  addOrganizer,
+  removeOrganizer,
+  addGroupExpense,
+  approveExpense,
+  getGroupExpenses,
+  createAttendanceCheck,
+  markAttendance,
+  getAttendanceReport,
+  createSOS,
+  respondToSOS,
+  getActiveSOS,
+  createAnnouncement,
+  markAnnouncementAsRead,
+  getGroupAnnouncements,
+  getGroupDashboard,
+  getGroupStatistics,
 } = require("./Service/GroupService");
 const {
   uploadImage,
@@ -98,9 +120,57 @@ app.post("/api/auth/logout", handleLogout);
 app.post("/api/auth/profile/update", handleProfileUpdate);
 app.post("/api/auth/refresh", refreshToken);
 
+// OTP verification routes
+app.post("/api/auth/send-verification-otp", sendVerificationOTP);
+app.post("/api/auth/verify-email", verifyEmailOTP);
+app.post("/api/auth/resend-verification-otp", resendVerificationOTP);
+app.get("/api/auth/otp-status", checkOTPStatus);
+
 app.route("/api/groups").post(createGroup).get(getAllGroups);
 app.route("/api/groups/:id/join").post(joinGroup);
 app.route("/api/groups/:id/cancel").post(joinGroup); // Reusing joinGroup for cancellation
+
+// Group Travel Management Routes
+app.post("/api/groups/:id/organizers", verifyJwt, addOrganizer);
+app.delete(
+  "/api/groups/:id/organizers/:organizerId",
+  verifyJwt,
+  removeOrganizer
+);
+app.get("/api/groups/:id/dashboard", verifyJwt, getGroupDashboard);
+app.get("/api/groups/:id/statistics", verifyJwt, getGroupStatistics);
+
+// Group Expense Management Routes
+app.post("/api/groups/:id/expenses", verifyJwt, addGroupExpense);
+app.get("/api/groups/:id/expenses", verifyJwt, getGroupExpenses);
+app.post(
+  "/api/groups/:id/expenses/:expenseId/approve",
+  verifyJwt,
+  approveExpense
+);
+
+// Group Attendance Management Routes
+app.post("/api/groups/:id/attendance", verifyJwt, createAttendanceCheck);
+app.post(
+  "/api/groups/:id/attendance/:attendanceId/mark",
+  verifyJwt,
+  markAttendance
+);
+app.get("/api/groups/:id/attendance/report", verifyJwt, getAttendanceReport);
+
+// Group SOS & Emergency Routes
+app.post("/api/groups/:id/sos", verifyJwt, createSOS);
+app.get("/api/groups/:id/sos", verifyJwt, getActiveSOS);
+app.post("/api/groups/:id/sos/:sosId/respond", verifyJwt, respondToSOS);
+
+// Group Announcements Routes
+app.post("/api/groups/:id/announcements", verifyJwt, createAnnouncement);
+app.get("/api/groups/:id/announcements", verifyJwt, getGroupAnnouncements);
+app.post(
+  "/api/groups/:id/announcements/:announcementId/read",
+  verifyJwt,
+  markAnnouncementAsRead
+);
 
 app.post("/api/upload-image", upload.array("images"), uploadImage);
 app.post(
@@ -126,7 +196,7 @@ app.get("/api/expenses/categories", async (req, res) => {
   res.status(200).json(result);
 });
 
-app.get("/api/expenses/summary", async (req, res) => {
+app.get("/api/expenses/summary", verifyJwt, async (req, res) => {
   const { userID } = req.user;
   const { startDate, endDate, tripID } = req.query;
 
@@ -143,7 +213,7 @@ app.get("/api/expenses/summary", async (req, res) => {
   }
 });
 
-app.get("/api/expenses/search", async (req, res) => {
+app.get("/api/expenses/search", verifyJwt, async (req, res) => {
   const { userID } = req.user;
   const { q: searchTerm, page, limit } = req.query;
 
@@ -166,7 +236,7 @@ app.get("/api/expenses/search", async (req, res) => {
   }
 });
 
-app.get("/api/expenses", async (req, res) => {
+app.get("/api/expenses", verifyJwt, async (req, res) => {
   const { userID } = req.user;
   const filters = req.query;
 
@@ -179,7 +249,7 @@ app.get("/api/expenses", async (req, res) => {
   }
 });
 
-app.get("/api/expenses/:expenseID", async (req, res) => {
+app.get("/api/expenses/:expenseID", verifyJwt, async (req, res) => {
   const { userID } = req.user;
   const { expenseID } = req.params;
 
@@ -192,7 +262,7 @@ app.get("/api/expenses/:expenseID", async (req, res) => {
   }
 });
 
-app.post("/api/expenses", async (req, res) => {
+app.post("/api/expenses", verifyJwt, async (req, res) => {
   const { userID } = req.user;
   const expenseData = req.body;
 
@@ -205,7 +275,7 @@ app.post("/api/expenses", async (req, res) => {
   }
 });
 
-app.put("/api/expenses/:expenseID", async (req, res) => {
+app.put("/api/expenses/:expenseID", verifyJwt, async (req, res) => {
   const { userID } = req.user;
   const { expenseID } = req.params;
   const updateData = req.body;
@@ -223,7 +293,7 @@ app.put("/api/expenses/:expenseID", async (req, res) => {
   }
 });
 
-app.delete("/api/expenses/:expenseID", async (req, res) => {
+app.delete("/api/expenses/:expenseID", verifyJwt, async (req, res) => {
   const { userID } = req.user;
   const { expenseID } = req.params;
 

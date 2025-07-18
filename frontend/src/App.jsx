@@ -21,6 +21,8 @@ import ProtectedRoute from './components/Auth/ProtectedRoute'
 import Translator from './pages/Translator'
 import EmergencyAssistance from './components/EmergencyAssistance'
 import ExpenseTracker from './components/ExpenseTracker'
+import EmailVerification from './components/EmailVerification'
+import GroupTravelDashboard from './components/GroupTravel/GroupTravelDashboard'
 
 function App() {
 
@@ -31,12 +33,18 @@ function App() {
         <Route index element={<Home/>}/>
         <Route path='login' element={<Login/>}/>
         <Route path='register' element={<Register/>}/>
+        <Route path='verify-email' element={<EmailVerification/>}/>
         <Route path='newtrip' element={<NewTrip/>}/>
         <Route path='upgrade' element={<SubscriptionPlans/>}/>
         <Route path='uploadimage' element={<ImageUpload/>}/>
         <Route path='logout' element={<Logout/>}/>
         <Route path='group/new' element={<CreateGroup/>}/>
         <Route path='group/:id' element={<PackageDetail/>}/>
+        <Route path='group/:id/dashboard' element={
+          <ProtectedRoute>
+            <GroupTravelDashboard/>
+          </ProtectedRoute>
+        }/>
         <Route path='translate' element={<Translator/>}/>
         <Route path='emergency' element={<EmergencyAssistance/>}/>
         <Route path='expenses' element={<ExpenseTracker/>}/>

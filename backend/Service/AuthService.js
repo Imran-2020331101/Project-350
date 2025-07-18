@@ -2,6 +2,8 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { generateAccessToken, generateRefreshToken } = require("../utils/token");
+const OTPService = require("./OTPService");
+const EmailService = require("./EmailService");
 require("dotenv").config();
 
 const handleLogin = async (req, res) => {
@@ -20,19 +22,31 @@ const handleLogin = async (req, res) => {
     if (!match)
       return res.status(401).json({ msg: "Invalid email or password" });
 
+    // Check if email is verified
+    if (!foundUser.isEmailVerified) {
+      return res.status(403).json({
+        msg: "Email not verified. Please verify your email to continue.",
+        emailVerificationRequired: true,
+        email: foundUser.email,
+      });
+    }
+
     const accessToken = generateAccessToken(foundUser);
     const refreshToken = generateRefreshToken(foundUser);
 
-    res.status(200).cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/auth/refresh-token'
-    }).json({
-      accessToken,
-      user: foundUser,
-    });
+    res
+      .status(200)
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: "/auth/refresh-token",
+      })
+      .json({
+        accessToken,
+        user: foundUser,
+      });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ msg: "Internal server error" });
@@ -48,6 +62,7 @@ const handleRegister = async (req, res) => {
         .status(400)
         .json({ message: "Name, email, and password are required." });
     }
+
     const duplicateUser = await User.findOne({ email: email });
     if (duplicateUser)
       return res.status(409).json({ message: "User already exists." });
@@ -58,11 +73,34 @@ const handleRegister = async (req, res) => {
       email: email,
       password: hashedPassword,
       role: "user",
+      isEmailVerified: false,
     });
 
-    res
-      .status(201)
-      .json({ message: "User registered successfully.", userEntity });
+    // Generate and send OTP for email verification
+    const otpResult = await OTPService.generateAndSendOTP(
+      email,
+      "registration"
+    );
+
+    if (!otpResult.success) {
+      // If OTP sending fails, we still create the user but inform about the issue
+      console.error("Failed to send verification OTP:", otpResult.message);
+      return res.status(201).json({
+        message:
+          "User registered successfully, but failed to send verification email. Please try to verify later.",
+        userEntity,
+        emailSent: false,
+        otpError: otpResult.message,
+      });
+    }
+
+    res.status(201).json({
+      message:
+        "User registered successfully. Please check your email for verification code.",
+      userEntity,
+      emailSent: true,
+      requiresEmailVerification: true,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
@@ -148,10 +186,175 @@ const refreshToken = (req, res) => {
   });
 };
 
+// New OTP-related functions
+const sendVerificationOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is already verified",
+      });
+    }
+
+    const result = await OTPService.generateAndSendOTP(email, "registration");
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  } catch (error) {
+    console.error("Send verification OTP error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const verifyEmailOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and OTP are required",
+      });
+    }
+
+    // Verify OTP
+    const result = await OTPService.verifyOTP(email, otp, "registration");
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    // Update user's email verification status
+    const user = await User.findOneAndUpdate(
+      { email },
+      {
+        isEmailVerified: true,
+        emailVerifiedAt: new Date(),
+      },
+      { new: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Send welcome email
+    EmailService.sendWelcomeEmail(email, user.name).catch(console.error);
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Verify email OTP error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const resendVerificationOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    // Check if user exists and is not verified
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is already verified",
+      });
+    }
+
+    const result = await OTPService.resendOTP(email, "registration");
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  } catch (error) {
+    console.error("Resend verification OTP error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const checkOTPStatus = async (req, res) => {
+  try {
+    const { email, purpose = "registration" } = req.query;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const result = await OTPService.checkOTPStatus(email, purpose);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Check OTP status error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   handleLogin,
   handleRegister,
   handleLogout,
   handleProfileUpdate,
   refreshToken,
+  sendVerificationOTP,
+  verifyEmailOTP,
+  resendVerificationOTP,
+  checkOTPStatus,
 };

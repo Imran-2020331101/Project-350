@@ -36,17 +36,42 @@ const Register = () => {
             return;
         }
         try {
-            await dispatch(registerUser({ name, email, password })).unwrap();
-            toast.success("Registration successful! Please log in to continue.");
-            // Clear form data
-            setFormData({
-                name: '',
-                email: '',
-                password: '',
-                confirmPassword: ''
-            });
-            // Redirect to login page
-            navigate('/login');
+            const result = await dispatch(registerUser({ name, email, password })).unwrap();
+            
+            // Check if the response indicates email verification is required
+            if (result.requiresEmailVerification && result.emailSent) {
+                toast.success("Registration successful! Please check your email for verification code.");
+                // Clear form data
+                setFormData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                });
+                // Redirect to email verification page
+                navigate('/verify-email', { state: { email } });
+            } else if (result.requiresEmailVerification && !result.emailSent) {
+                toast.warning("Registration successful but verification email failed to send. Please try to verify later.");
+                // Clear form data
+                setFormData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                });
+                // Still redirect to verification page in case user wants to resend
+                navigate('/verify-email', { state: { email } });
+            } else {
+                // Fallback to old behavior
+                toast.success("Registration successful! Please log in to continue.");
+                setFormData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                });
+                navigate('/login');
+            }
         } catch (err) {
             toast.error(`Registration failed: ${err}`);
             console.log("Error signing up : " + err);
